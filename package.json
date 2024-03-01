@@ -1,27 +1,46 @@
 {
   "name": "chat-system",
+  "type": "module",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@8.15.4",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "postinstall": "simple-git-hooks"
   },
   "dependencies": {
-    "react": "^18",
-    "react-dom": "^18",
-    "next": "14.1.0"
+    "next": "^14.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "typescript": "^5",
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "autoprefixer": "^10.0.1",
-    "postcss": "^8",
-    "tailwindcss": "^3.3.0",
-    "eslint": "^8",
-    "eslint-config-next": "14.1.0"
+    "@antfu/eslint-config": "^2.6.4",
+    "@eslint/eslintrc": "^3.0.2",
+    "@types/node": "^20.11.23",
+    "@types/react": "^18.2.61",
+    "@types/react-dom": "^18.2.19",
+    "autoprefixer": "^10.4.17",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^14.1.0",
+    "eslint-plugin-perfectionist": "^2.5.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "eslint-plugin-tailwindcss": "^3.14.3",
+    "lint-staged": "^15.2.2",
+    "postcss": "^8.4.35",
+    "simple-git-hooks": "^2.9.0",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.3.3"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm lint-staged"
+  },
+  "lint-staged": {
+    "*": "pnpm lint:fix"
   }
 }
