@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# IM 加密聊天系统
 
-## Getting Started
+## 1. 简介
 
-First, run the development server:
+## 2. 开始
+
+项目依赖：
+
+- Node.js >= 20.x
+- pnpm >= 8.x
+
+安装 `pnpm`：
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+corepack enable
+corepack prepare pnpm@latest --activate
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+安装依赖：
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm i
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+启动项目：
 
-## Learn More
+```bash
+pnpm dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+格式化代码：
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+pnpm lint
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+构建项目：
 
-## Deploy on Vercel
+```bash
+pnpm build
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+运行构建后的项目：
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+```bash
+pnpm start
+```
+
+## 3. 部署
+
+Docker 构建并运行：
+
+```bash
+docker build -t im-chat-system .
+
+docker run -d \
+  -p 3000:3000 \
+  --restart=always \
+  --name im-chat-system \
+  im-chat-system
+```
+
+Docker Compose 启动：
+
+```bash
+docker compose up -d
+```
+
+关闭 Docker Compose：
+
+```bash
+docker compose down
+```
