@@ -9,6 +9,7 @@ import {
   react,
   sortPackageJson,
   sortTsconfig,
+  stylistic,
   typescript,
   unicorn,
   yaml,
@@ -33,6 +34,7 @@ const config = [
     react(),
     sortPackageJson(),
     sortTsconfig(),
+    stylistic(),
     typescript(),
     unicorn(),
     yaml(),
@@ -45,10 +47,10 @@ const config = [
   perfectionistNatural,
   {
     rules: {
-      'quotes': ['error', 'single'],
-      'semi': ['error', 'never'],
-    }
-  }
+      quotes: ['error', 'single'],
+      semi: ['error', 'never'],
+    },
+  },
 ]
 
 export default config

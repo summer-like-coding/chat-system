@@ -1,16 +1,14 @@
-import './globals.css'
+import { AntdRegistry } from '@ant-design/nextjs-registry'
+import React from 'react'
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+function RootLayout({ children }: React.PropsWithChildren) {
   return (
-    <html lang="en">
+    <html>
       <body>
-        {/* Layout UI */}
-        <main>{children}</main>
+        <AntdRegistry>{children}</AntdRegistry>
       </body>
     </html>
   )
 }
+
+export default RootLayout

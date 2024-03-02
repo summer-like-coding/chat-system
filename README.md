@@ -22,6 +22,12 @@ corepack prepare pnpm@latest --activate
 pnpm i
 ```
 
+先准备配置开发环境：
+
+```bash
+cp .env.example .env
+```
+
 启动项目：
 
 ```bash

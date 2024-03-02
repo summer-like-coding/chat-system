@@ -13,11 +13,16 @@
     "postinstall": "simple-git-hooks"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.3.1",
+    "@ant-design/nextjs-registry": "^1.0.0",
     "@prisma/client": "^5.10.2",
+    "ahooks": "^3.7.10",
+    "antd": "^5.14.2",
     "next": "^14.1.0",
     "next-auth": "^4.24.6",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "zustand": "^4.5.2"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^2.6.4",
