@@ -1,6 +1,7 @@
 import {
   combine,
   comments,
+  formatters,
   ignores,
   javascript,
   jsdoc,
@@ -27,6 +28,7 @@ const config = [
   ...(await combine(
     comments(),
     ignores(),
+    formatters(),
     javascript(),
     jsdoc(),
     jsonc(),
@@ -43,6 +45,23 @@ const config = [
     extends: ['plugin:tailwindcss/recommended'],
     rules: {
     },
+  }),
+  ...compat.config({
+    overrides: [{
+      extends: ['plugin:markdownlint/recommended'],
+      files: ['*.md'],
+      parser: 'eslint-plugin-markdownlint/parser',
+      rules: {
+        // no-multiple-blanks
+        'markdownlint/md012': 'warn',
+        // line-length
+        'markdownlint/md013': 'off',
+        // blanks-around-fences
+        'markdownlint/md031': ['warn', {
+          list_items: false,
+        }],
+      },
+    }],
   }),
   perfectionistNatural,
   {

@@ -1,6 +1,17 @@
-# IM 加密聊天系统
+# 加密聊天
 
 ## 1. 简介
+
+一个支持端到端加密的 IM 系统，支持单聊、群聊。
+
+- [x] 🚀 React 18 + Next.js 14 + TypeScript
+- [x] ✨ UI 使用 [Ant Design](https://ant.design/) + [Tailwind CSS](https://tailwindcss.com/)
+- [x] 💡 使用 [Protobuf](https://github.com/protobufjs/protobuf.js/) 通信，并支持端到端加密
+- [x] 🥭 [Prisma](https://www.prisma.io/) + [MongoDB](https://www.mongodb.com/) 数据库
+- [x] 💾 [Zustand](https://github.com/pmndrs/zustand) 存储
+- [x] 🪝 随处可用的 [ahooks](https://ahooks.js.org/) 钩子
+- [x] 🎇 [ESLint Flat Config](https://eslint.org/docs/latest/use/configure/configuration-files-new) + 自动修复
+- [x] 📐 超简单的 [Git 钩子](https://github.com/toplenboren/simple-git-hooks)，规范提交代码
 
 ## 2. 开始
 
@@ -25,7 +36,7 @@ pnpm i
 先准备配置开发环境：
 
 ```bash
-cp .env.example .env
+cp .env.example .env.development
 ```
 
 启动项目：
@@ -40,6 +51,14 @@ pnpm dev
 pnpm lint
 ```
 
+## 3. 部署
+
+复制并配置环境变量：
+
+```bash
+cp .env.example .env.production
+```
+
 构建项目：
 
 ```bash
@@ -51,8 +70,6 @@ pnpm build
 ```bash
 pnpm start
 ```
-
-## 3. 部署
 
 Docker 构建并运行：
 
