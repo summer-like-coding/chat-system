@@ -1,0 +1,18 @@
+syntax = "proto3";
+package framework;
+
+message Message {
+    uint64 user_id = 1;
+    uint64 room_id = 2;
+    IMessageType type = 3;
+    string message = 4;
+    string mobile = 5;
+}
+
+enum IMessageType {
+    TEXT = 0;
+    IMAGE = 1;
+    VIDEO = 2;
+    AUDIO = 3;
+    FILE = 4;
+}
