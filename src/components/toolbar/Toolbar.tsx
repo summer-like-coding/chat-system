@@ -1,14 +1,22 @@
 /* eslint-disable tailwindcss/no-custom-classname */
+
 import { MessageOutlined, SettingOutlined } from '@ant-design/icons'
 import { Avatar, Badge } from 'antd'
+import { useRouter } from 'next/navigation'
 
 import './style.css'
 
 function ToolBar() {
+  const router = useRouter()
+  function checkLogin() {
+    // 跳转到登录页面
+    router.push('/login')
+  }
   return (
     <aside className="side-toolbar">
       <div className="tool-content">
         <Avatar
+          onClick={checkLogin}
           shape="square"
           size={32}
           style={{
