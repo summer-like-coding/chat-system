@@ -12,7 +12,8 @@ export default function LoginPassword() {
          w-full
          max-w-[800px]
          grid-cols-1 gap-4
-         rounded-lg bg-white shadow-xl
+         rounded-lg  bg-sky-100
+         shadow-xl
          md:grid-cols-2
          "
     >
@@ -27,11 +28,27 @@ export default function LoginPassword() {
         >
           <Form.Item
             label="邮箱"
+            required
+            rules={[
+              {
+                message: 'The input is not valid E-mail!',
+                type: 'email',
+              },
+              {
+                message: 'Please input your E-mail!',
+                required: true,
+              },
+            ]}
           >
             <Input placeholder="Email" type="email" />
           </Form.Item>
           <Form.Item
             label="密码"
+            required
+            rules={[{
+              message: 'Please input your password!',
+              required: true,
+            }]}
           >
             <Input placeholder="Password" type="password" />
           </Form.Item>
@@ -69,7 +86,7 @@ export default function LoginPassword() {
           title="注册"
         >
           <Form.Item
-            label="用户名"
+            label="用户"
           >
             <Input placeholder="User" type="text" />
           </Form.Item>

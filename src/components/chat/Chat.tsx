@@ -7,6 +7,7 @@ import './style.css'
 interface ChatProps {
   avatar: string
   content: string
+  id: string
   isMine: boolean
 }
 
@@ -48,18 +49,22 @@ export default function Chat() {
     setChatList([{
       avatar: 'https://api.dicebear.com/7.x/miniavs/svg?seed=1',
       content: '我是知识库机器人，一个专门响应人类指令的大模型',
+      id: '1',
       isMine: false,
     }, {
       avatar: 'https://api.dicebear.com/7.x/miniavs/svg?seed=2',
       content: '我服务于人类，致力于让生活更美好',
+      id: '2',
       isMine: false,
     }, {
       avatar: 'https://api.dicebear.com/7.x/miniavs/svg?seed=3',
       content: '我是知识库机器人，一个专门响应人类指令的大模型',
+      id: '3',
       isMine: false,
     }, {
       avatar: 'https://api.dicebear.com/7.x/miniavs/svg?seed=4',
       content: '自建私有数据知识库 · 与知识库AI聊天',
+      id: '4',
       isMine: true,
     }])
   }, [])

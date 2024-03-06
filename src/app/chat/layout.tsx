@@ -1,8 +1,11 @@
 'use client'
 import type { User } from '@prisma/client'
 
+type IUser = Pick<User, 'description' | 'id' | 'nickname'>
+
 import ToolBar from '@/components/toolbar/Toolbar'
-import { UploadOutlined, UserOutlined, VideoCameraOutlined } from '@ant-design/icons'
+import { DashOutlined, TeamOutlined, UserOutlined } from '@ant-design/icons'
+import { useToggle } from 'ahooks'
 import { Avatar, Button, Input, Layout, List, Menu, Popover } from 'antd'
 import React, { useState } from 'react'
 
@@ -11,20 +14,21 @@ import './style.css'
 function ChatLayout({ children }: React.PropsWithChildren) {
   const { Search } = Input
   const { Content, Header, Sider } = Layout
-  const items = [UserOutlined, VideoCameraOutlined, UploadOutlined, UserOutlined].map(
+  const items = [UserOutlined, TeamOutlined].map(
     (icon, index) => ({
       icon: React.createElement(icon),
       key: String(index + 1),
       label: `nav ${index + 1}`,
     }),
   )
-  const [userList, _setUserList] = useState<User[]>([
-    { description: 'description1', id: '1', name: 'user1' },
-    { description: 'description2', id: '2', name: 'user2' },
+  const [userList, _setUserList] = useState<IUser[]>([
+    { description: 'description1', id: '1', nickname: 'user1' },
+    { description: 'description2', id: '2', nickname: 'user2' },
   ])
-  const [clickUser, setClickUser] = useState<User>({} as User)
+  const [clickUser, setClickUser] = useState<IUser>({} as User)
+  const [userToggle, { toggle }] = useToggle(false)
 
-  function handleMenuClick(item: User) {
+  function handleMenuClick(item: IUser) {
     setClickUser(item)
   }
 
@@ -37,15 +41,15 @@ function ChatLayout({ children }: React.PropsWithChildren) {
         <div className="basis-1/2">
           <p>
             用户名:
-            {clickUser.name}
+            {clickUser.nickname}
           </p>
           <p>
             年龄:
-            {clickUser.age || '未知'}
+            {clickUser.nickname || '未知'}
           </p>
           <p>
             性别:
-            {clickUser.sex || '未知'}
+            {clickUser.nickname || '未知'}
           </p>
         </div>
       </div>
@@ -92,7 +96,15 @@ function ChatLayout({ children }: React.PropsWithChildren) {
             textAlign: 'center',
           }}
         >
-          Header
+          <div className="w-full">
+            <div className="float-left ml-2">聊天室</div>
+            <div className="float-right mr-2">
+              <DashOutlined
+                onClick={toggle}
+                size={32}
+              />
+            </div>
+          </div>
         </Header>
         <Content
           className="content-container"
@@ -104,6 +116,7 @@ function ChatLayout({ children }: React.PropsWithChildren) {
         style={{
           backgroundColor: 'transparent',
           borderLeft: '1px solid #fefefe',
+          display: userToggle ? 'block' : 'none',
         }}
         width="18%"
       >
@@ -139,7 +152,7 @@ function ChatLayout({ children }: React.PropsWithChildren) {
                 <List.Item.Meta
                   avatar={<Avatar size={48} src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`} />}
                   description={item.description}
-                  title={item.name}
+                  title={item.nickname}
                 />
               </List.Item>
             )}
