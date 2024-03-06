@@ -10,7 +10,7 @@
     "start": "next start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "postinstall": "simple-git-hooks"
+    "postinstall": "simple-git-hooks && prisma generate"
   },
   "dependencies": {
     "@ant-design/icons": "^5.3.1",

@@ -7,6 +7,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// 通用状态
+enum CommonStatusType {
+  ACTIVE
+  INACTIVE
+}
+
 // 用户状态
 enum UserStatusType {
   ACTIVE
@@ -19,14 +25,192 @@ model User {
   id          String         @id @default(auto()) @map("_id") @db.ObjectId
   username    String
   password    String
+  avatar      String?
   nickname    String?
   description String?
   email       String?
   phone       String?
   birthday    DateTime?
+  gender      String?
   status      UserStatusType @default(ACTIVE)
   isDeleted   Boolean        @default(false) @map("is_deleted")
   createdAt   DateTime       @default(now()) @map("created_at")
   updatedAt   DateTime       @default(now()) @updatedAt @map("updated_at")
+
   @@map("user")
+}
+
+// 角色
+model Role {
+  id          String           @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  status      CommonStatusType @default(ACTIVE)
+  isDeleted   Boolean          @default(false) @map("is_deleted")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @default(now()) @updatedAt @map("updated_at")
+
+  @@map("role")
+}
+
+// 用户角色
+model UserRole {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @map("user_id") @db.ObjectId
+  roleId String @map("role_id") @db.ObjectId
+
+  @@map("user_role")
+}
+
+// 权限
+model Permission {
+  id          String           @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  status      CommonStatusType @default(ACTIVE)
+  isDeleted   Boolean          @default(false) @map("is_deleted")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @default(now()) @updatedAt @map("updated_at")
+
+  @@map("permission")
+}
+
+// 角色权限
+model RolePermission {
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  roleId       String @map("role_id") @db.ObjectId
+  permissionId String @map("permission_id") @db.ObjectId
+
+  @@map("role_permission")
+}
+
+// 用户好友
+model UserFriend {
+  id        String           @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String           @map("user_id") @db.ObjectId
+  friendId  String           @map("friend_id") @db.ObjectId
+  status    CommonStatusType @default(ACTIVE)
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @default(now()) @updatedAt @map("updated_at")
+
+  @@map("user_friend")
+}
+
+// 群组
+model Group {
+  id          String           @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  avatar      String?
+  description String?
+  status      CommonStatusType @default(ACTIVE)
+  isDeleted   Boolean          @default(false) @map("is_deleted")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @default(now()) @updatedAt @map("updated_at")
+
+  @@map("group")
+}
+
+enum GroupRoleType {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+// 用户群组
+model UserGroup {
+  id        String           @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String           @map("user_id") @db.ObjectId
+  groupId   String           @map("group_id") @db.ObjectId
+  groupRole GroupRoleType    @default(MEMBER) @map("group_role")
+  status    CommonStatusType @default(ACTIVE)
+  isDeleted Boolean          @default(false) @map("is_deleted")
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @default(now()) @updatedAt @map("updated_at")
+
+  @@map("user_group")
+}
+
+enum RoomType {
+  FRIEND
+  GROUP
+}
+
+// 房间
+model Room {
+  id            String           @id @default(auto()) @map("_id") @db.ObjectId
+  type          RoomType
+  status        CommonStatusType @default(ACTIVE)
+  lastUpdatedAt DateTime         @default(now()) @map("last_updated_at")
+  lastMessageId String?          @map("last_message_id") @db.ObjectId
+  isDeleted     Boolean          @default(false) @map("is_deleted")
+  createdAt     DateTime         @default(now()) @map("created_at")
+  updatedAt     DateTime         @default(now()) @updatedAt @map("updated_at")
+
+  @@map("room")
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  FILE
+}
+
+// 消息
+model Message {
+  id        String           @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String           @map("user_id") @db.ObjectId
+  roomId    String           @map("room_id") @db.ObjectId
+  content   String
+  type      MessageType      @default(TEXT)
+  status    CommonStatusType @default(ACTIVE)
+  isDeleted Boolean          @default(false) @map("is_deleted")
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @default(now()) @updatedAt @map("updated_at")
+
+  @@map("message")
+}
+
+// 单聊房间
+model FriendRoom {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  roomId    String   @map("room_id") @db.ObjectId
+  user1Id   String   @map("user1_id") @db.ObjectId
+  user2Id   String   @map("user2_id") @db.ObjectId
+  key       String
+  isDeleted Boolean  @default(false) @map("is_deleted")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("friend_room")
+}
+
+// 群聊房间
+model GroupRoom {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  roomId    String   @map("room_id") @db.ObjectId
+  groupId   String   @map("group_id") @db.ObjectId
+  isHot     Boolean  @default(false) @map("is_hot")
+  isDeleted Boolean  @default(false) @map("is_deleted")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("group_room")
+}
+
+// 用户聊天
+model UserContact {
+  id            String           @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String           @map("user_id") @db.ObjectId
+  roomId        String           @map("room_id") @db.ObjectId
+  isTop         Boolean          @default(false) @map("is_top")
+  isMute        Boolean          @default(false) @map("is_mute")
+  lastReadAt    DateTime?        @map("last_read_at")
+  lastMessageAt DateTime?        @map("last_message_at")
+  lastMessageId String?          @map("last_message_id") @db.ObjectId
+  status        CommonStatusType @default(ACTIVE)
+  isDeleted     Boolean          @default(false) @map("is_deleted")
+  createdAt     DateTime         @default(now()) @map("created_at")
+  updatedAt     DateTime         @default(now()) @updatedAt @map("updated_at")
+
+  @@map("user_contact")
 }

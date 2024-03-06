@@ -10,6 +10,7 @@ docker pull mongo:7.0.5
 
 ```bash
 cd tools/mongo
+mkdir -p secrets
 openssl rand -base64 756 > secrets/rs0.key
 chmod 400 secrets/rs0.key
 ```
@@ -29,6 +30,7 @@ docker exec -it mongo1 mongosh
 初始化集群：
 
 ```js
+use admin
 db.auth('root', 'password')
 config = {
   _id: "rs0",
