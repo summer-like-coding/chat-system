@@ -16,7 +16,7 @@ function chatLayout({ children }: React.PropsWithChildren) {
       label: `nav ${index + 1}`,
     }),
   );
-  const [userList, setUserList] = useState<User[]>([
+  const [userList, _setUserList] = useState<User[]>([
     { name: 'user1', description: 'description1', id: '1' },
     { name: 'user2', description: 'description2', id: '2' },
   ]);
@@ -41,7 +41,7 @@ function chatLayout({ children }: React.PropsWithChildren) {
     );
   }
   return (
-    <Layout className="layut-container">
+    <Layout className="layout-container">
       <Sider
         style={{
           backgroundColor: '#2e2e2e',

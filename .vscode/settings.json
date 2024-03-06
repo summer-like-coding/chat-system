@@ -42,5 +42,6 @@
   ],
   "cSpell.words": [
     "Sider"
-  ]
+  ],
+  "css.customData": ["./css_custom_data.json"],
 }
