@@ -1,0 +1,82 @@
+.chatContainer {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background: linear-gradient(to bottom right, #dbe6fb, #f3f4f8);
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+.chatBody {
+  flex: 1;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  overflow-y: auto;
+}
+
+.chatRow {
+  margin: 20px 10px;
+  display: flex;
+}
+
+.chatMine {
+  justify-content: flex-end;
+}
+.chatAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+  margin-left: 10px;
+  background: #f3f4f8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  color: #2870EA;
+}
+
+.chatContent {
+  display: inline-block;
+  border-radius: 8px;
+  padding: 6px 12px;
+  max-width: 500px;
+  background: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  box-shadow: 0px 0.3px 0.9px rgba(0, 0, 0, 0.12), 0px 1.6px 3.6px rgba(0, 0, 0, 0.16);
+}
+
+.chatMine .chatContent {
+  background: linear-gradient(90deg, #2870EA 10.79%, #1B4AEF 87.08%);
+  color: #fff;
+}
+
+.chatInput {
+  display: flex;
+  padding: 5px 10px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.chatInput .chatInputBox {
+  flex: 1;
+  padding: 0px 5px;
+  height: 35px;
+  line-height: 30px;
+  border-radius: 10px 0px 0px 10px;
+}
+
+
+.chatInput .chatInputButton {
+  height: 35px;
+  color: #fff;
+  background: linear-gradient(90deg, #2870EA 10.79%, #1B4AEF 87.08%);
+  box-shadow: 0 2px 0 rgba(5, 145, 255, 0.1);
+  border: none;
+  padding: 0 20px;
+  border-radius: 0px 8px 8px 0px;
+  cursor: pointer;
+  text-align: center;
+}

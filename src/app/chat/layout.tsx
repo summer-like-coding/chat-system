@@ -1,44 +1,55 @@
-'use client';
-import ToolBar from '@/components/toolbar/Toolbar';
-import { UploadOutlined, UserOutlined, VideoCameraOutlined } from '@ant-design/icons';
-import { Avatar, Button, Input, Layout, List, Menu, Popover } from 'antd';
-import React, { useState } from 'react';
-import type { User } from '@prisma/client';
-import './style.css';
+'use client'
+import type { User } from '@prisma/client'
 
-function chatLayout({ children }: React.PropsWithChildren) {
-  const { Search } = Input;
-  const { Content, Header, Sider } = Layout;
+import ToolBar from '@/components/toolbar/Toolbar'
+import { UploadOutlined, UserOutlined, VideoCameraOutlined } from '@ant-design/icons'
+import { Avatar, Button, Input, Layout, List, Menu, Popover } from 'antd'
+import React, { useState } from 'react'
+
+import './style.css'
+
+function ChatLayout({ children }: React.PropsWithChildren) {
+  const { Search } = Input
+  const { Content, Header, Sider } = Layout
   const items = [UserOutlined, VideoCameraOutlined, UploadOutlined, UserOutlined].map(
     (icon, index) => ({
       icon: React.createElement(icon),
       key: String(index + 1),
       label: `nav ${index + 1}`,
     }),
-  );
+  )
   const [userList, _setUserList] = useState<User[]>([
-    { name: 'user1', description: 'description1', id: '1' },
-    { name: 'user2', description: 'description2', id: '2' },
-  ]);
-  const [clickUser, setClickUser] = useState<User>({} as User);
+    { description: 'description1', id: '1', name: 'user1' },
+    { description: 'description2', id: '2', name: 'user2' },
+  ])
+  const [clickUser, setClickUser] = useState<User>({} as User)
 
   function handleMenuClick(item: User) {
-    setClickUser(item);
+    setClickUser(item)
   }
 
   function popOverContent() {
     return (
-      <div className='flex flex-row w-64'>
-        <div className='basis-1/2'>
+      <div className="flex w-64 flex-row">
+        <div className="basis-1/2">
           <Avatar size={64} src="https://api.dicebear.com/7.x/miniavs/svg?seed=1" />
         </div>
-        <div className='basis-1/2'>
-          <p>用户名: {clickUser.name}</p>
-          <p>年龄: {clickUser.age || "未知"}</p>
-          <p>性别: {clickUser.sex || "未知"}</p>
+        <div className="basis-1/2">
+          <p>
+            用户名:
+            {clickUser.name}
+          </p>
+          <p>
+            年龄:
+            {clickUser.age || '未知'}
+          </p>
+          <p>
+            性别:
+            {clickUser.sex || '未知'}
+          </p>
         </div>
       </div>
-    );
+    )
   }
   return (
     <Layout className="layout-container">
@@ -107,24 +118,28 @@ function chatLayout({ children }: React.PropsWithChildren) {
               <List.Item
                 actions={[
                   <Popover
-                    key={"popover" + index}
                     content={popOverContent}
+                    key={`popover${index}`}
                     title="用户信息"
-                    trigger="click">
+                    trigger="click"
+                  >
                     <Button
                       key="list-view"
-                      type='link'
-                      onClick={(e) => {
-                        handleMenuClick(item);
+                      onClick={() => {
+                        handleMenuClick(item)
                       }}
-                    >查看</Button>,
-                  </Popover>
+                      type="link"
+                    >
+                      查看
+                    </Button>
+                    ,
+                  </Popover>,
                 ]}
               >
                 <List.Item.Meta
-                  avatar={<Avatar src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`} size={48} />}
-                  title={item.name}
+                  avatar={<Avatar size={48} src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`} />}
                   description={item.description}
+                  title={item.name}
                 />
               </List.Item>
             )}
@@ -132,7 +147,7 @@ function chatLayout({ children }: React.PropsWithChildren) {
         </div>
       </Sider>
     </Layout>
-  );
+  )
 }
 
-export default chatLayout;
+export default ChatLayout
