@@ -1,30 +1,15 @@
 version: '3'
 services:
-  web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    restart: always
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-    ports:
-      - 3000:3000
-    logging:
-      driver: json-file
-      options:
-        max-size: 1m
   mongo1:
     image: mongo:7.0.5
     restart: always
+    container_name: mongo1
+    ports:
+      - 27017:27017
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:-password}
-    command:
-      - mongod
-      - --replSet
-      - rs0
-      - --keyFile
-      - /secrets/rs0.key
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    command: mongod --replSet rs0 --keyFile /secrets/rs0.key
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./secrets/rs0.key:/secrets/rs0.key
@@ -35,18 +20,18 @@ services:
         chmod 400 /secrets/rs0.key
         chown 999:999 /secrets/rs0.key
         exec docker-entrypoint.sh $$@
+    extra_hosts:
+      - host.docker.internal:host-gateway
   mongo2:
     image: mongo:7.0.5
     restart: always
+    container_name: mongo2
+    ports:
+      - 27018:27017
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:-password}
-    command:
-      - mongod
-      - --replSet
-      - rs0
-      - --keyFile
-      - /secrets/rs0.key
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    command: mongod --replSet rs0 --keyFile /secrets/rs0.key
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./secrets/rs0.key:/secrets/rs0.key
@@ -57,18 +42,18 @@ services:
         chmod 400 /secrets/rs0.key
         chown 999:999 /secrets/rs0.key
         exec docker-entrypoint.sh $$@
+    extra_hosts:
+      - host.docker.internal:host-gateway
   mongo3:
     image: mongo:7.0.5
     restart: always
+    container_name: mongo3
+    ports:
+      - 27019:27017
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:-password}
-    command:
-      - mongod
-      - --replSet
-      - rs0
-      - --keyFile
-      - /secrets/rs0.key
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    command: mongod --replSet rs0 --keyFile /secrets/rs0.key
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./secrets/rs0.key:/secrets/rs0.key
@@ -79,3 +64,5 @@ services:
         chmod 400 /secrets/rs0.key
         chown 999:999 /secrets/rs0.key
         exec docker-entrypoint.sh $$@
+    extra_hosts:
+      - host.docker.internal:host-gateway

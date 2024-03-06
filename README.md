@@ -36,7 +36,7 @@ pnpm i
 先准备配置开发环境：
 
 ```bash
-cp .env.example .env.development
+cp .env.example .env
 ```
 
 启动项目：
@@ -50,6 +50,18 @@ pnpm dev
 ```bash
 pnpm lint
 ```
+
+> [!TIP]
+> 创建开发/测试使用的 MongoDB：
+>
+> ```bash
+> docker run -d \
+>     --name mongo \
+>     -p 27017:27017 \
+>     -e MONGO_INITDB_ROOT_USERNAME=admin \
+>     -e MONGO_INITDB_ROOT_PASSWORD=password \
+>     mongo:7.0.5
+> ```
 
 ## 3. 部署
 
