@@ -1,12 +1,29 @@
 'use client'
+import type { CredentialsType } from '@/lib/auth'
+
 import { useToggle } from 'ahooks'
 import { Button, Form, Input } from 'antd'
-import React from 'react'
+import { useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
+import { signIn } from 'next-auth/react'
+import React, { useCallback } from 'react'
 
 export default function LoginPassword() {
   const [toggle, setToggle] = useToggle()
-  return (
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const callbackUrl = searchParams.get('callbackUrl')
 
+  const login = useCallback(async ({ password, username }: CredentialsType) => {
+    const res = await signIn('credentials', {
+      password,
+      username,
+    })
+    if (res?.ok)
+      router.push(callbackUrl || '/')
+  }, [callbackUrl, router])
+
+  return (
     <div
       className="grid min-h-[300px]
          w-full
@@ -56,6 +73,10 @@ export default function LoginPassword() {
             className="flex w-full justify-center"
           >
             <Button
+              onClick={() => login({
+                password: 'password',
+                username: 'username',
+              })}
               type="primary"
             >
               登录
@@ -123,6 +144,5 @@ export default function LoginPassword() {
         </div>
       </div>
     </div>
-
   )
 }

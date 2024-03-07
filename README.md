@@ -52,16 +52,7 @@ pnpm lint
 ```
 
 > [!TIP]
-> 创建开发/测试使用的 MongoDB：
->
-> ```bash
-> docker run -d \
->     --name mongo \
->     -p 27017:27017 \
->     -e MONGO_INITDB_ROOT_USERNAME=admin \
->     -e MONGO_INITDB_ROOT_PASSWORD=password \
->     mongo:7.0.5
-> ```
+> 请参考如何 [创建开发/测试使用的 MongoDB](./tools/mongo/README.md)。
 
 ## 3. 部署
 
@@ -70,6 +61,10 @@ pnpm lint
 ```bash
 cp .env.example .env.production
 ```
+
+确保已经配置了
+
+### 3.1 本地构建
 
 构建项目：
 
@@ -83,22 +78,56 @@ pnpm build
 pnpm start
 ```
 
+### 3.2 Docker 构建
+
 Docker 构建并运行：
 
 ```bash
-docker build -t im-chat-system .
+docker build -t chat-system .
 
 docker run -d \
   -p 3000:3000 \
   --restart=always \
-  --name im-chat-system \
-  im-chat-system
+  --name chat-system \
+  chat-system
 ```
 
-Docker Compose 启动：
+### 3.3 Docker Compose
+
+创建密钥：
 
 ```bash
-docker compose up -d
+mkdir -p secrets
+openssl rand -base64 756 > secrets/rs0.key
+chmod 400 secrets/rs0.key
+```
+
+Docker Compose 部署：
+
+```bash
+docker compose up -d --env-file .env.production
+```
+
+需要手动初始化集群，进入任意容器：
+
+```bash
+docker exec -it $mongo_container mongosh
+```
+
+初始化集群：
+
+```js
+use admin
+db.auth('root', 'password')
+config = {
+  _id: "rs0",
+  members: [
+    {_id: 0, host: "host.docker.internal:27017"},
+    {_id: 1, host: "host.docker.internal:27018"},
+    {_id: 2, host: "host.docker.internal:27019"},
+  ]
+}
+rs.initiate(config)
 ```
 
 关闭 Docker Compose：

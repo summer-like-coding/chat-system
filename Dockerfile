@@ -2,7 +2,7 @@ ARG NODE_VERSION=20.11.0
 ARG NPM_REGISTRY=https://registry.npmmirror.com/
 
 # Builder image
-FROM node:$NODE_VERSION-bookworm as builder
+FROM node:${NODE_VERSION}-bookworm as builder
 ARG NPM_REGISTRY
 WORKDIR /app
 

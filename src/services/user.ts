@@ -2,7 +2,6 @@
 
 import type { User } from '@prisma/client'
 
-import { signIn } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import bcrypt from 'bcryptjs'
 
@@ -38,30 +37,4 @@ export async function registerUser(data: RegisterUserType): Promise<{
     },
   })
   return { user: newUser }
-}
-
-/**
- * 登录
- * @param data 表单数据
- * @returns 登录信息
- */
-export async function login(data: RegisterUserType): Promise<{
-  error?: string
-  user?: User
-}> {
-  const { password, username } = data
-  const user = await prisma.user.findFirst({
-    where: {
-      username,
-    },
-  })
-  if (!user)
-    return { error: 'Invalid username or password' }
-  try {
-    signIn('credentials', { password, username })
-  }
-  catch (error) {
-    return { error: 'Invalid username or password' }
-  }
-  return { user }
 }
