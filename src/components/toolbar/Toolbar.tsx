@@ -2,9 +2,9 @@
 'use client'
 import type { User } from '@prisma/client'
 
-import { MessageOutlined, SettingOutlined } from '@ant-design/icons'
+import { CommentOutlined, ExclamationCircleOutlined, FileSearchOutlined, LogoutOutlined, MessageOutlined, SettingOutlined, UserSwitchOutlined } from '@ant-design/icons'
 import { useToggle } from 'ahooks'
-import { Avatar, Badge, Popover } from 'antd'
+import { Avatar, Badge, List, Popover } from 'antd'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -25,6 +25,30 @@ function ToolBar() {
     if (!isLogin)
       router.push('/login')
   }
+
+  const data = [
+    <div className="item-center flex" key="1">
+      <ExclamationCircleOutlined size={32} />
+      <div>关于钉钉</div>
+    </div>,
+    // '客服与帮助',
+    <div className="item-center flex" key="2">
+      <CommentOutlined size={32} />
+      <div>客服与帮助</div>
+    </div>,
+    <div className="item-center flex" key="2">
+      <SettingOutlined size={32} />
+      <div>设置与隐私</div>
+    </div>,
+    <div className="item-center flex" key="2">
+      <UserSwitchOutlined size={32} />
+      <div>切换账号</div>
+    </div>,
+    <div className="item-center flex" key="2">
+      <LogoutOutlined size={32} />
+      <div>退出钉钉</div>
+    </div>,
+  ]
 
   function userInfo() {
     return (
@@ -50,27 +74,36 @@ function ToolBar() {
     )
   }
 
+  function settingInfo() {
+    return (
+      <List
+        bordered
+        dataSource={data}
+        footer={<div>Footer</div>}
+        header={userInfo()}
+        renderItem={item => <List.Item>{item}</List.Item>}
+        size="large"
+      />
+    )
+  }
+
   return (
     <aside className="side-toolbar">
       <div className="tool-content">
-        {
-          isLogin
-            ? (
-              <Popover content={userInfo} title="用户信息">
-                <Avatar size={48} src="https://api.dicebear.com/7.x/miniavs/svg?seed=1" />
-              </Popover>
-              )
-            : (
-              <Avatar onClick={checkLogin} size={48} src="https://api.dicebear.com/7.x/miniavs/svg?seed=1" />
-              )
-        }
-        <div className="mt-4">
+        <Popover content={settingInfo} title="用户信息" trigger="click">
+          <Avatar size={48} src="https://api.dicebear.com/7.x/miniavs/svg?seed=1" />
+        </Popover>
+        <div className="mt-4 flex flex-col items-center">
           <Badge overflowCount={99}>
             <MessageOutlined
               className="tool-icon"
               style={{ color: '#848484', fontSize: 28 }}
             />
           </Badge>
+          <FileSearchOutlined
+            className="tool-icon"
+            style={{ color: '#848484', fontSize: 28, marginTop: 20 }}
+          />
         </div>
       </div>
       <div className="tool-footer">
