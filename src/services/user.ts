@@ -6,6 +6,7 @@ import { prisma } from '@/lib/db'
 import bcrypt from 'bcryptjs'
 
 interface RegisterUserType {
+  email?: string
   password: string
   username: string
 }
@@ -19,7 +20,7 @@ export async function registerUser(data: RegisterUserType): Promise<{
   error?: string
   user?: User
 }> {
-  const { password, username } = data
+  const { email, password, username } = data
   const user = await prisma.user.findFirst({
     where: {
       username,
@@ -32,6 +33,7 @@ export async function registerUser(data: RegisterUserType): Promise<{
   const hashedPassword = await bcrypt.hash(password, salt)
   const newUser = await prisma.user.create({
     data: {
+      email,
       password: hashedPassword,
       username,
     },

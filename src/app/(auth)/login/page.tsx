@@ -13,6 +13,8 @@ export default function LoginPassword() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl')
+  const [loginFormRef] = Form.useForm()
+  const [registerFormRef] = Form.useForm()
 
   const login = useCallback(async ({ password, username }: CredentialsType) => {
     const res = await signIn('credentials', {
@@ -22,6 +24,26 @@ export default function LoginPassword() {
     if (res?.ok)
       router.push(callbackUrl || '/')
   }, [callbackUrl, router])
+
+  const register = useCallback(() => {
+    fetch('/api/users/register', {
+      body: JSON.stringify({
+        email: registerFormRef.getFieldValue('registerEmail') || '',
+        password: registerFormRef.getFieldValue('registerPassword') || '',
+        username: registerFormRef.getFieldValue('registerUserName') || '',
+      }),
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      method: 'POST',
+      mode: 'cors',
+    }).then(() => {
+      setToggle.setRight()
+    }).catch((e) => {
+      console.error('Error:', e)
+    })
+  }, [registerFormRef, setToggle])
 
   return (
     <div
@@ -38,29 +60,22 @@ export default function LoginPassword() {
         className="flex w-full items-center justify-center p-4"
       >
         <Form
+          form={loginFormRef}
           style={{
             display: toggle ? 'block' : 'none',
           }}
           title="登录"
         >
           <Form.Item
-            label="邮箱"
+            label="用户"
+            name="loginUserName"
             required
-            rules={[
-              {
-                message: 'The input is not valid E-mail!',
-                type: 'email',
-              },
-              {
-                message: 'Please input your E-mail!',
-                required: true,
-              },
-            ]}
           >
-            <Input placeholder="Email" type="email" />
+            <Input placeholder="用户名" />
           </Form.Item>
           <Form.Item
             label="密码"
+            name="loginPassword"
             required
             rules={[{
               message: 'Please input your password!',
@@ -74,8 +89,8 @@ export default function LoginPassword() {
           >
             <Button
               onClick={() => login({
-                password: 'password',
-                username: 'username',
+                password: loginFormRef.getFieldValue('loginPassword') || '',
+                username: loginFormRef.getFieldValue('loginUserName') || '',
               })}
               type="primary"
             >
@@ -101,6 +116,7 @@ export default function LoginPassword() {
       >
         <Form
           className="transition-all duration-300 ease-in-out"
+          form={registerFormRef}
           style={{
             display: toggle ? 'none' : 'block',
           }}
@@ -108,23 +124,29 @@ export default function LoginPassword() {
         >
           <Form.Item
             label="用户"
+            name="registerUserName"
           >
             <Input placeholder="User" type="text" />
           </Form.Item>
           <Form.Item
             label="邮箱"
+            name="registerEmail"
           >
             <Input placeholder="Email" type="email" />
           </Form.Item>
           <Form.Item
             label="密码"
+            name="registerPassword"
           >
             <Input placeholder="Password" type="password" />
           </Form.Item>
           <Form.Item
             className="flex w-full justify-center"
           >
-            <Button type="primary">
+            <Button
+              onClick={register}
+              type="primary"
+            >
               注册
             </Button>
           </Form.Item>
