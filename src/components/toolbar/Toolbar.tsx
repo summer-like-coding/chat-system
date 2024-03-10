@@ -3,52 +3,134 @@
 import type { User } from '@prisma/client'
 
 import { CommentOutlined, ExclamationCircleOutlined, FileSearchOutlined, LogoutOutlined, MessageOutlined, SettingOutlined, UserSwitchOutlined } from '@ant-design/icons'
-import { useToggle } from 'ahooks'
-import { Avatar, Badge, List, Popover } from 'antd'
+import { useBoolean } from 'ahooks'
+import { Avatar, Badge, List, Modal, Popover } from 'antd'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
+import Icon from '../icon/Icon'
+import Setting from '../setting/Setting'
 import './style.css'
 
 type IUser = Pick<User, 'birthday' | 'description' | 'id' | 'nickname'>
 
 function ToolBar() {
-  const [isLogin, { setLeft, setRight }] = useToggle(false)
+  const [isLogin, { setFalse, setTrue }] = useBoolean(false)
+  const [modalVisible, { setFalse: setModalFalse, setTrue: setModalTrue }] = useBoolean(false)
   const [loginUser, _setLoginUser] = useState<IUser>({} as IUser)
+  const [modalType, setModalType] = useState<string>('about')
   const router = useRouter()
-  function checkLogin() {
+
+  function _checkLogin() {
     if (sessionStorage.getItem('user'))
-      setLeft()
+      setTrue()
     else
-      setRight()
+      setFalse()
 
     if (!isLogin)
       router.push('/login')
   }
 
-  const data = [
-    <div className="item-center flex" key="1">
-      <ExclamationCircleOutlined size={32} />
-      <div>关于钉钉</div>
-    </div>,
-    // '客服与帮助',
-    <div className="item-center flex" key="2">
-      <CommentOutlined size={32} />
-      <div>客服与帮助</div>
-    </div>,
-    <div className="item-center flex" key="2">
-      <SettingOutlined size={32} />
-      <div>设置与隐私</div>
-    </div>,
-    <div className="item-center flex" key="2">
-      <UserSwitchOutlined size={32} />
-      <div>切换账号</div>
-    </div>,
-    <div className="item-center flex" key="2">
-      <LogoutOutlined size={32} />
-      <div>退出钉钉</div>
-    </div>,
-  ]
+  function logout() {
+    sessionStorage.removeItem('user')
+    setFalse()
+    router.push('/login')
+  }
+
+  const poverItemContent = {
+    about: {
+      content: <div
+        className="item-center flex"
+        key="1"
+        onClick={() => {
+          setModalType('about')
+          setModalTrue()
+        }}
+               >
+        <ExclamationCircleOutlined className="mr-2" size={32} />
+        <div className="w-full">
+          <div>关于</div>
+        </div>
+      </div>,
+      modalContent: <div className="flex w-full flex-row items-center justify-around">
+        <Icon />
+        <div>
+          <h1 className="mb-2 text-4xl">欢乐聊天时</h1>
+          <p className="mb-2 text-base">
+            当前版本号：1.0.0 Native
+          </p>
+        </div>
+      </div>,
+      title: '关于',
+    },
+    help: {
+      content: <div
+        className="item-center flex"
+        key="2"
+        onClick={() => {
+          setModalType('help')
+          setModalTrue()
+        }}
+               >
+        <CommentOutlined className="mr-2" size={32} />
+        <div>客服与帮助</div>
+      </div>,
+      modalContent: <div className="flex w-full">
+        <div> 请向3244742300@qq.com发送你的疑问 </div>
+      </div>,
+      title: '客服与帮助',
+    },
+    logout: {
+      content: <div
+        className="item-center flex"
+        key="3"
+        onClick={() => {
+          setModalType('logout')
+          setModalTrue()
+          logout()
+        }}
+               >
+        <LogoutOutlined className="mr-2" size={32} />
+        <div>退出钉钉</div>
+      </div>,
+      modalContent: <></>,
+      title: '退出钉钉',
+    },
+    setting: {
+      content: <div
+        className="item-center flex"
+        key="4"
+        onClick={() => {
+          setModalType('setting')
+          setModalTrue()
+        }}
+               >
+        <SettingOutlined className="mr-2" size={32} />
+        <div>设置与隐私</div>
+      </div>,
+      modalContent: <div className="w-full">
+        <Setting />
+      </div>,
+      title: '设置与隐私',
+    },
+    switch: {
+      content: <div
+        className="item-center flex"
+        key="5"
+        onClick={() => {
+          setModalType('switch')
+          setModalTrue()
+        }}
+               >
+        <UserSwitchOutlined className="mr-2" size={32} />
+        <div>切换账号</div>
+      </div>,
+      modalContent: <></>,
+      title: '切换账号',
+    },
+  }
+
+  const contentList = [poverItemContent.about.content, poverItemContent.help.content, poverItemContent.setting.content, poverItemContent.switch.content, poverItemContent.logout.content]
 
   function userInfo() {
     return (
@@ -78,8 +160,8 @@ function ToolBar() {
     return (
       <List
         bordered
-        dataSource={data}
-        footer={<div>Footer</div>}
+        dataSource={contentList}
+        footer={null}
         header={userInfo()}
         renderItem={item => <List.Item>{item}</List.Item>}
         size="large"
@@ -90,7 +172,10 @@ function ToolBar() {
   return (
     <aside className="side-toolbar">
       <div className="tool-content">
-        <Popover content={settingInfo} title="用户信息" trigger="click">
+        <Popover
+          content={settingInfo}
+          trigger="click"
+        >
           <Avatar size={48} src="https://api.dicebear.com/7.x/miniavs/svg?seed=1" />
         </Popover>
         <div className="mt-4 flex flex-col items-center">
@@ -106,15 +191,14 @@ function ToolBar() {
           />
         </div>
       </div>
-      <div className="tool-footer">
-        <Badge overflowCount={99}>
-          <SettingOutlined
-            className="tool-icon"
-            style={{ color: '#848484', fontSize: 28 }}
-
-          />
-        </Badge>
-      </div>
+      <Modal
+        footer={null}
+        onCancel={setModalFalse}
+        open={modalVisible}
+        title={poverItemContent[modalType as keyof typeof poverItemContent].title}
+      >
+        {poverItemContent[modalType as keyof typeof poverItemContent].modalContent}
+      </Modal>
     </aside>
   )
 }

@@ -66,8 +66,9 @@ const config = [
   perfectionistNatural,
   {
     rules: {
-      quotes: ['error', 'single'],
-      semi: ['error', 'never'],
+      'quotes': ['error', 'single'],
+      'semi': ['error', 'never'],
+      'style/jsx-closing-tag-location': 'off',
     },
   },
 ]
