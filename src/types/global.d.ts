@@ -1,7 +1,7 @@
 /**
  * 返回结果
  */
-interface ResultType<T> {
+export interface ResultType<T> {
   /**
    * 状态码
    */
@@ -19,7 +19,7 @@ interface ResultType<T> {
 /**
  * 分页查询结果
  */
-interface PageType<T> {
+export interface PageType<T> {
   /**
    * 数据
    */
@@ -41,7 +41,7 @@ interface PageType<T> {
 /**
  * 分页查询参数
  */
-interface PageParamsType {
+export interface PageParamsType {
   /**
    * 当前页
    */
@@ -50,4 +50,8 @@ interface PageParamsType {
    * 每页数量
    */
   size: number
+}
+
+export interface PathIdParams {
+  params: { id: string }
 }

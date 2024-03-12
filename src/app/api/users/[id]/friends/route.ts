@@ -1,17 +1,18 @@
 import type { PathIdParams } from '@/types/global'
 
+import { friendService } from '@/services/friend'
 import { userService } from '@/services/user'
+import { getPageParams } from '@/utils/params'
 import { Result } from '@/utils/result'
 
 /**
- * 查询用户信息
+ *
  */
 export async function GET(request: Request, { params }: PathIdParams) {
   try {
-    const user = await userService.getById(params.id)
-    if (!user)
-      return Result.error('User not found')
-    return Result.success(userService.asVo(user))
+    const page = getPageParams(request)
+    const friends = await friendService.getFriends(params.id, page)
+    return Result.success(userService.asVo(...friends))
   }
   catch (e) {
     console.error('Error:', e)

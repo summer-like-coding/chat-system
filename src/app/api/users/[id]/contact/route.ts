@@ -1,16 +1,20 @@
-import { Result } from '@/lib/result'
-import { userService } from '@/services/user'
-import { NextResponse } from 'next/server'
+import type { PathIdParams } from '@/types/global'
+
+import { contactService } from '@/services/contact'
+import { getPageParams } from '@/utils/params'
+import { Result } from '@/utils/result'
 
 /**
- * 查询用户联系信息
+ * 查询用户对话信息
  */
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: PathIdParams) {
   try {
-    const user = await userService.getById(params.id)
-    if (!user)
-      return NextResponse.json(Result.error('User not found'))
+    const page = getPageParams(request)
+    const contacts = await contactService.getByUserId(params.id, page)
+    return Result.success(contactService.asVo(...contacts))
   }
   catch (e) {
+    console.error('Error:', e)
+    return Result.error('Internal Server Error')
   }
 }

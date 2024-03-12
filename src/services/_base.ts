@@ -1,3 +1,5 @@
+import type { PageParamsType, PageType } from '@/types/global'
+
 /**
  * 查询方法委托
  */
@@ -19,6 +21,15 @@ export interface Delegate {
  * 抽象服务
  */
 export abstract class AbstractService<T> {
+  /**
+   * 返回 VO 对象
+   * @param data 数据
+   * @returns VO 对象
+   */
+  asVo(...data: T[]): Partial<T>[] {
+    return data
+  }
+
   /**
    * 计数
    * @returns 数字
