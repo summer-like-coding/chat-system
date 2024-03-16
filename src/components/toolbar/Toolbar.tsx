@@ -2,10 +2,10 @@
 'use client'
 import type { User } from '@prisma/client'
 
-import { CommentOutlined, ExclamationCircleOutlined, FileSearchOutlined, LogoutOutlined, MessageOutlined, SettingOutlined, UserSwitchOutlined } from '@ant-design/icons'
+import { CommentOutlined, ExclamationCircleOutlined, FileSearchOutlined, LogoutOutlined, MessageOutlined, SettingOutlined } from '@ant-design/icons'
 import { useBoolean } from 'ahooks'
 import { Avatar, Badge, List, Modal, Popover } from 'antd'
-import { useRouter } from 'next/navigation'
+import { signOut } from 'next-auth/react'
 import { useState } from 'react'
 
 import Icon from '../icon/Icon'
@@ -15,27 +15,9 @@ import './style.css'
 type IUser = Pick<User, 'birthday' | 'description' | 'id' | 'nickname'>
 
 function ToolBar() {
-  const [isLogin, { setFalse, setTrue }] = useBoolean(false)
   const [modalVisible, { setFalse: setModalFalse, setTrue: setModalTrue }] = useBoolean(false)
   const [loginUser, _setLoginUser] = useState<IUser>({} as IUser)
   const [modalType, setModalType] = useState<string>('about')
-  const router = useRouter()
-
-  function _checkLogin() {
-    if (sessionStorage.getItem('user'))
-      setTrue()
-    else
-      setFalse()
-
-    if (!isLogin)
-      router.push('/login')
-  }
-
-  function logout() {
-    sessionStorage.removeItem('user')
-    setFalse()
-    router.push('/login')
-  }
 
   const poverItemContent = {
     about: {
@@ -86,15 +68,17 @@ function ToolBar() {
         key="3"
         onClick={() => {
           setModalType('logout')
-          setModalTrue()
-          logout()
+          // setModalTrue()
+          signOut({
+            callbackUrl: '/login',
+          })
         }}
                >
         <LogoutOutlined className="mr-2" size={32} />
-        <div>退出钉钉</div>
+        <div>退出账号</div>
       </div>,
       modalContent: <></>,
-      title: '退出钉钉',
+      title: '退出账号',
     },
     setting: {
       content: <div
@@ -113,24 +97,9 @@ function ToolBar() {
       </div>,
       title: '设置与隐私',
     },
-    switch: {
-      content: <div
-        className="item-center flex"
-        key="5"
-        onClick={() => {
-          setModalType('switch')
-          setModalTrue()
-        }}
-               >
-        <UserSwitchOutlined className="mr-2" size={32} />
-        <div>切换账号</div>
-      </div>,
-      modalContent: <></>,
-      title: '切换账号',
-    },
   }
 
-  const contentList = [poverItemContent.about.content, poverItemContent.help.content, poverItemContent.setting.content, poverItemContent.switch.content, poverItemContent.logout.content]
+  const contentList = [poverItemContent.about.content, poverItemContent.help.content, poverItemContent.setting.content, poverItemContent.logout.content]
 
   function userInfo() {
     return (

@@ -11,7 +11,7 @@ export async function GET(request: Request, { params }: PathIdParams) {
   try {
     const page = getPageParams(request)
     const contacts = await contactService.getByUserId(params.id, page)
-    return Result.success(contactService.asVo(...contacts))
+    return Result.success(contactService.asVoList(contacts))
   }
   catch (e) {
     console.error('Error:', e)

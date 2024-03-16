@@ -12,7 +12,7 @@ export async function GET(request: Request, { params }: PathIdParams) {
   try {
     const page = getPageParams(request)
     const friends = await friendService.getFriends(params.id, page)
-    return Result.success(userService.asVo(...friends))
+    return Result.success(userService.asVoList(friends))
   }
   catch (e) {
     console.error('Error:', e)

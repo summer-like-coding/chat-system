@@ -36,7 +36,7 @@ async function login(data?: CredentialsType) {
 export const authOptions: NextAuthOptions = {
   pages: {
     error: '/error', // Error code passed in query string as ?error=
-    newUser: '/auth/new-user', // New users will be directed here on first sign in (leave the property out if not of interest)
+    newUser: '/login', // New users will be directed here on first sign in (leave the property out if not of interest)
     signIn: '/login',
     signOut: '/signout',
     verifyRequest: '/auth/verify-request', // (used for check email message)

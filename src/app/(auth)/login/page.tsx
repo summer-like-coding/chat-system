@@ -1,49 +1,46 @@
 'use client'
 import type { CredentialsType } from '@/lib/auth'
+import type { User } from '@prisma/client'
 
+import { request } from '@/app/utils/request'
 import { useToggle } from 'ahooks'
-import { Button, Form, Input } from 'antd'
+import { Button, Form, Input, message } from 'antd'
 import { useSearchParams } from 'next/navigation'
-import { useRouter } from 'next/navigation'
 import { signIn } from 'next-auth/react'
 import React, { useCallback } from 'react'
 
 export default function LoginPassword() {
   const [toggle, setToggle] = useToggle()
-  const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl')
   const [loginFormRef] = Form.useForm()
   const [registerFormRef] = Form.useForm()
 
   const login = useCallback(async ({ password, username }: CredentialsType) => {
-    const res = await signIn('credentials', {
+    await signIn('credentials', {
+      callbackUrl: callbackUrl || '/chat',
       password,
       username,
     })
-    if (res?.ok)
-      router.push(callbackUrl || '/')
-  }, [callbackUrl, router])
+    message.success('登录成功')
+  }, [callbackUrl])
 
-  const register = useCallback(() => {
-    fetch('/api/users/register', {
-      body: JSON.stringify({
+  const register = useCallback(async () => {
+    await registerFormRef.validateFields()
+    const res = await request<User>('/api/users/register', {
+      data: {
         email: registerFormRef.getFieldValue('registerEmail') || '',
         password: registerFormRef.getFieldValue('registerPassword') || '',
         username: registerFormRef.getFieldValue('registerUserName') || '',
-      }),
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
       },
       method: 'POST',
-      mode: 'cors',
-    }).then(() => {
-      setToggle.setRight()
-    }).catch((e) => {
-      console.error('Error:', e)
     })
-  }, [registerFormRef, setToggle])
+    loginFormRef.setFieldsValue({
+      loginUserName: res.username,
+    })
+    message.success('注册成功')
+    setToggle.setRight()
+  }, [loginFormRef, registerFormRef, setToggle])
 
   return (
     <div
@@ -70,6 +67,10 @@ export default function LoginPassword() {
             label="用户"
             name="loginUserName"
             required
+            rules={[{
+              message: 'Please input your username!',
+              required: true,
+            }]}
           >
             <Input placeholder="用户名" />
           </Form.Item>
@@ -125,18 +126,44 @@ export default function LoginPassword() {
           <Form.Item
             label="用户"
             name="registerUserName"
+            required
+            rules={[{
+              message: 'Please input your username!',
+              required: true,
+            }]}
           >
             <Input placeholder="User" type="text" />
           </Form.Item>
           <Form.Item
             label="邮箱"
             name="registerEmail"
+            required
+            rules={[{
+              message: 'Please input your email!',
+              required: true,
+            }, {
+              message: 'The input is not valid E-mail!',
+              type: 'email',
+              validator(rule, value, callback) {
+                if (!value || value.match(/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/)) {
+                  callback()
+                }
+                else {
+                  callback('The input is not valid E-mail!')
+                }
+              },
+            }]}
           >
             <Input placeholder="Email" type="email" />
           </Form.Item>
           <Form.Item
             label="密码"
             name="registerPassword"
+            required
+            rules={[{
+              message: 'Please input your password!',
+              required: true,
+            }]}
           >
             <Input placeholder="Password" type="password" />
           </Form.Item>

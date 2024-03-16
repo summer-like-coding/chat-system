@@ -66,6 +66,7 @@ const config = [
   perfectionistNatural,
   {
     rules: {
+      'curly': 'off',
       'quotes': ['error', 'single'],
       'semi': ['error', 'never'],
       'style/jsx-closing-tag-location': 'off',

@@ -26,8 +26,12 @@ export abstract class AbstractService<T> {
    * @param data 数据
    * @returns VO 对象
    */
-  asVo(...data: T[]): Partial<T>[] {
+  asVo(data: T): Partial<T> {
     return data
+  }
+
+  asVoList(data: T[]): Partial<T>[] {
+    return data.map(item => this.asVo(item))
   }
 
   /**

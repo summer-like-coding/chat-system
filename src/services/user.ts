@@ -20,25 +20,21 @@ interface RegisterUserType {
 export class UserService extends AbstractService<User> {
   delegate = prisma.user
 
-  asVo(...users: User[]) {
-    const result: Omit<User, 'isDeleted' | 'password'>[] = []
-    for (const user of users) {
-      result.push({
-        avatar: user.avatar,
-        birthday: user.birthday,
-        createdAt: user.createdAt,
-        description: user.description,
-        email: user.email,
-        gender: user.gender,
-        id: user.id,
-        nickname: user.nickname,
-        phone: user.phone,
-        status: user.status,
-        updatedAt: user.updatedAt,
-        username: user.username,
-      })
+  asVo(user: User) {
+    return {
+      avatar: user.avatar,
+      birthday: user.birthday,
+      createdAt: user.createdAt,
+      description: user.description,
+      email: user.email,
+      gender: user.gender,
+      id: user.id,
+      nickname: user.nickname,
+      phone: user.phone,
+      status: user.status,
+      updatedAt: user.updatedAt,
+      username: user.username,
     }
-    return result
   }
 
   /**
