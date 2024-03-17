@@ -20,7 +20,9 @@ interface RegisterUserType {
 export class UserService extends AbstractService<User> {
   delegate = prisma.user
 
-  asVo(user: User) {
+  asVo(user?: User | null) {
+    if (!user)
+      return null
     return {
       avatar: user.avatar,
       birthday: user.birthday,
@@ -62,7 +64,7 @@ export class UserService extends AbstractService<User> {
     const { email, password, username } = data
     const user = await this.getUserByUsername(username)
     if (user)
-      return { error: 'Username already exists' }
+      return { error: `用户名 ${username} 已经存在` }
 
     const salt = await bcrypt.genSalt(10)
     const hashedPassword = await bcrypt.hash(password, salt)

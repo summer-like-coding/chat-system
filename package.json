@@ -48,7 +48,6 @@
     "eslint-plugin-tailwindcss": "^3.14.3",
     "immer": "^10.0.4",
     "lint-staged": "^15.2.2",
-    "openai": "^4.29.0",
     "postcss": "^8.4.35",
     "prisma": "^5.10.2",
     "protobufjs-cli": "^1.1.2",

@@ -26,12 +26,12 @@ export abstract class AbstractService<T> {
    * @param data 数据
    * @returns VO 对象
    */
-  asVo(data: T): Partial<T> {
-    return data
+  asVo(data?: T | null): Partial<T> | null {
+    return data ?? null
   }
 
   asVoList(data: T[]): Partial<T>[] {
-    return data.map(item => this.asVo(item))
+    return data.map(item => this.asVo(item)!)
   }
 
   /**
@@ -127,7 +127,7 @@ export abstract class AbstractService<T> {
    * @param data 更新数据
    * @returns 更新结果
    */
-  async updateById(id: string, data: T): Promise<T | null> {
+  async updateById(id: string, data: Partial<T>): Promise<T | null> {
     return await this.delegate.update({
       data,
       where: {
