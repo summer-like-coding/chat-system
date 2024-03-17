@@ -10,11 +10,11 @@ export async function GET(request: Request, { params }: PathIdParams) {
   try {
     const user = await userService.getById(params.id)
     if (!user)
-      return Result.error('User not found')
+      return Result.error('未找到用户')
     return Result.success(userService.asVo(user))
   }
   catch (e) {
     console.error('Error:', e)
-    return Result.error('Internal Server Error')
+    return Result.error('未知错误')
   }
 }

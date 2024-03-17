@@ -2,10 +2,11 @@
 import type { CredentialsType } from '@/lib/auth'
 import type { User } from '@prisma/client'
 
+import { useUserStore } from '@/app/store/user'
 import { request } from '@/app/utils/request'
 import { useToggle } from 'ahooks'
 import { Button, Form, Input, message } from 'antd'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { signIn } from 'next-auth/react'
 import React, { useCallback } from 'react'
 
@@ -15,15 +16,24 @@ export default function LoginPassword() {
   const callbackUrl = searchParams.get('callbackUrl')
   const [loginFormRef] = Form.useForm()
   const [registerFormRef] = Form.useForm()
-
+  const router = useRouter()
+  const setUser = useUserStore(state => state.setUser)
   const login = useCallback(async ({ password, username }: CredentialsType) => {
     await signIn('credentials', {
-      callbackUrl: callbackUrl || '/chat',
       password,
+      redirect: false,
       username,
     })
+    router.push(callbackUrl || '/chat')
     message.success('登录成功')
-  }, [callbackUrl])
+    const res = await request<User>('/api/users/getByUsername', {
+      data: {
+        username,
+      },
+      method: 'POST',
+    })
+    setUser(res)
+  }, [callbackUrl, router, setUser])
 
   const register = useCallback(async () => {
     await registerFormRef.validateFields()

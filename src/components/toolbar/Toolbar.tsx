@@ -1,7 +1,7 @@
 /* eslint-disable tailwindcss/no-custom-classname */
 'use client'
-import type { User } from '@prisma/client'
 
+import { useUserStore } from '@/app/store/user'
 import { CommentOutlined, ExclamationCircleOutlined, FileSearchOutlined, LogoutOutlined, MessageOutlined, SettingOutlined } from '@ant-design/icons'
 import { useBoolean } from 'ahooks'
 import { Avatar, Badge, List, Modal, Popover } from 'antd'
@@ -12,11 +12,9 @@ import Icon from '../icon/Icon'
 import Setting from '../setting/Setting'
 import './style.css'
 
-type IUser = Pick<User, 'birthday' | 'description' | 'id' | 'nickname'>
-
 function ToolBar() {
+  const useStore = useUserStore(state => state.user)!
   const [modalVisible, { setFalse: setModalFalse, setTrue: setModalTrue }] = useBoolean(false)
-  const [loginUser, _setLoginUser] = useState<IUser>({} as IUser)
   const [modalType, setModalType] = useState<string>('about')
 
   const poverItemContent = {
@@ -110,15 +108,15 @@ function ToolBar() {
         <div className="basis-1/2">
           <p>
             用户名:
-            {loginUser.nickname}
+            {useStore.nickname || '未知'}
           </p>
           <p>
-            年龄:
-            {loginUser.birthday ? new Date().getFullYear() - (new Date(loginUser.birthday)).getFullYear() : '未知'}
+            生日:
+            {useStore.birthday ? new Date().getFullYear() - (new Date(useStore!.birthday)).getFullYear() : '未知'}
           </p>
           <p>
             性别:
-            {loginUser.nickname || '未知'}
+            {useStore.gender || '未知'}
           </p>
         </div>
       </div>
