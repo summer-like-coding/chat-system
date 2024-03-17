@@ -2,12 +2,14 @@
  * 根据用户名获取用户信息
  */
 
+import type { NextRequest } from 'next/server'
+
 import { authOptions } from '@/lib/auth'
 import { userService } from '@/services/user'
 import { Result } from '@/utils/result'
 import { getServerSession } from 'next-auth'
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     if (!session) {

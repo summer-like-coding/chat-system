@@ -1,10 +1,12 @@
+import type { NextRequest } from 'next/server'
+
 import { userService } from '@/services/user'
 import { Result } from '@/utils/result'
 
 /**
  * 注册新用户
  */
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const data = await request.json()
     const res = await userService.registerUser(data)
@@ -12,8 +14,8 @@ export async function POST(request: Request) {
       return Result.error(res.error)
     return Result.success(userService.asVo(res.user!))
   }
-  catch (e) {
-    console.error('Error:', e)
-    return Result.error('Internal Server Error')
+  catch (error) {
+    console.error('Error:', error)
+    return Result.error('未知错误')
   }
 }
