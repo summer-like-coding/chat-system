@@ -108,14 +108,17 @@ function ToolBar() {
         <div className="basis-1/2">
           <p>
             用户名:
+            {' '}
             {useStore.nickname || '未知'}
           </p>
           <p>
             生日:
-            {useStore.birthday ? new Date().getFullYear() - (new Date(useStore!.birthday)).getFullYear() : '未知'}
+            {' '}
+            {useStore.birthday ? new Date(useStore.birthday).toLocaleDateString() : '未知'}
           </p>
           <p>
             性别:
+            {' '}
             {useStore.gender || '未知'}
           </p>
         </div>
@@ -160,6 +163,7 @@ function ToolBar() {
       </div>
       <Modal
         footer={null}
+        // forceRender
         onCancel={setModalFalse}
         open={modalVisible}
         title={poverItemContent[modalType as keyof typeof poverItemContent].title}
