@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     const res = await userService.registerUser(data)
     if (res.error)
       return Result.error(res.error)
-    return Result.success(userService.asVo(res.user!))
+    return Result.success(userService.asVo(res.user))
   }
   catch (error) {
     console.error('Error:', error)

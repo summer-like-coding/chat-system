@@ -77,6 +77,34 @@ export class UserService extends AbstractService<User> {
     })
     return { user: newUser }
   }
+
+  /**
+   * 重置密码
+   */
+  async resetPassword(id: string, oldPassword: string, newPassword: string): Promise<{
+    error?: string
+    user?: User
+  }> {
+    const user = await this.getById(id)
+    if (!user)
+      return { error: '未找到用户' }
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password)
+    if (!isMatch)
+      return { error: '密码错误' }
+
+    const salt = await bcrypt.genSalt(10)
+    const hashedPassword = await bcrypt.hash(newPassword, salt)
+    const updatedUser = await prisma.user.update({
+      data: {
+        password: hashedPassword,
+      },
+      where: {
+        id,
+      },
+    })
+    return { user: updatedUser }
+  }
 }
 
 export const userService = new UserService()
