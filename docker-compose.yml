@@ -1,10 +1,9 @@
-version: '3'
 services:
   web:
     build:
       context: .
-      dockerfile: Dockerfile
-    restart: always
+      dockerfile: ./docker/Dockerfile
+    restart: unless-stopped
     volumes:
       - /etc/localtime:/etc/localtime:ro
     ports:
@@ -15,7 +14,7 @@ services:
         max-size: 1m
   mongo1:
     image: mongo:7.0.5
-    restart: always
+    restart: unless-stopped
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:-password}
@@ -37,7 +36,7 @@ services:
         exec docker-entrypoint.sh $$@
   mongo2:
     image: mongo:7.0.5
-    restart: always
+    restart: unless-stopped
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:-password}
@@ -59,7 +58,7 @@ services:
         exec docker-entrypoint.sh $$@
   mongo3:
     image: mongo:7.0.5
-    restart: always
+    restart: unless-stopped
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:-password}

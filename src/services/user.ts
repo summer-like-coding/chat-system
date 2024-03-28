@@ -8,8 +8,13 @@ import { AbstractService } from './_base'
 /**
  * 注册用户表单数据
  */
-interface RegisterUserType {
+export interface RegisterUserType {
   email?: string
+  password: string
+  username: string
+}
+
+export interface LoginCredentialsType {
   password: string
   username: string
 }
@@ -50,6 +55,26 @@ export class UserService extends AbstractService<User> {
         username,
       },
     })
+  }
+
+  /**
+   * 登录
+   */
+  async login(data?: LoginCredentialsType): Promise<User> {
+    if (!data)
+      throw new Error('没有数据')
+    const { password, username } = data
+    const user = await prisma.user.findFirst({
+      where: {
+        username,
+      },
+    })
+    if (!user)
+      throw new Error(`用户 ${username} 未找到`)
+    const isPasswordCorrect = await bcrypt.compare(password, user.password)
+    if (!isPasswordCorrect)
+      throw new Error('Password is incorrect')
+    return user
   }
 
   /**

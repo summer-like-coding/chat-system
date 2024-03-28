@@ -1,37 +1,8 @@
 import type { NextAuthOptions } from 'next-auth'
 
-import bcrypt from 'bcryptjs'
+import { userService } from '@/services/user'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import process from 'node:process'
-
-import { prisma } from './db'
-
-export interface CredentialsType {
-  password: string
-  username: string
-}
-
-/**
- * 登录
- * @param data 登录凭证
- * @returns 登录用户信息
- */
-async function login(data?: CredentialsType) {
-  if (!data)
-    throw new Error('No data')
-  const { password, username } = data
-  const user = await prisma.user.findFirst({
-    where: {
-      username,
-    },
-  })
-  if (!user)
-    throw new Error('User not found')
-  const isPasswordCorrect = await bcrypt.compare(password, user.password)
-  if (!isPasswordCorrect)
-    throw new Error('Password is incorrect')
-  return user
-}
 
 export const authOptions: NextAuthOptions = {
   pages: {
@@ -45,7 +16,7 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
       async authorize(credentials, _) {
         try {
-          return await login(credentials)
+          return await userService.login(credentials)
         }
         catch (error) {
           console.error(error)
