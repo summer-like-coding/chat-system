@@ -11,6 +11,7 @@ export async function GET(request: NextRequest) {
   const encoder = new TextEncoder()
   const url = new URL(request.nextUrl)
   const prompt = url.searchParams.get('prompt') || ''
+  const model = url.searchParams.get('model') || 'gpt-3.5-turbo'
 
   const openaiStream = await openai.chat.completions.create(
     {
@@ -20,7 +21,7 @@ export async function GET(request: NextRequest) {
           role: 'user',
         },
       ],
-      model: 'gpt-3.5-turbo',
+      model,
       stream: true,
     },
   );

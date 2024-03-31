@@ -2,9 +2,10 @@
 'use client'
 
 import { useUserStore } from '@/app/store/user'
-import { CommentOutlined, ExclamationCircleOutlined, FileSearchOutlined, LogoutOutlined, MessageOutlined, SettingOutlined } from '@ant-design/icons'
+import { CommentOutlined, ExclamationCircleOutlined, LogoutOutlined, MessageOutlined, RobotOutlined, SettingOutlined } from '@ant-design/icons'
 import { useBoolean } from 'ahooks'
 import { Avatar, Badge, List, Modal, Popover } from 'antd'
+import { useRouter } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import { useState } from 'react'
 
@@ -13,6 +14,7 @@ import Setting from '../setting/Setting'
 import './style.css'
 
 function ToolBar() {
+  const router = useRouter()
   const useStore = useUserStore(state => state.user)!
   const [modalVisible, { setFalse: setModalFalse, setTrue: setModalTrue }] = useBoolean(false)
   const [modalType, setModalType] = useState<string>('about')
@@ -139,6 +141,18 @@ function ToolBar() {
     )
   }
 
+  function menuClick(key: string) {
+    if (key === 'chat') {
+      router.push('/chat')
+    }
+    else if (key === 'bot') {
+      router.push('/bot')
+    }
+    else {
+      router.push('/')
+    }
+  }
+
   return (
     <aside className="side-toolbar">
       <div className="tool-content">
@@ -152,18 +166,23 @@ function ToolBar() {
           <Badge overflowCount={99}>
             <MessageOutlined
               className="tool-icon"
+              onClick={() => {
+                menuClick('chat')
+              }}
               style={{ color: '#848484', fontSize: 28 }}
             />
           </Badge>
-          <FileSearchOutlined
+          <RobotOutlined
             className="tool-icon"
+            onClick={() => {
+              menuClick('bot')
+            }}
             style={{ color: '#848484', fontSize: 28, marginTop: 20 }}
           />
         </div>
       </div>
       <Modal
         footer={null}
-        // forceRender
         onCancel={setModalFalse}
         open={modalVisible}
         title={poverItemContent[modalType as keyof typeof poverItemContent].title}

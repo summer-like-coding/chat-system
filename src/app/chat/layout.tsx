@@ -3,7 +3,6 @@ import type { User } from '@prisma/client'
 
 type IUser = Pick<User, 'description' | 'id' | 'nickname'>
 
-import ToolBar from '@/components/toolbar/Toolbar'
 import { DashOutlined, TeamOutlined, UserOutlined } from '@ant-design/icons'
 import { useToggle } from 'ahooks'
 import { Avatar, Button, Input, Layout, List, Menu, Popover } from 'antd'
@@ -56,18 +55,7 @@ function ChatLayout({ children }: React.PropsWithChildren) {
     )
   }
   return (
-    <Layout className="layout-container">
-      <Sider
-        style={{
-          backgroundColor: '#2e2e2e',
-          borderRight: '1px solid #fefefe',
-          color: '#848484',
-          textAlign: 'center',
-        }}
-        width="4%"
-      >
-        <ToolBar />
-      </Sider>
+    <>
       <Sider
         style={{
           backgroundColor: 'transparent',
@@ -159,7 +147,7 @@ function ChatLayout({ children }: React.PropsWithChildren) {
           />
         </div>
       </Sider>
-    </Layout>
+    </>
   )
 }
 
