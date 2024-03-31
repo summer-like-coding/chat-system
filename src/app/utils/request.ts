@@ -20,11 +20,13 @@ function errorHandle(code: keyof typeof errorMap, msg: string) {
   return errorMap[code] || msg
 }
 
-export async function request<T = unknown>(url: string, options: RequestOption): Promise<T> {
-  const response = await fetch(url, {
-    method: options.method,
+export async function request<T = unknown>(url: string, params?: Record<string, string>, options?: RequestOption): Promise<T> {
+  const searchParams = new URLSearchParams(params)
+  const fetchUrl = `${url}?${searchParams.toString()}`
+  const response = await fetch(fetchUrl, {
+    method: options?.method,
     ...options,
-    body: JSON.stringify(options.data),
+    body: options?.data && JSON.stringify(options.data),
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
@@ -37,4 +39,36 @@ export async function request<T = unknown>(url: string, options: RequestOption):
   }
   message.error(errorHandle(res.code as keyof typeof errorMap, res.msg))
   throw new Error(res.msg)
+}
+
+export async function requestEventStream(url: string, params?: Record<string, string>, onMessage?: (data: string) => void, onEnd?: () => void, options?: RequestOption) {
+  const abort = new AbortController()
+  const searchParams = new URLSearchParams(params)
+  const fetchUrl = `${url}?${searchParams.toString()}`
+  const response = await fetch(fetchUrl, {
+    method: options?.method,
+    ...options,
+    body: options?.data && JSON.stringify(options.data),
+    credentials: 'include',
+    mode: 'cors',
+    signal: abort.signal,
+  })
+
+  const reader = response.body?.getReader()
+  if (reader) {
+    const decoder = new TextDecoder()
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) {
+        onEnd?.()
+        break
+      }
+      const data = decoder.decode(value)
+      onMessage?.(data)
+    }
+  }
+  return {
+    abort: abort.abort,
+    response,
+  }
 }

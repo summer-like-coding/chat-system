@@ -1,22 +1,76 @@
 'use client'
 
 import Chat from '@/components/chat/Chat'
-import { TeamOutlined, UserOutlined } from '@ant-design/icons'
 import { Input, Layout, Menu } from 'antd'
-import React from 'react'
+import React, { useState } from 'react'
 
 import './style.css'
 
 export default function Bot() {
   const { Search } = Input
   const { Content, Header, Sider } = Layout
-  const items = [UserOutlined, TeamOutlined].map(
-    (icon, index) => ({
-      icon: React.createElement(icon),
-      key: String(index + 1),
-      label: `nav ${index + 1}`,
-    }),
-  )
+  const [menuKey, setMenuKey] = useState<string>('')
+
+  function createBotItems() {
+    const botList = [
+      {
+        key: 'gpt-3.5-turbo',
+        name: 'ChatGPT-3.5',
+      },
+      {
+        key: 'gpt-4',
+        name: 'GPT-4',
+      },
+      {
+        key: 'claude-3-opus-20240229',
+        name: 'Claude 3 Opus',
+      },
+      {
+        key: 'claude-3-sonnet-20240229',
+        name: 'Claude 3 Sonnet',
+      },
+      {
+        key: 'gemini-pro',
+        name: 'Gemini',
+      },
+      {
+        key: 'gemini-pro-vision',
+        name: 'Gemini Pro',
+      },
+      {
+        key: 'google-palm',
+        name: 'PaLM',
+      },
+      {
+        key: 'ERNIE-Bot-turbo',
+        name: '文心一言',
+      },
+      {
+        key: 'glm-3-turbo',
+        name: 'GLM 3',
+      },
+      {
+        key: 'chatglm_turbo',
+        name: 'ChatGLM',
+      },
+      {
+        key: 'qwen-turbo',
+        name: '通义千问',
+      },
+      {
+        key: 'qwen-plus',
+        name: '通义千问 Plus',
+      },
+    ]
+    const items = botList.map(
+      ({ key, name }) => ({
+        key,
+        label: name,
+      }),
+    )
+    return items
+  }
+
   return (
     <>
       <Sider
@@ -29,8 +83,11 @@ export default function Bot() {
           <Search placeholder="Search" />
         </div>
         <Menu
-          items={items}
+          items={createBotItems()}
           mode="inline"
+          onClick={({ key }) => {
+            setMenuKey(key)
+          }}
           style={{
             backgroundColor: '#f5f5f5',
             color: '#848484',
@@ -54,7 +111,10 @@ export default function Bot() {
         <Content
           className="content-container"
         >
-          <Chat />
+          <Chat
+            chatKey={menuKey}
+            type="bot"
+          />
         </Content>
       </Layout>
     </>

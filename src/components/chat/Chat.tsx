@@ -1,6 +1,8 @@
 'use client'
+import { requestEventStream } from '@/app/utils/request'
+import { useReactive } from 'ahooks'
 import { Affix, Avatar, Button, Input } from 'antd'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 
 import './style.css'
 
@@ -11,8 +13,15 @@ interface ChatProps {
   isMine: boolean
 }
 
-export default function Chat() {
-  const [chatList, setChatList] = useState<ChatProps[]>([])
+interface IChat {
+  chatKey: string
+  type: 'bot' | 'people'
+}
+
+export default function Chat({ chatKey, type }: IChat) {
+  const chatList = useReactive<ChatProps[]>([])
+  const [inputValue, setInputValue] = useState('')
+  const replay = useReactive({ value: '' })
 
   function getChatList() {
     return chatList.map((item, index) => {
@@ -37,6 +46,7 @@ export default function Chat() {
                     <Avatar size={32} src={item.avatar} />
                   </div>
                   <div className="chatContent">{item.content}</div>
+                  {/* <div className="chatContentTemp">{item.content}</div> */}
                 </>
                 )
           }
@@ -45,29 +55,42 @@ export default function Chat() {
     })
   }
 
-  useEffect(() => {
-    setChatList([{
-      avatar: 'https://api.dicebear.com/7.x/miniavs/svg?seed=1',
-      content: '我是知识库机器人，一个专门响应人类指令的大模型',
-      id: '1',
-      isMine: false,
-    }, {
-      avatar: 'https://api.dicebear.com/7.x/miniavs/svg?seed=2',
-      content: '我服务于人类，致力于让生活更美好',
-      id: '2',
-      isMine: false,
-    }, {
-      avatar: 'https://api.dicebear.com/7.x/miniavs/svg?seed=3',
-      content: '我是知识库机器人，一个专门响应人类指令的大模型',
-      id: '3',
-      isMine: false,
-    }, {
-      avatar: 'https://api.dicebear.com/7.x/miniavs/svg?seed=4',
-      content: '自建私有数据知识库 · 与知识库AI聊天',
-      id: '4',
-      isMine: true,
-    }])
-  }, [])
+  function onMessage(data: string) {
+    replay.value = replay.value + data
+    chatList[chatList.length - 1].content = replay.value
+  }
+
+  function onEnd() {
+    setTimeout(() => {
+      replay.value = ''
+    }, 5000)
+  }
+
+  function handleClick() {
+    const clickMap = {
+      bot: () => {
+        chatList.push({
+          avatar: 'https://api.dicebear.com/7.x/miniavs/svg?seed=4',
+          content: inputValue,
+          id: `${chatList.length + 1}`,
+          isMine: true,
+        }, {
+          avatar: 'https://api.dicebear.com/7.x/miniavs/svg?seed=2',
+          content: replay.value,
+          id: `${chatList.length + 2}`,
+          isMine: false,
+        })
+        requestEventStream('/api/robot/chat', {
+          model: chatKey,
+          prompt: inputValue,
+        }, onMessage, onEnd)
+      },
+      people: () => {
+      },
+    }
+    clickMap[type]()
+    setInputValue('')
+  }
 
   return (
     <div className="chatContainer">
@@ -76,12 +99,27 @@ export default function Chat() {
       </div>
       <Affix offsetBottom={0}>
         <div className="chatInput">
+          <Button
+            className="chatInputButton"
+            onClick={() => {
+              chatList.length = 0
+              replay.value = ''
+              setInputValue('')
+            }}
+          >
+            清除
+          </Button>
           <Input
+            allowClear
             className="chatInputBox"
+            onChange={e => setInputValue(e.target.value)}
+            onPressEnter={handleClick}
             placeholder="请输入内容"
+            value={inputValue}
           />
           <Button
             className="chatInputButton"
+            onClick={handleClick}
           >
             提交
           </Button>

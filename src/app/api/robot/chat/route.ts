@@ -29,12 +29,11 @@ export async function GET(request: NextRequest) {
     try {
       for await (const chunk of openaiStream) {
         const chunkText = chunk.choices[0]?.delta?.content || ''
-        // process.stdout.write(chunkText)
-        await writer.write(encoder.encode(`data: ${chunkText}\n\n`))
+        await writer.write(encoder.encode(`${chunkText}`))
       }
     }
     catch (error) {
-      await writer.write(encoder.encode(`data: ERROR: ${error}\n\n`))
+      await writer.write(encoder.encode(`ERROR: ${error}`))
     }
     finally {
       await writer.close()

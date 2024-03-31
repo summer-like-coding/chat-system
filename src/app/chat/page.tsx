@@ -3,6 +3,9 @@ import React from 'react'
 
 export default function page() {
   return (
-    <Chat />
+    <Chat
+      chatKey=""
+      type="people"
+    />
   )
 }

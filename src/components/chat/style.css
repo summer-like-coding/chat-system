@@ -11,7 +11,7 @@
 .chatBody {
   flex: 1;
   width: 100%;
-  max-width: 1000px;
+  /* max-width: 1000px; */
   margin: 0 auto;
   overflow-y: auto;
 }
@@ -39,6 +39,7 @@
 }
 
 .chatContent {
+  text-align: start;
   display: inline-block;
   border-radius: 8px;
   padding: 6px 12px;
@@ -65,7 +66,7 @@
   padding: 0px 5px;
   height: 35px;
   line-height: 30px;
-  border-radius: 10px 0px 0px 10px;
+  border-radius: 10px 10px;
 }
 
 
@@ -76,7 +77,8 @@
   box-shadow: 0 2px 0 rgba(5, 145, 255, 0.1);
   border: none;
   padding: 0 20px;
-  border-radius: 0px 8px 8px 0px;
+  border-radius: 8px;
+  margin: 0 5px;
   cursor: pointer;
   text-align: center;
 }
