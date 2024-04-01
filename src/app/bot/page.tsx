@@ -1,13 +1,13 @@
 'use client'
 
 import Chat from '@/components/chat/Chat'
-import { Input, Layout, Menu } from 'antd'
+import { Layout, Menu } from 'antd'
 import React, { useState } from 'react'
 
 import './style.css'
 
 export default function Bot() {
-  const { Search } = Input
+  // const { Search } = Input
   const { Content, Header, Sider } = Layout
   const [menuKey, setMenuKey] = useState<string>('')
 
@@ -79,10 +79,9 @@ export default function Bot() {
         }}
         width="15%"
       >
-        <div className="slider-search">
-          <Search placeholder="Search" />
-        </div>
+        <div className="slider-search">机器人列表</div>
         <Menu
+          defaultSelectedKeys={['gpt-3.5-turbo']}
           items={createBotItems()}
           mode="inline"
           onClick={({ key }) => {

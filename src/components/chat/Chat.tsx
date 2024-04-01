@@ -2,7 +2,8 @@
 import { requestEventStream } from '@/app/utils/request'
 import { useReactive } from 'ahooks'
 import { Affix, Avatar, Button, Input } from 'antd'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import Markdown from 'react-markdown'
 
 import './style.css'
 
@@ -34,7 +35,7 @@ export default function Chat({ chatKey, type }: IChat) {
             item.isMine
               ? (
                 <>
-                  <div className="chatContent">{item.content}</div>
+                  <div className="chatContent"><Markdown>{item.content}</Markdown></div>
                   <div className="chatAvatar">
                     <Avatar size={32} src={item.avatar} />
                   </div>
@@ -45,8 +46,7 @@ export default function Chat({ chatKey, type }: IChat) {
                   <div className="chatAvatar">
                     <Avatar size={32} src={item.avatar} />
                   </div>
-                  <div className="chatContent">{item.content}</div>
-                  {/* <div className="chatContentTemp">{item.content}</div> */}
+                  <div className="chatContent"><Markdown>{item.content}</Markdown></div>
                 </>
                 )
           }
@@ -91,6 +91,12 @@ export default function Chat({ chatKey, type }: IChat) {
     clickMap[type]()
     setInputValue('')
   }
+
+  useEffect(() => {
+    chatList.length = 0
+    replay.value = ''
+    setInputValue('')
+  }, [chatKey])
 
   return (
     <div className="chatContainer">

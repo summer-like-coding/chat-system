@@ -49,6 +49,11 @@
   box-shadow: 0px 0.3px 0.9px rgba(0, 0, 0, 0.12), 0px 1.6px 3.6px rgba(0, 0, 0, 0.16);
 }
 
+.language-html{
+  overflow-wrap: anywhere;
+  text-wrap: wrap;
+}
+
 .chatMine .chatContent {
   background: linear-gradient(90deg, #2870EA 10.79%, #1B4AEF 87.08%);
   color: #fff;
@@ -82,3 +87,5 @@
   cursor: pointer;
   text-align: center;
 }
+
+
