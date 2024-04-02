@@ -1,24 +1,65 @@
+import type { User } from '@prisma/client'
+
 import { useGlobalStore } from '@/app/store/global'
-import { SkinOutlined, UserOutlined } from '@ant-design/icons'
-import { Button, ColorPicker, DatePicker, Form, Input, Layout, Menu, Select, Switch } from 'antd'
-import React from 'react'
+import { useUserStore } from '@/app/store/user'
+import { request } from '@/app/utils/request'
+import { EditOutlined, LoadingOutlined, PlusOutlined, SkinOutlined, UserOutlined } from '@ant-design/icons'
+import { useBoolean, useToggle } from 'ahooks'
+import { Button, ColorPicker, DatePicker, Form, Image, Input, Layout, Menu, Select, Switch, Upload, message } from 'antd'
+import React, { useState } from 'react'
 
 export default function Setting() {
   const [accountFormRef] = Form.useForm()
   const [appearanceFormRef] = Form.useForm()
   const { Content, Sider } = Layout
-  const [selectedKey, setSelectedKey] = React.useState<string>('account')
+  const [selectedKey, setSelectedKey] = useState<string>('account')
+  const setUser = useUserStore(state => state.setUser)
+  const userStore = useUserStore(state => state.user)
   const setChatBg = useGlobalStore(state => state.setChatBg)
   const toggleTheme = useGlobalStore(state => state.toggleTheme)
   const apperanceConfig = useGlobalStore(state => state.apperanceConfig)
+  const [loading, { setFalse: setLoadingFalse, setTrue: setLoadingTrue }] = useBoolean(false)
+  const [emailDisabled, { toggle: toggleEmailDisabled }] = useToggle(false)
+  const [previewImage, setPreviewImage] = useState('')
+  const [previewOpen, setPreviewOpen] = useState(false)
 
-  function saveUserInfo() {
-    // console.log('保存用户信息')
+  async function saveUserInfo() {
+    const res = await request<User>(`/api/users/${userStore?.id}/update`, {}, {
+      data: accountFormRef.getFieldsValue(),
+      method: 'POST',
+    })
+    setUser(res)
   }
 
   function saveAppearanceInfo() {
     setChatBg(appearanceFormRef.getFieldValue('chatbg'))
     toggleTheme(appearanceFormRef.getFieldValue('theme'))
+  }
+
+  const uploadButton = (
+    <button style={{ background: 'none', border: 0 }} type="button">
+      {loading ? <LoadingOutlined /> : <PlusOutlined />}
+      <div style={{ marginTop: 8 }}>Upload</div>
+    </button>
+  )
+
+  function beforeUpload(file: File) {
+    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png'
+    if (!isJpgOrPng) {
+      message.error('You can only upload JPG/PNG file!')
+      return false
+    }
+    return isJpgOrPng
+  }
+
+  function handleChange(info: any) {
+    if (info.file.status === 'uploading') {
+      setLoadingTrue()
+      return
+    }
+    if (info.file.status === 'done') {
+      setLoadingFalse()
+    }
   }
 
   function appearanceItem() {
@@ -65,30 +106,69 @@ export default function Setting() {
     return (
       <Form
         form={accountFormRef}
+        initialValues={{
+          ...userStore,
+          birthday: undefined,
+        }}
         labelCol={{ span: 8 }}
         wrapperCol={{ span: 16 }}
       >
-        <Form.Item label="用户名">
+        <Form.Item label="头像" name="avatar">
+          <Upload
+            action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
+            beforeUpload={beforeUpload}
+            listType="picture-card"
+            maxCount={1}
+            name="avatar"
+            onChange={handleChange}
+            showUploadList={false}
+          >
+            {userStore?.avatar
+              ? (
+                <Image
+                  alt="avatar"
+                  preview={{
+                    afterOpenChange: visible => !visible && setPreviewImage(''),
+                    onVisibleChange: visible => setPreviewOpen(visible),
+                    visible: previewOpen,
+                  }}
+                  src={previewImage}
+                  wrapperStyle={{ display: 'none' }}
+                />
+                )
+              : uploadButton}
+          </Upload>
+        </Form.Item>
+        <Form.Item label="用户名" name="nickname">
           <Input className="w-full" />
         </Form.Item>
-        <Form.Item label="密码">
-          <Input.Password className="w-full" />
+        <Form.Item
+          label="更改邮箱"
+          name="email"
+        >
+          <Input
+            className="w-full"
+            disabled={!emailDisabled}
+            suffix={(
+              <EditOutlined
+                onClick={toggleEmailDisabled}
+              />
+            )}
+            type="email"
+          />
         </Form.Item>
-        <Form.Item label="邮箱">
-          <Input className="w-full" />
-        </Form.Item>
-        <Form.Item label="出生日期">
+        <Form.Item label="出生日期" name="birthday">
           <DatePicker className="w-full" />
         </Form.Item>
-        <Form.Item label="性别">
+        <Form.Item label="性别" name="gender">
           <Select
             className="w-full"
             options={[{
               label: '男',
-              value: '0',
+              value: '男',
             }, {
               label: '女',
-              value: '1',
+              value: '女',
             }]}
           />
         </Form.Item>

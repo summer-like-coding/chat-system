@@ -1,4 +1,3 @@
-/* eslint-disable tailwindcss/no-custom-classname */
 'use client'
 
 import { useUserStore } from '@/app/store/user'
