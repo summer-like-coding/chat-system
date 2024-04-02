@@ -17,7 +17,7 @@ export default function Setting() {
   const userStore = useUserStore(state => state.user)
   const setChatBg = useGlobalStore(state => state.setChatBg)
   const toggleTheme = useGlobalStore(state => state.toggleTheme)
-  const apperanceConfig = useGlobalStore(state => state.apperanceConfig)
+  const appearanceConfig = useGlobalStore(state => state.appearanceConfig)
   const [loading, { setFalse: setLoadingFalse, setTrue: setLoadingTrue }] = useBoolean(false)
   const [emailDisabled, { toggle: toggleEmailDisabled }] = useToggle(false)
   const [previewImage, setPreviewImage] = useState('')
@@ -75,7 +75,7 @@ export default function Setting() {
         >
           <Switch
             checkedChildren="light"
-            defaultChecked={apperanceConfig.theme === 'light'}
+            defaultChecked={appearanceConfig.theme === 'light'}
             onChange={checked => appearanceFormRef.setFieldValue('theme', checked ? 'light' : 'dark')}
             unCheckedChildren="dark"
           />
@@ -85,7 +85,7 @@ export default function Setting() {
           name="chatbg"
         >
           <ColorPicker
-            defaultValue={apperanceConfig.chatbg}
+            defaultValue={appearanceConfig.chatbg}
             onChange={color => appearanceFormRef.setFieldValue('chatbg', color.toHexString())}
           />
         </Form.Item>

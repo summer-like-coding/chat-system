@@ -1,14 +1,12 @@
 'use client'
-
 import { useUserStore } from '@/app/store/user'
-import { CommentOutlined, ExclamationCircleOutlined, LogoutOutlined, MessageOutlined, RobotOutlined, SettingOutlined } from '@ant-design/icons'
+import { CommentOutlined, LogoutOutlined, MessageOutlined, RobotOutlined, SettingOutlined } from '@ant-design/icons'
 import { useBoolean } from 'ahooks'
 import { Avatar, Badge, List, Modal, Popover } from 'antd'
 import { useRouter } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import { useState } from 'react'
 
-import Icon from '../icon/Icon'
 import Setting from '../setting/Setting'
 import './style.css'
 
@@ -16,34 +14,9 @@ function ToolBar() {
   const router = useRouter()
   const useStore = useUserStore(state => state.user)!
   const [modalVisible, { setFalse: setModalFalse, setTrue: setModalTrue }] = useBoolean(false)
-  const [modalType, setModalType] = useState<string>('about')
+  const [modalType, setModalType] = useState<string>('help')
 
-  const poverItemContent = {
-    about: {
-      content: <div
-        className="item-center flex"
-        key="1"
-        onClick={() => {
-          setModalType('about')
-          setModalTrue()
-        }}
-               >
-        <ExclamationCircleOutlined className="mr-2" size={32} />
-        <div className="w-full">
-          <div>关于</div>
-        </div>
-      </div>,
-      modalContent: <div className="flex w-full flex-row items-center justify-around">
-        <Icon />
-        <div>
-          <h1 className="mb-2 text-4xl">欢乐聊天时</h1>
-          <p className="mb-2 text-base">
-            当前版本号：1.0.0 Native
-          </p>
-        </div>
-      </div>,
-      title: '关于',
-    },
+  const hoverItemContent = {
     help: {
       content: <div
         className="item-center flex"
@@ -67,7 +40,6 @@ function ToolBar() {
         key="3"
         onClick={() => {
           setModalType('logout')
-          // setModalTrue()
           signOut({
             callbackUrl: '/login',
           })
@@ -98,7 +70,7 @@ function ToolBar() {
     },
   }
 
-  const contentList = [poverItemContent.about.content, poverItemContent.help.content, poverItemContent.setting.content, poverItemContent.logout.content]
+  const contentList = [hoverItemContent.help.content, hoverItemContent.setting.content, hoverItemContent.logout.content]
 
   function userInfo() {
     return (
@@ -164,7 +136,7 @@ function ToolBar() {
 
   return (
     <aside className="side-toolbar">
-      <div className="tool-content">
+      <div>
         <Popover
           content={settingInfo}
           trigger="click"
@@ -174,7 +146,6 @@ function ToolBar() {
         <div className="mt-4 flex flex-col items-center">
           <Badge overflowCount={99}>
             <MessageOutlined
-              className="tool-icon"
               onClick={() => {
                 menuClick('chat')
               }}
@@ -182,7 +153,6 @@ function ToolBar() {
             />
           </Badge>
           <RobotOutlined
-            className="tool-icon"
             onClick={() => {
               menuClick('bot')
             }}
@@ -194,9 +164,9 @@ function ToolBar() {
         footer={null}
         onCancel={setModalFalse}
         open={beforeOpen()}
-        title={poverItemContent[modalType as keyof typeof poverItemContent].title}
+        title={hoverItemContent[modalType as keyof typeof hoverItemContent].title}
       >
-        {poverItemContent[modalType as keyof typeof poverItemContent].modalContent}
+        {hoverItemContent[modalType as keyof typeof hoverItemContent].modalContent}
       </Modal>
     </aside>
   )

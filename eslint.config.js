@@ -52,11 +52,8 @@ const config = [
       files: ['*.md'],
       parser: 'eslint-plugin-markdownlint/parser',
       rules: {
-        // no-multiple-blanks
         'markdownlint/md012': 'warn',
-        // line-length
         'markdownlint/md013': 'off',
-        // blanks-around-fences
         'markdownlint/md031': ['warn', {
           list_items: false,
         }],

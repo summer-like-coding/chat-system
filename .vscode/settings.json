@@ -41,7 +41,9 @@
     "toml"
   ],
   "cSpell.words": [
-    "Sider"
+    "ahooks",
+    "Sider",
+    "zustand"
   ],
   "css.customData": ["./css_custom_data.json"]
 }

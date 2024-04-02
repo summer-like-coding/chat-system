@@ -4,7 +4,7 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 type Theme = 'dark' | 'light'
 
 interface GlobalStore {
-  apperanceConfig: {
+  appearanceConfig: {
     chatbg: string
     theme: Theme
   }
@@ -13,19 +13,19 @@ interface GlobalStore {
 }
 
 export const useGlobalStore = create(persist<GlobalStore>(set => ({
-  apperanceConfig: {
+  appearanceConfig: {
     chatbg: '#f0f0f0',
     theme: 'light',
   },
   setChatBg: chatbg => set(state => ({
-    apperanceConfig: {
-      ...state.apperanceConfig,
+    appearanceConfig: {
+      ...state.appearanceConfig,
       chatbg,
     },
   })),
   toggleTheme: theme => set(state => ({
-    apperanceConfig: {
-      ...state.apperanceConfig,
+    appearanceConfig: {
+      ...state.appearanceConfig,
       theme,
     },
   })),
