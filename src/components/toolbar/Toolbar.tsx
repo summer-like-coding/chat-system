@@ -111,17 +111,17 @@ function ToolBar() {
           <p>
             用户名:
             {' '}
-            {useStore.nickname || '未知'}
+            {useStore?.nickname || '未知'}
           </p>
           <p>
             生日:
             {' '}
-            {useStore.birthday ? new Date(useStore.birthday).toLocaleDateString() : '未知'}
+            {useStore?.birthday ? new Date(useStore.birthday).toLocaleDateString() : '未知'}
           </p>
           <p>
             性别:
             {' '}
-            {useStore.gender || '未知'}
+            {useStore?.gender || '未知'}
           </p>
         </div>
       </div>
@@ -150,6 +150,16 @@ function ToolBar() {
     }
     else {
       router.push('/')
+    }
+  }
+
+  function beforeOpen() {
+    if (!useStore) {
+      router.push('/login')
+      return false
+    }
+    else {
+      return modalVisible
     }
   }
 
@@ -184,7 +194,7 @@ function ToolBar() {
       <Modal
         footer={null}
         onCancel={setModalFalse}
-        open={modalVisible}
+        open={beforeOpen()}
         title={poverItemContent[modalType as keyof typeof poverItemContent].title}
       >
         {poverItemContent[modalType as keyof typeof poverItemContent].modalContent}

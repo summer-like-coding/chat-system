@@ -7,7 +7,6 @@ import React, { useState } from 'react'
 import './style.css'
 
 export default function Bot() {
-  // const { Search } = Input
   const { Content, Header, Sider } = Layout
   const [menuKey, setMenuKey] = useState<string>('')
 

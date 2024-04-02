@@ -26,7 +26,7 @@ export default function LoginPassword() {
     })
     router.push(callbackUrl || '/chat')
     message.success('登录成功')
-    const res = await request<User>('/api/users/getByUsername', {
+    const res = await request<User>('/api/users/getByUsername', {}, {
       data: {
         username,
       },
@@ -37,7 +37,7 @@ export default function LoginPassword() {
 
   const register = useCallback(async () => {
     await registerFormRef.validateFields()
-    const res = await request<User>('/api/users/register', {
+    const res = await request<User>('/api/users/register', {}, {
       data: {
         email: registerFormRef.getFieldValue('registerEmail') || '',
         password: registerFormRef.getFieldValue('registerPassword') || '',
