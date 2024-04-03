@@ -30,7 +30,6 @@ export const useGlobalStore = create(persist<GlobalStore>(set => ({
     },
   })),
 }), {
-  // merge: (initial, persisted) => deepMerge(initial, persisted),
   name: 'global',
   storage: createJSONStorage(() => localStorage),
 }))

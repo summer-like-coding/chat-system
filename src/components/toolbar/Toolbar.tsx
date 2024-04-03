@@ -1,8 +1,8 @@
 'use client'
 import { useUserStore } from '@/app/store/user'
-import { CommentOutlined, LogoutOutlined, MessageOutlined, RobotOutlined, SettingOutlined } from '@ant-design/icons'
+import { CommentOutlined, LogoutOutlined, MessageOutlined, PlusSquareOutlined, RobotOutlined, SettingOutlined, UserAddOutlined } from '@ant-design/icons'
 import { useBoolean } from 'ahooks'
-import { Avatar, Badge, List, Modal, Popover } from 'antd'
+import { Avatar, Badge, Button, List, Modal, Popover } from 'antd'
 import { useRouter } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import { useState } from 'react'
@@ -19,7 +19,7 @@ function ToolBar() {
   const hoverItemContent = {
     help: {
       content: <div
-        className="item-center flex"
+        className="flex items-center"
         key="2"
         onClick={() => {
           setModalType('help')
@@ -36,7 +36,7 @@ function ToolBar() {
     },
     logout: {
       content: <div
-        className="item-center flex"
+        className="flex items-center"
         key="3"
         onClick={() => {
           setModalType('logout')
@@ -53,7 +53,7 @@ function ToolBar() {
     },
     setting: {
       content: <div
-        className="item-center flex"
+        className="flex items-center"
         key="4"
         onClick={() => {
           setModalType('setting')
@@ -134,11 +134,34 @@ function ToolBar() {
     }
   }
 
+  function addUserContent() {
+    return (
+      <div className="flex flex-row justify-center">
+        <div className="flex flex-col flex-nowrap items-center">
+          <Button
+            icon={<MessageOutlined />}
+            size="large"
+          />
+          发起群聊
+        </div>
+        <div className="ml-2 flex flex-col flex-nowrap items-center">
+          <Button
+            icon={<UserAddOutlined />}
+            size="large"
+          />
+          添加好友
+        </div>
+      </div>
+
+    )
+  }
+
   return (
     <aside className="side-toolbar">
       <div>
         <Popover
           content={settingInfo}
+          placement="right"
           trigger="click"
         >
           <Avatar size={48} src="https://api.dicebear.com/7.x/miniavs/svg?seed=1" />
@@ -158,6 +181,12 @@ function ToolBar() {
             }}
             style={{ color: '#848484', fontSize: 28, marginTop: 20 }}
           />
+          <Popover content={addUserContent} placement="right" trigger="click">
+            <PlusSquareOutlined
+              style={{ color: '#848484', fontSize: 28, marginTop: 20 }}
+            />
+          </Popover>
+
         </div>
       </div>
       <Modal

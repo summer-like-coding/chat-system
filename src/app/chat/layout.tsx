@@ -6,13 +6,16 @@ type IUser = Pick<User, 'description' | 'id' | 'nickname'>
 import { DashOutlined, TeamOutlined, UserOutlined } from '@ant-design/icons'
 import { useToggle } from 'ahooks'
 import { Avatar, Button, Input, Layout, List, Menu, Popover } from 'antd'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
+import { useUserStore } from '../store/user'
+import { request } from '../utils/request'
 import './style.css'
 
 function ChatLayout({ children }: React.PropsWithChildren) {
   const { Search } = Input
   const { Content, Header, Sider } = Layout
+  const userStore = useUserStore(state => state.user)
   const items = [UserOutlined, TeamOutlined].map(
     (icon, index) => ({
       icon: React.createElement(icon),
@@ -20,7 +23,7 @@ function ChatLayout({ children }: React.PropsWithChildren) {
       label: `nav ${index + 1}`,
     }),
   )
-  const [userList, _setUserList] = useState<IUser[]>([
+  const [userList, setUserList] = useState<IUser[]>([
     { description: 'description1', id: '1', nickname: 'user1' },
     { description: 'description2', id: '2', nickname: 'user2' },
   ])
@@ -54,6 +57,16 @@ function ChatLayout({ children }: React.PropsWithChildren) {
       </div>
     )
   }
+
+  useEffect(() => {
+    if (userStore) {
+      request<IUser[]>(`/api/users/${userStore.id}/friends`).then((res) => {
+        // console.log('好友列表', res)
+        setUserList(res)
+      })
+    }
+  }, [userStore])
+
   return (
     <>
       <Sider
@@ -133,7 +146,6 @@ function ChatLayout({ children }: React.PropsWithChildren) {
                     >
                       查看
                     </Button>
-                    ,
                   </Popover>,
                 ]}
               >

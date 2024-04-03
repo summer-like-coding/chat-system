@@ -96,6 +96,7 @@ export default function Chat({ chatKey, type }: IChat) {
     chatList.length = 0
     replay.value = ''
     setInputValue('')
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatKey])
 
   return (
