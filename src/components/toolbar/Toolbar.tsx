@@ -1,4 +1,6 @@
 'use client'
+import type { User } from '@prisma/client'
+
 import { useUserStore } from '@/app/store/user'
 import { CommentOutlined, LogoutOutlined, MessageOutlined, PlusSquareOutlined, RobotOutlined, SettingOutlined, UserAddOutlined } from '@ant-design/icons'
 import { useBoolean } from 'ahooks'
@@ -7,7 +9,11 @@ import { useRouter } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import { useState } from 'react'
 
+import SearchInput from '../searchInput/SearchInput'
 import Setting from '../setting/Setting'
+import UserList from '../userList/UserList'
+
+type IUser = Pick<User, 'description' | 'id' | 'nickname'>
 import './style.css'
 
 function ToolBar() {
@@ -15,7 +21,10 @@ function ToolBar() {
   const useStore = useUserStore(state => state.user)!
   const removeUserStore = useUserStore(state => state.removeUser)
   const [modalVisible, { setFalse: setModalFalse, setTrue: setModalTrue }] = useBoolean(false)
+  const [addModalVisible, { setFalse: setAddModalFalse, setTrue: setAddModalTrue }] = useBoolean(false)
   const [modalType, setModalType] = useState<string>('help')
+  const [addModalType, setAddModalType] = useState<string>('addFriend')
+  const [applyUserList, _setApplyUserList] = useState<IUser[]>([])
 
   const hoverItemContent = {
     help: {
@@ -71,6 +80,51 @@ function ToolBar() {
         <Setting />
       </div>,
       title: '设置与隐私',
+    },
+  }
+
+  const addUserModalContent = {
+    addFriend: {
+      content: <div className="ml-2 flex flex-col flex-nowrap items-center">
+        <Button
+          icon={<UserAddOutlined />}
+          onClick={() => {
+            setAddModalType('addFriend')
+            setAddModalTrue()
+          }}
+          size="large"
+        />
+        添加好友
+      </div>,
+      modalContent: <div>
+        <SearchInput type="user" />
+        <UserList
+          type="apply"
+          userList={applyUserList}
+        />
+      </div>,
+      title: '添加好友',
+    },
+    addGroup: {
+      content: <div className="flex flex-col flex-nowrap items-center">
+        <Button
+          icon={<MessageOutlined />}
+          onClick={() => {
+            setAddModalType('addGroup')
+            setAddModalTrue()
+          }}
+          size="large"
+        />
+        发起群聊
+      </div>,
+      modalContent: <div>
+        <SearchInput type="user" />
+        <UserList
+          type="apply"
+          userList={applyUserList}
+        />
+      </div>,
+      title: '发起群聊',
     },
   }
 
@@ -138,28 +192,6 @@ function ToolBar() {
     }
   }
 
-  function addUserContent() {
-    return (
-      <div className="flex flex-row justify-center">
-        <div className="flex flex-col flex-nowrap items-center">
-          <Button
-            icon={<MessageOutlined />}
-            size="large"
-          />
-          发起群聊
-        </div>
-        <div className="ml-2 flex flex-col flex-nowrap items-center">
-          <Button
-            icon={<UserAddOutlined />}
-            size="large"
-          />
-          添加好友
-        </div>
-      </div>
-
-    )
-  }
-
   return (
     <aside className="side-toolbar">
       <div>
@@ -185,7 +217,16 @@ function ToolBar() {
             }}
             style={{ color: '#848484', fontSize: 28, marginTop: 20 }}
           />
-          <Popover content={addUserContent} placement="right" trigger="click">
+          <Popover
+            content={(
+              <div className="flex flex-row justify-center">
+                {addUserModalContent.addGroup.content}
+                {addUserModalContent.addFriend.content}
+              </div>
+            )}
+            placement="right"
+            trigger="click"
+          >
             <PlusSquareOutlined
               style={{ color: '#848484', fontSize: 28, marginTop: 20 }}
             />
@@ -193,6 +234,7 @@ function ToolBar() {
 
         </div>
       </div>
+      {/* 账号相关modal */}
       <Modal
         footer={null}
         onCancel={setModalFalse}
@@ -202,6 +244,15 @@ function ToolBar() {
         {
           modalType === 'logout' ? <div>正在退出中...</div> : hoverItemContent[modalType as keyof typeof hoverItemContent].modalContent
         }
+      </Modal>
+      {/* 添加用户相关 */}
+      <Modal
+        footer={null}
+        onCancel={setAddModalFalse}
+        open={addModalVisible}
+        title={addUserModalContent[addModalType as keyof typeof addUserModalContent].title}
+      >
+        {addUserModalContent[addModalType as keyof typeof addUserModalContent].modalContent}
       </Modal>
     </aside>
   )

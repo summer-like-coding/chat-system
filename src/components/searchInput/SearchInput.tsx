@@ -21,7 +21,6 @@ function SearchInput({ type }: SearchInputProps) {
   function handleRequest(value: string) {
     const requestMap = {
       group: () => {
-        // console.log('group')
         request(`/api/groups/${userStore?.id}/friends`).then((res) => {
           // eslint-disable-next-line no-console
           console.log('群组列表', res)
