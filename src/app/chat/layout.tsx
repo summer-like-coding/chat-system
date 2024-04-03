@@ -3,9 +3,10 @@ import type { User } from '@prisma/client'
 
 type IUser = Pick<User, 'description' | 'id' | 'nickname'>
 
+import SearchInput from '@/components/searchInput/SearchInput'
 import { DashOutlined, TeamOutlined, UserOutlined } from '@ant-design/icons'
 import { useToggle } from 'ahooks'
-import { Avatar, Button, Input, Layout, List, Menu, Popover } from 'antd'
+import { Avatar, Button, Layout, List, Menu, Popover } from 'antd'
 import React, { useEffect, useState } from 'react'
 
 import { useUserStore } from '../store/user'
@@ -13,7 +14,6 @@ import { request } from '../utils/request'
 import './style.css'
 
 function ChatLayout({ children }: React.PropsWithChildren) {
-  const { Search } = Input
   const { Content, Header, Sider } = Layout
   const userStore = useUserStore(state => state.user)
   const items = [UserOutlined, TeamOutlined].map(
@@ -61,7 +61,6 @@ function ChatLayout({ children }: React.PropsWithChildren) {
   useEffect(() => {
     if (userStore) {
       request<IUser[]>(`/api/users/${userStore.id}/friends`).then((res) => {
-        // console.log('好友列表', res)
         setUserList(res)
       })
     }
@@ -76,7 +75,8 @@ function ChatLayout({ children }: React.PropsWithChildren) {
         width="15%"
       >
         <div className="slider-search">
-          <Search placeholder="Search" />
+          {/* <Search placeholder="Search" /> */}
+          <SearchInput type="user" />
         </div>
         <Menu
           items={items}
@@ -122,7 +122,8 @@ function ChatLayout({ children }: React.PropsWithChildren) {
         width="18%"
       >
         <div className="slider-search">
-          <Search placeholder="Search" />
+          {/* <Search placeholder="Search" /> */}
+          <SearchInput type="group" />
         </div>
         <div className="slider-content">
           <List

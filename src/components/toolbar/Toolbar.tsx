@@ -13,6 +13,7 @@ import './style.css'
 function ToolBar() {
   const router = useRouter()
   const useStore = useUserStore(state => state.user)!
+  const removeUserStore = useUserStore(state => state.removeUser)
   const [modalVisible, { setFalse: setModalFalse, setTrue: setModalTrue }] = useBoolean(false)
   const [modalType, setModalType] = useState<string>('help')
 
@@ -43,6 +44,9 @@ function ToolBar() {
           signOut({
             callbackUrl: '/login',
           })
+            .then(() => {
+              removeUserStore()
+            })
         }}
                >
         <LogoutOutlined className="mr-2" size={32} />
@@ -195,7 +199,9 @@ function ToolBar() {
         open={beforeOpen()}
         title={hoverItemContent[modalType as keyof typeof hoverItemContent].title}
       >
-        {hoverItemContent[modalType as keyof typeof hoverItemContent].modalContent}
+        {
+          modalType === 'logout' ? <div>正在退出中...</div> : hoverItemContent[modalType as keyof typeof hoverItemContent].modalContent
+        }
       </Modal>
     </aside>
   )
