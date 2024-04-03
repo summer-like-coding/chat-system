@@ -184,7 +184,7 @@ function ToolBar() {
 
   function beforeOpen() {
     if (!useStore) {
-      router.push('/login')
+      // setTimeout(() => router.push('/login'))
       return false
     }
     else {

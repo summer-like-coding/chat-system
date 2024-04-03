@@ -9,7 +9,7 @@ export interface ResultType<T> {
   /**
    * 数据
    */
-  data: T
+  data?: T
   /**
    * 消息
    */

@@ -1,14 +1,31 @@
-/**
- * 根据用户名获取用户信息
- */
-
 import type { NextRequest } from 'next/server'
 
 import { authOptions } from '@/lib/auth'
 import { userService } from '@/services/user'
 import { Result } from '@/utils/result'
 import { getServerSession } from 'next-auth'
-
+/**
+ * 根据用户名获取用户信息
+ * @swagger
+ * /api/getByUsername/:
+ *   get:
+ *     summary: 根据用户名获取用户信息
+ *     tags:
+ *      - 用户
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: 用户名
+ *     responses:
+ *       200:
+ *         description: ResultType\<UserVo> 用户信息
+ */
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)

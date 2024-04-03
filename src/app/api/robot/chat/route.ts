@@ -5,6 +5,17 @@ import { openai } from '@/lib/openai'
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
+/**
+ * @swagger
+ * /api/robot/chat:
+ *   get:
+ *     summary: 与 GPT 机器人聊天
+ *     tags:
+ *       - 机器人
+ *     responses:
+ *       200:
+ *         description: 流式数据
+ */
 export async function GET(request: NextRequest) {
   const responseStream = new TransformStream()
   const writer = responseStream.writable.getWriter()

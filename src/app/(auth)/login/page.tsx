@@ -37,7 +37,8 @@ export default function LoginPassword() {
       },
       method: 'POST',
     })
-    setUser(res)
+    if (res)
+      setUser(res)
   }
 
   async function register() {
@@ -50,11 +51,16 @@ export default function LoginPassword() {
       },
       method: 'POST',
     })
-    loginFormRef.setFieldsValue({
-      loginUserName: res.username,
-    })
-    message.success('注册成功')
-    setToggle.setRight()
+    if (res) {
+      loginFormRef.setFieldsValue({
+        loginUserName: res.username,
+      })
+      message.success('注册成功')
+      setToggle.setRight()
+    }
+    else {
+      message.error('注册失败！请重试')
+    }
   }
 
   return (

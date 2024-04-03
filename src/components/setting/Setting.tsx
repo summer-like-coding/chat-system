@@ -28,7 +28,8 @@ export default function Setting() {
       data: accountFormRef.getFieldsValue(),
       method: 'POST',
     })
-    setUser(res)
+    if (res)
+      setUser(res)
   }
 
   function saveAppearanceInfo() {

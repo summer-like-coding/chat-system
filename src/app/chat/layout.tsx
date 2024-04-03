@@ -33,7 +33,7 @@ function ChatLayout({ children }: React.PropsWithChildren) {
   useEffect(() => {
     if (userStore) {
       request<IUser[]>(`/api/users/${userStore.id}/friends`).then((res) => {
-        setUserList(res)
+        res && setUserList(res)
       })
     }
   }, [userStore])

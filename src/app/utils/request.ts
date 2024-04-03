@@ -20,7 +20,7 @@ function errorHandle(code: keyof typeof errorMap, msg: string) {
   return errorMap[code] || msg
 }
 
-export async function request<T = unknown>(url: string, params?: Record<string, string>, options?: RequestOption): Promise<T> {
+export async function request<T = unknown>(url: string, params?: Record<string, string>, options?: RequestOption): Promise<T | null> {
   const searchParams = new URLSearchParams(params)
   const fetchUrl = `${url}?${searchParams.toString()}`
   const response = await fetch(fetchUrl, {
@@ -35,7 +35,7 @@ export async function request<T = unknown>(url: string, params?: Record<string, 
   })
   const res: ResultType<T> = await response.json()
   if (response.ok && res.code === 0) {
-    return res.data
+    return res.data ?? null
   }
   message.error(errorHandle(res.code as keyof typeof errorMap, res.msg))
   throw new Error(res.msg)

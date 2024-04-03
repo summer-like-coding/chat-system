@@ -8,7 +8,7 @@ async function main() {
     },
   })
   const users = await prisma.user.findMany()
-  console.warn(users)
+  console.warn('users:', users)
 }
 
 main()
