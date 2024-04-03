@@ -20,13 +20,11 @@ RUN npm -v \
 RUN mkdir -p /app/dist \
   && rm -rf /app/.next/cache \
   && cp -r /app/.next /app/dist/.next \
-  && cp -r /app/prisma /app/dist/prisma \
   && cp /app/package.json /app/dist/package.json \
   && cp /app/pnpm-lock.yaml /app/dist/pnpm-lock.yaml \
   && cd /app/dist \
   && pnpm i --prod --ignore-scripts \
-  && pnpm prisma generate \
-  && rm -rf package.json pnpm-lock.yaml prisma
+  && rm -rf package.json pnpm-lock.yaml
 
 # Production image
 FROM node:${NODE_VERSION}-bookworm-slim

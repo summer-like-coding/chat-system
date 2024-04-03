@@ -1,5 +1,5 @@
 'use client'
-import type { CredentialsType } from '@/lib/auth'
+import type { LoginCredentialsType } from '@/services/user'
 import type { User } from '@prisma/client'
 
 import { useUserStore } from '@/app/store/user'
@@ -8,7 +8,7 @@ import { useToggle } from 'ahooks'
 import { Button, Form, Input, message } from 'antd'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { signIn } from 'next-auth/react'
-import React, { useCallback } from 'react'
+import React from 'react'
 
 export default function LoginPassword() {
   const [toggle, setToggle] = useToggle()
@@ -18,12 +18,17 @@ export default function LoginPassword() {
   const [registerFormRef] = Form.useForm()
   const router = useRouter()
   const setUser = useUserStore(state => state.setUser)
-  const login = useCallback(async ({ password, username }: CredentialsType) => {
-    await signIn('credentials', {
+
+  async function login({ password, username }: LoginCredentialsType) {
+    const loginResult = await signIn('credentials', {
       password,
       redirect: false,
       username,
     })
+    if (loginResult?.ok === false) {
+      message.error('登录失败！用户名或密码错误')
+      return
+    }
     router.push(callbackUrl || '/chat')
     message.success('登录成功')
     const res = await request<User>('/api/users/getByUsername', {}, {
@@ -33,9 +38,9 @@ export default function LoginPassword() {
       method: 'POST',
     })
     setUser(res)
-  }, [callbackUrl, router, setUser])
+  }
 
-  const register = useCallback(async () => {
+  async function register() {
     await registerFormRef.validateFields()
     const res = await request<User>('/api/users/register', {}, {
       data: {
@@ -50,7 +55,7 @@ export default function LoginPassword() {
     })
     message.success('注册成功')
     setToggle.setRight()
-  }, [loginFormRef, registerFormRef, setToggle])
+  }
 
   return (
     <div

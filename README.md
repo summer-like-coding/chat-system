@@ -105,13 +105,13 @@ chmod 400 secrets/rs0.key
 Docker Compose 部署：
 
 ```bash
-docker compose up -d --env-file .env.production
+docker compose --env-file .env.production up -d
 ```
 
 需要手动初始化集群，进入任意容器：
 
 ```bash
-docker exec -it $mongo_container mongosh
+docker exec -it $0 mongosh
 ```
 
 初始化集群：
@@ -135,3 +135,6 @@ rs.initiate(config)
 ```bash
 docker compose down
 ```
+
+> [!TIP]
+> 如果无法连接，请求确保你的主机解析 `host.docker.internal` 为 `127.0.0.1` 或不解析。
