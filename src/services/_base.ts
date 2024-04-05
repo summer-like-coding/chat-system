@@ -47,7 +47,7 @@ export abstract class AbstractService<T> {
    * @param data 对象数据
    * @returns 创建结果
    */
-  async create(data: T): Promise<T> {
+  async create(data: Partial<T>): Promise<T> {
     return await this.delegate.create({
       data,
     })

@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic'
  * @swagger
  * /api/robot/chat:
  *   get:
- *     summary: 与 GPT 机器人聊天
+ *     summary: 与 GPT 机器人聊天 @todo 文档更新
  *     tags:
  *       - 机器人
  *     responses:

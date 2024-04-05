@@ -1,6 +1,3 @@
-/**
- * 更新用户信息
- */
 import type { PathIdParams } from '@/types/global'
 import type { NextRequest } from 'next/server'
 
@@ -10,6 +7,31 @@ import { Result } from '@/utils/result'
 import { getServerSession } from 'next-auth'
 import { getToken } from 'next-auth/jwt'
 
+/**
+ * 更新用户信息
+ * @swagger
+ * /api/users/[id]/update/:
+ *   post:
+ *     summary: 更新用户信息
+ *     tags:
+ *      - 用户
+ *     parameters:
+ *      - name: id
+ *        in: path
+ *        description: 用户 ID
+ *        required: true
+ *        type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             $ref: '#/definitions/UserBody'
+ *     responses:
+ *       200:
+ *         description: '`ResultType<UserVo>` 用户信息'
+ */
 export async function POST(request: NextRequest, { params }: PathIdParams) {
   try {
     const session = await getServerSession(authOptions)

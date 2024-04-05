@@ -11,6 +11,36 @@ import { getPageParams } from '@/utils/params'
 import { Result } from '@/utils/result'
 import { getServerSession } from 'next-auth'
 
+/**
+ * 查询用户的好友列表
+ * @swagger
+ * /api/users/[id]/friends/:
+ *   get:
+ *     summary: 查询用户的好友列表
+ *     tags:
+ *      - 用户
+ *     parameters:
+ *      - name: id
+ *        in: path
+ *        description: 用户 ID
+ *        required: true
+ *        type: string
+ *      - name: page
+ *        in: query
+ *        description: 页码
+ *        required: false
+ *        type: integer
+ *        default: 1
+ *      - name: size
+ *        in: query
+ *        description: 每页数量
+ *        required: false
+ *        type: integer
+ *        default: 10
+ *     responses:
+ *       200:
+ *         description: '`ResultType<Friends[]>` 用户的好友列表'
+ */
 export async function GET(request: NextRequest, { params }: PathIdParams) {
   try {
     const session = await getServerSession(authOptions)

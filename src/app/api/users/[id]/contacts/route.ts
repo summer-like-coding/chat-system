@@ -1,6 +1,3 @@
-/**
- * 查询用户对话信息
- */
 import type { PathIdParams } from '@/types/global'
 import type { NextRequest } from 'next/server'
 
@@ -11,6 +8,36 @@ import { Result } from '@/utils/result'
 import { getServerSession } from 'next-auth'
 import { getToken } from 'next-auth/jwt'
 
+/**
+ * 查询用户对话信息
+ * @swagger
+ * /api/users/[id]/contacts/:
+ *   get:
+ *     summary: 查询用户对话信息
+ *     tags:
+ *      - 用户
+ *     parameters:
+ *      - name: id
+ *        in: path
+ *        description: 用户 ID
+ *        required: true
+ *        type: string
+ *      - name: page
+ *        in: query
+ *        description: 页码
+ *        required: false
+ *        type: integer
+ *        default: 1
+ *      - name: size
+ *        in: query
+ *        description: 每页数量
+ *        required: false
+ *        type: integer
+ *        default: 10
+ *     responses:
+ *       200:
+ *         description: '`ResultType<UserVo>` 用户信息'
+ */
 export async function GET(request: NextRequest, { params }: PathIdParams) {
   try {
     const session = await getServerSession(authOptions)

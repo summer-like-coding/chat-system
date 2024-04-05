@@ -4,11 +4,12 @@ import { authOptions } from '@/lib/auth'
 import { userService } from '@/services/user'
 import { Result } from '@/utils/result'
 import { getServerSession } from 'next-auth'
+
 /**
  * 根据用户名获取用户信息
  * @swagger
  * /api/getByUsername/:
- *   get:
+ *   post:
  *     summary: 根据用户名获取用户信息
  *     tags:
  *      - 用户
@@ -18,13 +19,15 @@ import { getServerSession } from 'next-auth'
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *              - username
  *             properties:
  *               username:
  *                 type: string
  *                 description: 用户名
  *     responses:
  *       200:
- *         description: ResultType\<UserVo> 用户信息
+ *         description: '`ResultType<UserVo>` 用户信息'
  */
 export async function POST(request: NextRequest) {
   try {

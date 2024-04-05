@@ -22,7 +22,7 @@ import { getServerSession } from 'next-auth'
  *        type: string
  *     responses:
  *       200:
- *         description: ResultType\<UserVo> 用户信息
+ *         description: '`ResultType<UserVo>` 用户信息'
  */
 export async function GET(request: NextRequest, { params }: PathIdParams) {
   try {

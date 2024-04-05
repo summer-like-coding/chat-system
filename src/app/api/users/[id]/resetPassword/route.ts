@@ -1,6 +1,3 @@
-/**
- * 重置密码
- */
 import type { PathIdParams } from '@/types/global'
 import type { NextRequest } from 'next/server'
 
@@ -10,6 +7,47 @@ import { Result } from '@/utils/result'
 import { getServerSession } from 'next-auth'
 import { getToken } from 'next-auth/jwt'
 
+/**
+ * @swagger
+ * definitions:
+ *   UserResetPasswordBody:
+ *     required:
+ *      - oldPassword
+ *      - newPassword
+ *     properties:
+ *       oldPassword:
+ *         type: string
+ *         description: 旧密码
+ *       newPassword:
+ *         type: string
+ *         description: 新密码
+ */
+
+/**
+ * 重置密码
+ * @swagger
+ * /api/resetPassword/:
+ *   post:
+ *     summary: 重置密码
+ *     tags:
+ *      - 用户
+ *     parameters:
+ *      - name: id
+ *        in: path
+ *        description: 用户 ID
+ *        required: true
+ *        type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             $ref: '#/definitions/UserResetPasswordBody'
+ *     responses:
+ *       200:
+ *         description: '`ResultType<UserVo>` 用户信息'
+ */
 export async function POST(request: NextRequest, { params }: PathIdParams) {
   try {
     const session = await getServerSession(authOptions)

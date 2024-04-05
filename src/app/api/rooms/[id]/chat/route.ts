@@ -11,9 +11,7 @@ import { getToken } from 'next-auth/jwt'
 
 export interface MessageQueryType {
   content: string
-  createdAt: string
   type: MessageType
-  updatedAt: string
 }
 
 async function createMessage(data: MessageQueryType, roomId: string, userId: string) {
@@ -36,6 +34,28 @@ async function createMessage(data: MessageQueryType, roomId: string, userId: str
 
 /**
  * 在房间中聊天
+ * @swagger
+ * /api/rooms/[id]/chat/:
+ *   post:
+ *     summary: 在房间中聊天 @todo
+ *     tags:
+ *      - 房间
+ *     parameters:
+ *      - name: id
+ *        in: path
+ *        description: 房间 ID
+ *        required: true
+ *        type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             $ref: '#/definitions/MessageBody'
+ *     responses:
+ *       200:
+ *         description: '`ResultType<MessageVo>` 消息'
  */
 export async function POST(request: NextRequest, { params }: PathIdParams) {
   try {

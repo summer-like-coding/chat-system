@@ -5,6 +5,22 @@ import { Result } from '@/utils/result'
 
 /**
  * 注册新用户
+ * @swagger
+ * /api/resigter/:
+ *   post:
+ *     summary: 注册新用户
+ *     tags:
+ *      - 用户
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             $ref: '#/definitions/UserRegisterBody'
+ *     responses:
+ *       200:
+ *         description: '`ResultType<UserVo>` 用户信息'
  */
 export async function POST(request: NextRequest) {
   try {
