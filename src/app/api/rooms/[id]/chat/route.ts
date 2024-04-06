@@ -47,6 +47,7 @@ async function createMessage(data: MessageQueryType, roomId: string, userId: str
  *        required: true
  *        type: string
  *     requestBody:
+ *       description: '`{ content: string, type: MessageType }`'
  *       required: true
  *       content:
  *         application/json:

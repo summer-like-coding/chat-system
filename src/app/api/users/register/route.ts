@@ -6,12 +6,13 @@ import { Result } from '@/utils/result'
 /**
  * 注册新用户
  * @swagger
- * /api/resigter/:
+ * /api/users/resigter/:
  *   post:
  *     summary: 注册新用户
  *     tags:
  *      - 用户
  *     requestBody:
+ *       description: '`{ username: string, password: string, email: string }`'
  *       required: true
  *       content:
  *         application/json:

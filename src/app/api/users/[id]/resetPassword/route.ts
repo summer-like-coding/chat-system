@@ -26,7 +26,7 @@ import { getToken } from 'next-auth/jwt'
 /**
  * 重置密码
  * @swagger
- * /api/resetPassword/:
+ * /api/users/resetPassword/:
  *   post:
  *     summary: 重置密码
  *     tags:
@@ -38,6 +38,7 @@ import { getToken } from 'next-auth/jwt'
  *        required: true
  *        type: string
  *     requestBody:
+ *       description: '`{ oldPassword: string, newPassword: string }`'
  *       required: true
  *       content:
  *         application/json:

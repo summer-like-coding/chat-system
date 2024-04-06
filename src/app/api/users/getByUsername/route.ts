@@ -8,12 +8,13 @@ import { getServerSession } from 'next-auth'
 /**
  * 根据用户名获取用户信息
  * @swagger
- * /api/getByUsername/:
+ * /api/users/getByUsername/:
  *   post:
  *     summary: 根据用户名获取用户信息
  *     tags:
  *      - 用户
  *     requestBody:
+ *       description: '`{ username: string }`'
  *       required: true
  *       content:
  *         application/json:

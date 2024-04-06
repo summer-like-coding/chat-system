@@ -22,6 +22,16 @@ import { getToken } from 'next-auth/jwt'
  *        required: true
  *        type: string
  *     requestBody:
+ *       description: |
+ *        `{
+ *          avatar?: string,
+ *          birthday?: string,
+ *          description?: string,
+ *          email?: string,
+ *          gender?: string,
+ *          nickname?: string,
+ *          phone?: string
+ *         }`
  *       required: true
  *       content:
  *         application/json:

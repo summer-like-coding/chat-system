@@ -11,7 +11,7 @@ import { getToken } from 'next-auth/jwt'
  * 拉取房间中的消息
  * @swagger
  * /api/rooms/[id]/pull/:
- *   get:
+ *   post:
  *     summary: 拉取房间中的消息 @todo
  *     tags:
  *      - 房间
@@ -21,11 +21,28 @@ import { getToken } from 'next-auth/jwt'
  *        description: 房间 ID
  *        required: true
  *        type: string
+ *     requestBody:
+ *       description: '`{ lastMessageId: string, lastMessageTime: string }`'
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *              - lastMessageId
+ *              - lastMessageTime
+ *             properties:
+ *               lastMessageId:
+ *                 type: string
+ *                 description: 最后一条消息的 ID
+ *               lastMessageTime:
+ *                 type: string
+ *                 description: 最后一条消息的时间
  *     responses:
  *       200:
- *         description: '`ResultType<MessageVo>` 消息'
+ *         description: '`ResultType<MessageVo[]>` 消息'
  */
-export async function GET(request: NextRequest, { params }: PathIdParams) {
+export async function POST(request: NextRequest, { params }: PathIdParams) {
   try {
     const session = await getServerSession(authOptions)
     if (!session) {

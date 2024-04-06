@@ -1,5 +1,8 @@
 /**
  * @swagger
+ * tags:
+ *  - name: 用户
+ *    description: 用户注册、登录、信息修改
  * definitions:
  *   UserBody:
  *     properties:

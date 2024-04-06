@@ -56,6 +56,7 @@ export class Groupervice extends AbstractService<Group> {
   /**
    * 搜索群组
    * @param keyword 关键词
+   * @param page 分页参数
    * @returns 群组列表
    */
   async searchGroups(keyword: string, page: PageParamsType) {

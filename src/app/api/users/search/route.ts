@@ -1,19 +1,19 @@
 import type { NextRequest } from 'next/server'
 
 import { authOptions } from '@/lib/auth'
-import { groupService } from '@/services/group'
+import { userService } from '@/services/user'
 import { getPageParams } from '@/utils/params'
 import { Result } from '@/utils/result'
 import { getServerSession } from 'next-auth'
 
 /**
- * 搜索群组
+ * 搜索用户
  * @swagger
- * /api/groups/search/:
+ * /api/users/search/:
  *   post:
- *     summary: 搜索群组
+ *     summary: 搜索用户
  *     tags:
- *      - 群组
+ *      - 用户
  *     parameters:
  *      - name: page
  *        in: query
@@ -42,7 +42,7 @@ import { getServerSession } from 'next-auth'
  *                 description: 关键词
  *     responses:
  *       200:
- *         description: '`ResultType<GroupVo[]>` 群组列表'
+ *         description: '`ResultType<UserVo[]>` 用户列表'
  */
 export async function POST(request: NextRequest) {
   try {
@@ -52,8 +52,8 @@ export async function POST(request: NextRequest) {
     }
     const { keyword } = await request.json()
     const page = getPageParams(request)
-    const res = await groupService.searchGroups(keyword, page)
-    return Result.success(groupService.asVoList(res))
+    const res = await userService.searchUsers(keyword, page)
+    return Result.success(userService.asVoList(res))
   }
   catch (error) {
     console.error('Error:', error)

@@ -7,14 +7,26 @@ export const dynamic = 'force-dynamic'
 
 /**
  * @swagger
- * /api/robot/chat:
+ * /api/robot/chat/:
  *   get:
- *     summary: 与 GPT 机器人聊天 @todo 文档更新
+ *     summary: 与 GPT 机器人聊天
  *     tags:
  *       - 机器人
+ *     parameters:
+ *      - name: prompt
+ *        in: query
+ *        description: 对话内容
+ *        required: true
+ *        type: string
+ *      - name: model
+ *        in: query
+ *        description: 模型名称
+ *        required: false
+ *        type: string
+ *        default: gpt-3.5-turbo
  *     responses:
  *       200:
- *         description: 流式数据
+ *         description: 流式数据 `text/event-stream`
  */
 export async function GET(request: NextRequest) {
   const responseStream = new TransformStream()

@@ -1,3 +1,4 @@
+import type { PageParamsType } from '@/types/global'
 import type { User } from '@prisma/client'
 
 import { prisma } from '@/lib/db'
@@ -52,6 +53,7 @@ export class UserService extends AbstractService<User> {
   async getUserByUsername(username: string): Promise<User | null> {
     return await prisma.user.findFirst({
       where: {
+        isDeleted: false,
         username,
       },
     })
@@ -66,6 +68,7 @@ export class UserService extends AbstractService<User> {
     const { password, username } = data
     const user = await prisma.user.findFirst({
       where: {
+        isDeleted: false,
         username,
       },
     })
@@ -126,9 +129,29 @@ export class UserService extends AbstractService<User> {
       },
       where: {
         id,
+        isDeleted: false,
       },
     })
     return { user: updatedUser }
+  }
+
+  /**
+   * 搜索用户
+   * @param keyword 关键词
+   * @param page 分页参数
+   * @returns 用户列表
+   */
+  async searchUsers(keyword: string, page: PageParamsType) {
+    return this.delegate.findMany({
+      skip: (page.page - 1) * page.size,
+      take: page.size,
+      where: {
+        isDeleted: false,
+        username: {
+          contains: keyword,
+        },
+      },
+    })
   }
 }
 
