@@ -215,36 +215,42 @@ model UserContact {
   @@map("user_contact")
 }
 
+enum ApplyStatusType {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
 // 用户好友申请
 model FriendApply {
-  id         String           @id @default(auto()) @map("_id") @db.ObjectId
-  userId     String           @map("user_id") @db.ObjectId
-  targetId   String           @map("target_id") @db.ObjectId
+  id         String          @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String          @map("user_id") @db.ObjectId
+  targetId   String          @map("target_id") @db.ObjectId
   type       String?
   reason     String?
   selfRemark String?
   answer     String?
-  status     CommonStatusType @default(ACTIVE)
-  isDeleted  Boolean          @default(false) @map("is_deleted")
-  createdAt  DateTime         @default(now()) @map("created_at")
-  updatedAt  DateTime         @default(now()) @updatedAt @map("updated_at")
+  status     ApplyStatusType @default(PENDING)
+  isDeleted  Boolean         @default(false) @map("is_deleted")
+  createdAt  DateTime        @default(now()) @map("created_at")
+  updatedAt  DateTime        @default(now()) @updatedAt @map("updated_at")
 
   @@map("friend_apply")
 }
 
 // 群组申请
 model GroupApply {
-  id         String           @id @default(auto()) @map("_id") @db.ObjectId
-  userId     String           @map("user_id") @db.ObjectId
-  groupId    String           @map("group_id") @db.ObjectId
+  id         String          @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String          @map("user_id") @db.ObjectId
+  groupId    String          @map("group_id") @db.ObjectId
   type       String?
   reason     String?
   selfRemark String?
   answer     String?
-  status     CommonStatusType @default(ACTIVE)
-  isDeleted  Boolean          @default(false) @map("is_deleted")
-  createdAt  DateTime         @default(now()) @map("created_at")
-  updatedAt  DateTime         @default(now()) @updatedAt @map("updated_at")
+  status     ApplyStatusType @default(PENDING)
+  isDeleted  Boolean         @default(false) @map("is_deleted")
+  createdAt  DateTime        @default(now()) @map("created_at")
+  updatedAt  DateTime        @default(now()) @updatedAt @map("updated_at")
 
   @@map("group_apply")
 }

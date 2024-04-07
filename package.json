@@ -15,7 +15,7 @@
   "dependencies": {
     "@ant-design/icons": "^5.3.5",
     "@ant-design/nextjs-registry": "^1.0.0",
-    "@prisma/client": "^5.11.0",
+    "@prisma/client": "^5.12.1",
     "ahooks": "^3.7.10",
     "antd": "^5.15.4",
     "bcryptjs": "^2.4.3",
@@ -53,7 +53,7 @@
     "immer": "^10.0.4",
     "lint-staged": "^15.2.2",
     "postcss": "^8.4.38",
-    "prisma": "^5.11.0",
+    "prisma": "^5.12.1",
     "protobufjs-cli": "^1.1.2",
     "simple-git-hooks": "^2.11.1",
     "tailwindcss": "^3.4.3",
