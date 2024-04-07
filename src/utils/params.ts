@@ -5,12 +5,12 @@ import type { PageParamsType } from '@/types/global'
  * @param request 请求
  * @returns 查询参数
  */
-export function getParams(request: Request): Record<string, string> {
+export function getParams(request: Request): Record<string, string | undefined> {
   const searchParams = new URLSearchParams(request.url.split('?')[1])
-  const params: Record<string, string> = {}
-  for (const [key, value] of searchParams)
+  const params: Record<string, string | undefined> = {}
+  for (const [key, value] of searchParams) {
     params[key] = value
-
+  }
   return params
 }
 

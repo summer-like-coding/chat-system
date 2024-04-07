@@ -1,3 +1,5 @@
+import type { PageParamsType } from '@/types/global'
+
 import { prisma } from '@/lib/db'
 import { ApplyStatusType, type FriendApply, type GroupApply } from '@prisma/client'
 
@@ -60,6 +62,46 @@ export class FriendApplyService extends AbstractService<FriendApply> {
       })
       return applyCreated
     })
+  }
+
+  /**
+   * 根据 userId 查找申请记录
+   * @param userId 用户 ID
+   * @param page 分页参数
+   * @param status 申请状态
+   * @returns 申请记录列表
+   */
+  async getApplies(userId: string, page: PageParamsType, status?: ApplyStatusType) {
+    const applies = await this.delegate.findMany({
+      skip: (page.page - 1) * page.size,
+      take: page.size,
+      where: {
+        isDeleted: false,
+        status,
+        userId,
+      },
+    })
+    return applies
+  }
+
+  /**
+   * 根据 targetId 查找申请记录
+   * @param targetId 目标用户 ID
+   * @param page 分页参数
+   * @param status 申请状态
+   * @returns 申请记录列表
+   */
+  async getAppliesByTargetId(targetId: string, page: PageParamsType, status?: ApplyStatusType) {
+    const applies = await this.delegate.findMany({
+      skip: (page.page - 1) * page.size,
+      take: page.size,
+      where: {
+        isDeleted: false,
+        status,
+        targetId,
+      },
+    })
+    return applies
   }
 }
 

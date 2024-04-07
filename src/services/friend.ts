@@ -32,6 +32,7 @@ export class FriendService extends AbstractService<UserFriend> {
         id: {
           in: userIdList.map(x => x.friendId),
         },
+        isDeleted: false,
       },
     })
     return users

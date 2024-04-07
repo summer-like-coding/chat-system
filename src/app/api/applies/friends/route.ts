@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
       type,
       userId,
     })
-    return Result.success(apply)
+    return Result.success(friendApplyService.asVo(apply))
   }
   catch (error: any) {
     console.error('Error:', error)
