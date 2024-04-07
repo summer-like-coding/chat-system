@@ -2,21 +2,24 @@
  * 好友搜索框/群搜索框
  */
 
-import type { Group, User } from '@prisma/client'
+import type { FriendApply, Group, User } from '@prisma/client'
 
 import { useUserStore } from '@/app/store/user'
 import { request } from '@/app/utils/request'
 import { SearchOutlined } from '@ant-design/icons'
-import { Button, Select } from 'antd'
+import { Button, Select, message } from 'antd'
 import React, { useState } from 'react'
+
+import type { IApplyList } from '../applyList/ApplyList'
 
 interface SearchInputProps {
   id?: string
+  setList?: React.Dispatch<React.SetStateAction<IApplyList[]>>
   type: 'group' | 'user'
   usedBy: 'apply' | 'chat'
 }
 
-function SearchInput({ type, usedBy }: SearchInputProps) {
+function SearchInput({ setList, type, usedBy }: SearchInputProps) {
   const userStore = useUserStore(state => state.user)
   const [options, setOptions] = useState<{
     label: string
@@ -26,7 +29,10 @@ function SearchInput({ type, usedBy }: SearchInputProps) {
   async function handleRequest(value: string) {
     const requestMap = {
       group: async () => {
-        const res = await request<Group[]>(`/api/groups/${userStore?.id}/friends`)
+        const res = await request<Group[]>('/api/groups/search', {
+          page: '1',
+          size: '10',
+        })
         setOptions(res!.map(item => ({
           label: item.name,
           value: item.id,
@@ -50,6 +56,52 @@ function SearchInput({ type, usedBy }: SearchInputProps) {
     requestMap[type]()
   }
 
+  function queryApplies() {
+    const queryAppliesMap = {
+      group: async () => {
+        const res = await request('/api/applies/groups', {}, {
+          data: {
+            userId: userStore!.id,
+          },
+        })
+        return res
+      },
+      user: async () => {
+        const res = await request<FriendApply[]>(`/api/users/${userStore!.id}/applies`, {})
+        const lists: IApplyList[] = res?.map((item) => {
+          return {
+            status: item.status,
+            targetId: item.id,
+          }
+        }) || []
+        setList && setList(lists)
+        return res
+      },
+    }
+    queryAppliesMap[type]()
+  }
+
+  function handleClick(value: string) {
+    const handleClickMap = {
+      'apply-group': () => {}, // 申请加入群组
+      'apply-user': async () => {
+        const res = await request('/api/applies/friends', {}, {
+          data: {
+            targetId: value,
+            userId: userStore!.id,
+          },
+          method: 'POST',
+        })
+        message.success('申请成功')
+        queryApplies()
+        return res
+      }, // 申请加好友
+      'chat-group': () => {}, // 聊天
+      'chat-user': () => {}, // 聊天
+    }
+    handleClickMap[`${usedBy}-${type}`]()
+  }
+
   return (
     <Select
       allowClear
@@ -58,10 +110,10 @@ function SearchInput({ type, usedBy }: SearchInputProps) {
         handleRequest('')
       }}
       onSearch={handleRequest}
-      optionRender={({ label }) => (
+      optionRender={({ label, value }) => (
         <div className="flex flex-row items-center justify-between">
           <div style={{ marginLeft: 8 }}>{label}</div>
-          <Button type="link">
+          <Button onClick={() => handleClick(value as any)} type="link">
             {usedBy === 'apply' ? '申请' : '聊天'}
           </Button>
         </div>

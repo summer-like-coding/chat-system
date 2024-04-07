@@ -1,19 +1,22 @@
 'use client'
-import type { User } from '@prisma/client'
+
+import type { FriendApply } from '@prisma/client'
 
 import { useUserStore } from '@/app/store/user'
+import { request } from '@/app/utils/request'
+import { applyStatusMapping } from '@/types/mapping'
 import { CommentOutlined, LogoutOutlined, MessageOutlined, PlusSquareOutlined, RobotOutlined, SettingOutlined, UserAddOutlined } from '@ant-design/icons'
 import { useBoolean } from 'ahooks'
-import { Avatar, Badge, Button, List, Modal, Popover } from 'antd'
+import { Avatar, Badge, Button, List, Modal, Popover, Tabs } from 'antd'
 import { useRouter } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import { useState } from 'react'
 
+import type { IApplyList } from '../applyList/ApplyList'
+
+import ApplyList from '../applyList/ApplyList'
 import SearchInput from '../searchInput/SearchInput'
 import Setting from '../setting/Setting'
-import UserList from '../userList/UserList'
-
-type IUser = Pick<User, 'description' | 'id' | 'nickname'>
 import './style.css'
 
 function ToolBar() {
@@ -24,7 +27,20 @@ function ToolBar() {
   const [addModalVisible, { setFalse: setAddModalFalse, setTrue: setAddModalTrue }] = useBoolean(false)
   const [modalType, setModalType] = useState<string>('help')
   const [addModalType, setAddModalType] = useState<string>('addFriend')
-  const [applyUserList, _setApplyUserList] = useState<IUser[]>([])
+  const [applyUserList, setApplyUserList] = useState<IApplyList[]>([])
+
+  async function handleTabClick(key: string) {
+    const res = await request<FriendApply[]>(`/api/users/${useStore!.id}/applies`, {
+      type: key === 'applyUser' ? 'self' : 'target',
+    })
+    const lists: IApplyList[] = res?.map((item) => {
+      return {
+        status: item.status,
+        targetId: item.id,
+      }
+    }) || []
+    setApplyUserList(lists)
+  }
 
   const hoverItemContent = {
     help: {
@@ -96,14 +112,43 @@ function ToolBar() {
         />
         添加好友
       </div>,
-      modalContent: <div>
-        <SearchInput type="user" usedBy="apply" />
-        <UserList
-          type="apply"
-          userList={applyUserList}
-        />
-      </div>,
-      title: '添加好友',
+      modalContent: <Tabs
+        defaultActiveKey="applyUser"
+        items={[{
+          children: <div>
+            <SearchInput
+              setList={setApplyUserList}
+              type="user"
+              usedBy="apply"
+            />
+            <List
+              dataSource={applyUserList}
+              itemLayout="horizontal"
+              renderItem={(item, index) => (
+                <List.Item>
+                  <List.Item.Meta
+                    avatar={<Avatar size={48} src={item.avatar || `https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`} />}
+                    description={applyStatusMapping[item.status]}
+                    title={item.targetId}
+                  />
+                </List.Item>
+              )}
+            />
+          </div>,
+          key: 'applyUser',
+          label: '申请好友',
+        }, {
+          children: <div>
+            <ApplyList
+              applyList={applyUserList}
+            />
+          </div>,
+          key: 'appliedUser',
+          label: '新朋友',
+        }]}
+        onTabClick={key => handleTabClick(key)}
+                    />,
+      title: '好友',
     },
     addGroup: {
       content: <div className="flex flex-col flex-nowrap items-center">
@@ -117,14 +162,24 @@ function ToolBar() {
         />
         发起群聊
       </div>,
-      modalContent: <div>
-        <SearchInput type="user" usedBy="apply" />
-        <UserList
-          type="apply"
-          userList={applyUserList}
-        />
-      </div>,
-      title: '发起群聊',
+      modalContent: <Tabs
+        defaultActiveKey="applyGroup"
+        items={[{
+          children: <div>
+            <SearchInput
+              setList={setApplyUserList}
+              type="user"
+              usedBy="apply"
+            />
+            <ApplyList
+              applyList={applyUserList}
+            />
+          </div>,
+          key: 'applyGroup',
+          label: '发起群聊',
+        }]}
+                    />,
+      title: '群聊',
     },
   }
 
@@ -184,7 +239,6 @@ function ToolBar() {
 
   function beforeOpen() {
     if (!useStore) {
-      // setTimeout(() => router.push('/login'))
       return false
     }
     else {
