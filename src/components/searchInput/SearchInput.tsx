@@ -2,37 +2,48 @@
  * 好友搜索框/群搜索框
  */
 
-import type { User } from '@prisma/client'
+import type { Group, User } from '@prisma/client'
 
 import { useUserStore } from '@/app/store/user'
 import { request } from '@/app/utils/request'
 import { SearchOutlined } from '@ant-design/icons'
-import { Select } from 'antd'
-import React from 'react'
+import { Button, Select } from 'antd'
+import React, { useState } from 'react'
 
 interface SearchInputProps {
   id?: string
   type: 'group' | 'user'
+  usedBy: 'apply' | 'chat'
 }
 
-function SearchInput({ type }: SearchInputProps) {
+function SearchInput({ type, usedBy }: SearchInputProps) {
   const userStore = useUserStore(state => state.user)
+  const [options, setOptions] = useState<{
+    label: string
+    value: string
+  }[]>([] as any)
 
-  function handleRequest(value: string) {
+  async function handleRequest(value: string) {
     const requestMap = {
-      group: () => {
-        request(`/api/groups/${userStore?.id}/friends`).then((res) => {
-          // eslint-disable-next-line no-console
-          console.log('群组列表', res)
-        })
+      group: async () => {
+        const res = await request<Group[]>(`/api/groups/${userStore?.id}/friends`)
+        setOptions(res!.map(item => ({
+          label: item.name,
+          value: item.id,
+        })))
+        return res
       },
       user: async () => {
-        const res = await request<User>('/api/users/getByUsername', {}, {
+        const res = await request<User[]>('/api/users/search', {}, {
           data: {
-            username: value,
+            keyword: value,
           },
           method: 'POST',
         })
+        setOptions(res!.map(item => ({
+          label: item.username,
+          value: item.id,
+        })))
         return res
       },
     }
@@ -41,17 +52,24 @@ function SearchInput({ type }: SearchInputProps) {
 
   return (
     <Select
-      fieldNames={{
-        label: 'username',
-        value: 'id',
+      allowClear
+      filterOption={false}
+      onFocus={() => {
+        handleRequest('')
       }}
-      notFoundContent={null}
       onSearch={handleRequest}
-      placeholder="Search"
+      optionRender={({ label }) => (
+        <div className="flex flex-row items-center justify-between">
+          <div style={{ marginLeft: 8 }}>{label}</div>
+          <Button type="link">
+            {usedBy === 'apply' ? '申请' : '聊天'}
+          </Button>
+        </div>
+      )}
+      options={options}
+      placeholder={`搜索${type === 'group' ? '群组' : '好友'}`}
       showSearch
-      style={{
-        width: '100%',
-      }}
+      style={{ width: '100%' }}
       suffixIcon={<SearchOutlined />}
     />
   )

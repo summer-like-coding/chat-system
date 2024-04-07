@@ -28,13 +28,16 @@ export default function Setting() {
       data: accountFormRef.getFieldsValue(),
       method: 'POST',
     })
-    if (res)
+    if (res) {
+      message.success('更新成功')
       setUser(res)
+    }
   }
 
   function saveAppearanceInfo() {
     setChatBg(appearanceFormRef.getFieldValue('chatbg'))
     toggleTheme(appearanceFormRef.getFieldValue('theme'))
+    message.success('更新成功')
   }
 
   const uploadButton = (

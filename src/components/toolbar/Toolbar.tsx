@@ -97,7 +97,7 @@ function ToolBar() {
         添加好友
       </div>,
       modalContent: <div>
-        <SearchInput type="user" />
+        <SearchInput type="user" usedBy="apply" />
         <UserList
           type="apply"
           userList={applyUserList}
@@ -118,7 +118,7 @@ function ToolBar() {
         发起群聊
       </div>,
       modalContent: <div>
-        <SearchInput type="user" />
+        <SearchInput type="user" usedBy="apply" />
         <UserList
           type="apply"
           userList={applyUserList}

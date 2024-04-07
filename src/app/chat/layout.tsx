@@ -47,7 +47,7 @@ function ChatLayout({ children }: React.PropsWithChildren) {
         width="15%"
       >
         <div className="slider-search">
-          <SearchInput type="user" />
+          <SearchInput type="user" usedBy="chat" />
         </div>
         <Menu
           items={items}
@@ -93,7 +93,7 @@ function ChatLayout({ children }: React.PropsWithChildren) {
         width="18%"
       >
         <div className="slider-search">
-          <SearchInput type="group" />
+          <SearchInput type="group" usedBy="chat" />
         </div>
         <div className="slider-content">
           <UserList
