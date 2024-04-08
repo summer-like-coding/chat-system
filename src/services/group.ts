@@ -75,3 +75,32 @@ export class Groupervice extends AbstractService<Group> {
 }
 
 export const groupService = new Groupervice()
+
+/**
+ * 用户群组服务
+ */
+export class UserGroupervice extends AbstractService<Group> {
+  delegate = prisma.userGroup
+
+  /**
+   * 通过用户 ID 查询用户的群组列表
+   * @param userId 用户 ID
+   * @param page 分页参数
+   * @returns 群组列表
+   */
+  async getByUsername(userId: string, page: PageParamsType): Promise<Group[]> {
+    const userGroups = await this.delegate.findMany({
+      include: {
+        group: true,
+      },
+      skip: (page.page - 1) * page.size,
+      take: page.size,
+      where: {
+        userId,
+      },
+    })
+    return userGroups.map(item => item.group)
+  }
+}
+
+export const userGroupService = new UserGroupervice()

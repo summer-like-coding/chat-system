@@ -37,6 +37,17 @@ model User {
   createdAt   DateTime       @default(now()) @map("created_at")
   updatedAt   DateTime       @default(now()) @updatedAt @map("updated_at")
 
+  userFriends         UserFriend[]  @relation(name: "UserFriend:user")
+  friendUserFriends   UserFriend[]  @relation(name: "UserFriend:friend")
+  userGroups          UserGroup[]
+  messages            Message[]
+  user1FriendRooms    FriendRoom[]  @relation(name: "FriendRoom:user1")
+  user2FriendRooms    FriendRoom[]  @relation(name: "FriendRoom:user2")
+  userContacts        UserContact[]
+  userFriendApplies   FriendApply[] @relation(name: "FriendApply:user")
+  targetFriendApplies FriendApply[] @relation(name: "FriendApply:target")
+  groupApplies        GroupApply[]
+
   @@map("user")
 }
 
@@ -49,6 +60,8 @@ model Role {
   isDeleted   Boolean          @default(false) @map("is_deleted")
   createdAt   DateTime         @default(now()) @map("created_at")
   updatedAt   DateTime         @default(now()) @updatedAt @map("updated_at")
+
+  rolePermissions RolePermission[]
 
   @@map("role")
 }
@@ -72,6 +85,8 @@ model Permission {
   createdAt   DateTime         @default(now()) @map("created_at")
   updatedAt   DateTime         @default(now()) @updatedAt @map("updated_at")
 
+  rolePermissions RolePermission[]
+
   @@map("permission")
 }
 
@@ -80,6 +95,9 @@ model RolePermission {
   id           String @id @default(auto()) @map("_id") @db.ObjectId
   roleId       String @map("role_id") @db.ObjectId
   permissionId String @map("permission_id") @db.ObjectId
+
+  role       Role       @relation(fields: [roleId], references: [id])
+  permission Permission @relation(fields: [permissionId], references: [id])
 
   @@map("role_permission")
 }
@@ -92,6 +110,9 @@ model UserFriend {
   isDeleted Boolean  @default(false) @map("is_deleted")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  users   User @relation(name: "UserFriend:user", fields: [userId], references: [id])
+  friends User @relation(name: "UserFriend:friend", fields: [friendId], references: [id])
 
   @@map("user_friend")
 }
@@ -106,6 +127,10 @@ model Group {
   isDeleted   Boolean          @default(false) @map("is_deleted")
   createdAt   DateTime         @default(now()) @map("created_at")
   updatedAt   DateTime         @default(now()) @updatedAt @map("updated_at")
+
+  userGroups   UserGroup[]
+  groupApplies GroupApply[]
+  groupRooms   GroupRoom[]
 
   @@map("group")
 }
@@ -127,6 +152,9 @@ model UserGroup {
   createdAt DateTime         @default(now()) @map("created_at")
   updatedAt DateTime         @default(now()) @updatedAt @map("updated_at")
 
+  user  User  @relation(fields: [userId], references: [id])
+  group Group @relation(fields: [groupId], references: [id])
+
   @@map("user_group")
 }
 
@@ -145,6 +173,11 @@ model Room {
   isDeleted     Boolean          @default(false) @map("is_deleted")
   createdAt     DateTime         @default(now()) @map("created_at")
   updatedAt     DateTime         @default(now()) @updatedAt @map("updated_at")
+
+  userContacts UserContact[]
+  groupRooms   GroupRoom[]
+  friendRooms  FriendRoom[]
+  messages     Message[]
 
   @@map("room")
 }
@@ -167,6 +200,9 @@ model Message {
   createdAt DateTime         @default(now()) @map("created_at")
   updatedAt DateTime         @default(now()) @updatedAt @map("updated_at")
 
+  user         User          @relation(fields: [userId], references: [id])
+  room         Room          @relation(fields: [roomId], references: [id])
+
   @@map("message")
 }
 
@@ -181,6 +217,10 @@ model FriendRoom {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
+  room Room @relation(fields: [roomId], references: [id])
+  user1 User @relation(name: "FriendRoom:user1", fields: [user1Id], references: [id])
+  user2 User @relation(name: "FriendRoom:user2", fields: [user2Id], references: [id])
+
   @@map("friend_room")
 }
 
@@ -193,6 +233,9 @@ model GroupRoom {
   isDeleted Boolean  @default(false) @map("is_deleted")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  room  Room  @relation(fields: [roomId], references: [id])
+  group Group @relation(fields: [groupId], references: [id])
 
   @@map("group_room")
 }
@@ -211,6 +254,9 @@ model UserContact {
   isDeleted     Boolean          @default(false) @map("is_deleted")
   createdAt     DateTime         @default(now()) @map("created_at")
   updatedAt     DateTime         @default(now()) @updatedAt @map("updated_at")
+
+  user        User     @relation(fields: [userId], references: [id])
+  room        Room     @relation(fields: [roomId], references: [id])
 
   @@map("user_contact")
 }
@@ -236,6 +282,9 @@ model FriendApply {
   createdAt  DateTime        @default(now()) @map("created_at")
   updatedAt  DateTime        @default(now()) @updatedAt @map("updated_at")
 
+  user   User @relation(name: "FriendApply:user", fields: [userId], references: [id])
+  target User @relation(name: "FriendApply:target", fields: [targetId], references: [id])
+
   @@map("friend_apply")
 }
 
@@ -252,6 +301,9 @@ model GroupApply {
   isDeleted  Boolean         @default(false) @map("is_deleted")
   createdAt  DateTime        @default(now()) @map("created_at")
   updatedAt  DateTime        @default(now()) @updatedAt @map("updated_at")
+
+  user  User  @relation(fields: [userId], references: [id])
+  group Group @relation(fields: [groupId], references: [id])
 
   @@map("group_apply")
 }

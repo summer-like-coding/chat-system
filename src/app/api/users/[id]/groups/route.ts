@@ -2,17 +2,16 @@ import type { PathIdParams } from '@/types/global'
 import type { NextRequest } from 'next/server'
 
 import { authOptions } from '@/lib/auth'
-import { friendService } from '@/services/friend'
-import { userService } from '@/services/user'
+import { groupService, userGroupService } from '@/services/group'
 import { getPageParams } from '@/utils/params'
 import { Result } from '@/utils/result'
 import { getServerSession } from 'next-auth'
 import { getToken } from 'next-auth/jwt'
 
 /**
- * 查询用户的好友列表
+ * 查询用户的群聊列表
  * @swagger
- * /api/users/[id]/friends/:
+ * /api/users/[id]/groups/:
  *   get:
  *     summary: 查询用户的好友列表
  *     description: 需要鉴权，仅用户自己可查询
@@ -38,7 +37,7 @@ import { getToken } from 'next-auth/jwt'
  *        default: 10
  *     responses:
  *       200:
- *         description: '`ResultType<UserFriend[]>` 用户的好友列表'
+ *         description: '`ResultType<Group[]>` 用户的好友列表'
  */
 export async function GET(request: NextRequest, { params }: PathIdParams) {
   try {
@@ -47,12 +46,13 @@ export async function GET(request: NextRequest, { params }: PathIdParams) {
       return Result.error('未登录')
     }
     const token = await getToken({ req: request })
-    if (token?.sub !== params.id) {
+    const { id: userId } = params
+    if (token?.sub !== userId) {
       return Result.error('无权限查询用户好友列表')
     }
     const page = getPageParams(request)
-    const friends = await friendService.getFriends(params.id, page)
-    return Result.success(userService.asVoList(friends))
+    const groups = await userGroupService.getByUsername(userId, page)
+    return Result.success(groupService.asVoList(groups))
   }
   catch (error: any) {
     console.error('Error:', error)
