@@ -16,9 +16,9 @@ export class FriendService extends AbstractService<UserFriend> {
    * @param userId 用户 ID
    */
   async getFriends(userId: string, page: PageParamsType) {
-    const userIdList = await this.delegate.findMany({
-      select: {
-        friendId: true,
+    const userFriend = await this.delegate.findMany({
+      include: {
+        user: true,
       },
       skip: (page.page - 1) * page.size,
       take: page.size,
@@ -27,15 +27,7 @@ export class FriendService extends AbstractService<UserFriend> {
         userId,
       },
     })
-    const users = await prisma.user.findMany({
-      where: {
-        id: {
-          in: userIdList.map(x => x.friendId),
-        },
-        isDeleted: false,
-      },
-    })
-    return users
+    return userFriend.map(item => item.user)
   }
 }
 

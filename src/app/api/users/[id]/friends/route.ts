@@ -38,7 +38,7 @@ import { getToken } from 'next-auth/jwt'
  *        default: 10
  *     responses:
  *       200:
- *         description: '`ResultType<UserFriend[]>` 用户的好友列表'
+ *         description: '`ResultType<User[]>` 用户列表'
  */
 export async function GET(request: NextRequest, { params }: PathIdParams) {
   try {
@@ -51,8 +51,8 @@ export async function GET(request: NextRequest, { params }: PathIdParams) {
       return Result.error('无权限查询用户好友列表')
     }
     const page = getPageParams(request)
-    const friends = await friendService.getFriends(params.id, page)
-    return Result.success(userService.asVoList(friends))
+    const users = await friendService.getFriends(params.id, page)
+    return Result.success(userService.asVoList(users))
   }
   catch (error: any) {
     console.error('Error:', error)
