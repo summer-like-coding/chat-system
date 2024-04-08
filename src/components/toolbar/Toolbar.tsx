@@ -5,7 +5,7 @@ import type { FriendApply } from '@prisma/client'
 import { useUserStore } from '@/app/store/user'
 import { request } from '@/app/utils/request'
 import { applyStatusMapping } from '@/types/mapping'
-import { CommentOutlined, LogoutOutlined, MessageOutlined, PlusSquareOutlined, RobotOutlined, SettingOutlined, UserAddOutlined } from '@ant-design/icons'
+import { CommentOutlined, LogoutOutlined, MessageOutlined, PlusSquareOutlined, RobotOutlined, SettingOutlined, UnorderedListOutlined, UserAddOutlined } from '@ant-design/icons'
 import { useBoolean } from 'ahooks'
 import { Avatar, Badge, Button, List, Modal, Popover, Tabs } from 'antd'
 import { useRouter } from 'next/navigation'
@@ -232,6 +232,9 @@ function ToolBar() {
     else if (key === 'bot') {
       router.push('/bot')
     }
+    else if (key === 'friendList') {
+      router.push('/friendList')
+    }
     else {
       router.push('/')
     }
@@ -285,7 +288,12 @@ function ToolBar() {
               style={{ color: '#848484', fontSize: 28, marginTop: 20 }}
             />
           </Popover>
-
+          <UnorderedListOutlined
+            onClick={() => {
+              menuClick('friendList')
+            }}
+            style={{ color: '#848484', fontSize: 28, marginTop: 20 }}
+          />
         </div>
       </div>
       {/* 账号相关modal */}

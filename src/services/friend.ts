@@ -1,7 +1,7 @@
 import type { PageParamsType } from '@/types/global'
+import type { UserFriend } from '@prisma/client'
 
 import { prisma } from '@/lib/db'
-import { CommonStatusType, type UserFriend } from '@prisma/client'
 
 import { AbstractService } from './_base'
 
@@ -23,7 +23,7 @@ export class FriendService extends AbstractService<UserFriend> {
       skip: (page.page - 1) * page.size,
       take: page.size,
       where: {
-        status: CommonStatusType.ACTIVE,
+        isDeleted: false,
         userId,
       },
     })

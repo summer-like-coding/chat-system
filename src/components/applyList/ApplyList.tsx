@@ -1,6 +1,7 @@
 import type { ApplyStatusType } from '@prisma/client'
 
-import { Avatar, Button, List } from 'antd'
+import { request } from '@/app/utils/request'
+import { Avatar, Button, List, message } from 'antd'
 import React from 'react'
 
 export interface IApplyList {
@@ -14,6 +15,19 @@ interface IApplyListProps {
 }
 
 function ApplyList({ applyList }: IApplyListProps) {
+  async function handleAudit(type: 'accept' | 'reject', targetId: string) {
+    // console.log(type)
+    const res = await request(`/api/applies/friends/${targetId}/audit`, {}, {
+      data: {
+        opinion: type,
+      },
+      method: 'POST',
+    })
+    // eslint-disable-next-line no-console
+    console.log('res', res)
+    message.success('操作成功')
+  }
+
   function handleListAction(item: IApplyList) {
     const actionMap = {
       ACCEPTED: [
@@ -24,12 +38,21 @@ function ApplyList({ applyList }: IApplyListProps) {
           已接受
         </Button>,
       ],
+      IGNORED: [
+        <Button
+          disabled
+          key="ignored"
+        >
+          已忽略
+        </Button>,
+      ],
       PENDING: [
         <div
           key="pending"
         >
           <Button
             key="accept-apply"
+            onClick={() => handleAudit('accept', item.targetId)}
           >
             接受
           </Button>
