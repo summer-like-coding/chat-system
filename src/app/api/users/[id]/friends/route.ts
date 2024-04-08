@@ -18,6 +18,7 @@ import { getToken } from 'next-auth/jwt'
  * /api/users/[id]/friends/:
  *   get:
  *     summary: 查询用户的好友列表
+ *     description: 需要鉴权，仅用户自己可查询
  *     tags:
  *      - 用户
  *     parameters:
@@ -56,8 +57,8 @@ export async function GET(request: NextRequest, { params }: PathIdParams) {
     const friends = await friendService.getFriends(params.id, page)
     return Result.success(userService.asVoList(friends))
   }
-  catch (error) {
+  catch (error: any) {
     console.error('Error:', error)
-    return Result.error('未知错误')
+    return Result.error(`错误: ${error.message}`)
   }
 }

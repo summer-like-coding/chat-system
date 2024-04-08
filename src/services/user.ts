@@ -85,25 +85,29 @@ export class UserService extends AbstractService<User> {
    * @param data 表单数据
    * @returns 注册信息
    */
-  async registerUser(data: RegisterUserType): Promise<{
-    error?: string
-    user?: User
-  }> {
+  async registerUser(data: RegisterUserType): Promise<User> {
     const { email, password, username } = data
-    const user = await this.getUserByUsername(username)
-    if (user)
-      return { error: `用户名 ${username} 已经存在` }
-
-    const salt = await bcrypt.genSalt(10)
-    const hashedPassword = await bcrypt.hash(password, salt)
-    const newUser = await prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        username,
-      },
+    const user = await prisma.$transaction(async (ctx) => {
+      const user = await ctx.user.findFirst({
+        where: {
+          username,
+        },
+      })
+      if (user) {
+        throw new Error(`用户名 ${username} 已经存在`)
+      }
+      const salt = await bcrypt.genSalt(10)
+      const hashedPassword = await bcrypt.hash(password, salt)
+      const newUser = await ctx.user.create({
+        data: {
+          email,
+          password: hashedPassword,
+          username,
+        },
+      })
+      return newUser
     })
-    return { user: newUser }
+    return user
   }
 
   /**

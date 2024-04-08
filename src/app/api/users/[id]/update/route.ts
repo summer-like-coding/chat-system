@@ -13,6 +13,7 @@ import { getToken } from 'next-auth/jwt'
  * /api/users/[id]/update/:
  *   post:
  *     summary: 更新用户信息
+ *     description: 需要鉴权，仅用户自己可更新
  *     tags:
  *      - 用户
  *     parameters:
@@ -67,8 +68,8 @@ export async function POST(request: NextRequest, { params }: PathIdParams) {
     })
     return Result.success(userService.asVo(res))
   }
-  catch (error) {
+  catch (error: any) {
     console.error('Error:', error)
-    return Result.error('未知错误')
+    return Result.error(`错误: ${error.message}`)
   }
 }

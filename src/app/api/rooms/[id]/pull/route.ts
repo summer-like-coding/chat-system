@@ -55,8 +55,8 @@ export async function POST(request: NextRequest, { params }: PathIdParams) {
     if (!room)
       return Result.error('未找到房间')
   }
-  catch (error) {
+  catch (error: any) {
     console.error('Error:', error)
-    return Result.error('未知错误')
+    return Result.error(`错误: ${error.message}`)
   }
 }

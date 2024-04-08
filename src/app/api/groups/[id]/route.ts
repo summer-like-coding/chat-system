@@ -35,8 +35,8 @@ export async function GET(request: NextRequest, { params }: PathIdParams) {
       return Result.error('未找到群组')
     return Result.success(groupService.asVo(group))
   }
-  catch (error) {
+  catch (error: any) {
     console.error('Error:', error)
-    return Result.error('未知错误')
+    return Result.error(`错误: ${error.message}`)
   }
 }

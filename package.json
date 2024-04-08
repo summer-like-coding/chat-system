@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@8.15.5",
+  "packageManager": "pnpm@8.15.6",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -15,8 +15,10 @@
   "dependencies": {
     "@ant-design/icons": "^5.3.5",
     "@ant-design/nextjs-registry": "^1.0.0",
+    "@microsoft/fetch-event-source": "^2.0.1",
     "@prisma/client": "^5.12.1",
     "ahooks": "^3.7.10",
+    "ai": "^3.0.19",
     "antd": "^5.15.4",
     "bcryptjs": "^2.4.3",
     "next": "^14.1.4",

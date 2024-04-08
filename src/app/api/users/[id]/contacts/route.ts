@@ -14,6 +14,7 @@ import { getToken } from 'next-auth/jwt'
  * /api/users/[id]/contacts/:
  *   get:
  *     summary: 查询用户对话信息
+ *     description: 需要鉴权，仅用户自己可查询
  *     tags:
  *      - 用户
  *     parameters:
@@ -36,7 +37,7 @@ import { getToken } from 'next-auth/jwt'
  *        default: 10
  *     responses:
  *       200:
- *         description: '`ResultType<UserVo>` 用户信息'
+ *         description: '`ResultType<ContactVo>` 联系信息'
  */
 export async function GET(request: NextRequest, { params }: PathIdParams) {
   try {
@@ -52,8 +53,8 @@ export async function GET(request: NextRequest, { params }: PathIdParams) {
     const contacts = await contactService.getByUserId(params.id, page)
     return Result.success(contactService.asVoList(contacts))
   }
-  catch (error) {
+  catch (error: any) {
     console.error('Error:', error)
-    return Result.error('未知错误')
+    return Result.error(`错误: ${error.message}`)
   }
 }

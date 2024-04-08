@@ -1,11 +1,14 @@
 import type { NextRequest } from 'next/server'
 
 import { openai } from '@/lib/openai'
+import { getParams } from '@/utils/params'
+import { OpenAIStream, StreamingTextResponse } from 'ai'
 
-export const runtime = 'nodejs'
+export const runtime = 'edge'
 export const dynamic = 'force-dynamic'
 
 /**
+ * @deprecated 请使用 POST /api/robot/chat/ 提供的 OpenAI 兼容接口
  * @swagger
  * /api/robot/chat/:
  *   get:
@@ -69,4 +72,36 @@ export async function GET(request: NextRequest) {
       'Content-Type': 'text/event-stream; charset=utf-8',
     },
   })
+}
+
+/**
+ * @swagger
+ * /api/robot/chat/:
+ *   post:
+ *     description: OpenAI 兼容接口
+ *     summary: 与 GPT 机器人聊天
+ *     tags:
+ *       - 机器人
+ *     parameters:
+ *      - name: model
+ *        in: query
+ *        description: 模型名称
+ *        required: false
+ *        type: string
+ *        default: gpt-3.5-turbo
+ *     responses:
+ *       200:
+ *         description: 流式数据 `text/event-stream`
+ */
+export async function POST(request: Request) {
+  const { messages } = await request.json()
+  const { model } = getParams(request)
+  const response = await openai.chat.completions.create({
+    messages,
+    model: model ?? 'gpt-3.5-turbo',
+    stream: true,
+  })
+
+  const stream = OpenAIStream(response)
+  return new StreamingTextResponse(stream)
 }

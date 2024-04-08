@@ -12,6 +12,7 @@ import { getServerSession } from 'next-auth'
  * /api/users/[id]/:
  *   get:
  *     summary: 查询用户信息
+ *     description: 需要鉴权，登录用户可请求
  *     tags:
  *      - 用户
  *     parameters:
@@ -35,8 +36,8 @@ export async function GET(request: NextRequest, { params }: PathIdParams) {
       return Result.error('未找到用户')
     return Result.success(userService.asVo(user))
   }
-  catch (error) {
+  catch (error: any) {
     console.error('Error:', error)
-    return Result.error('未知错误')
+    return Result.error(`错误: ${error.message}`)
   }
 }

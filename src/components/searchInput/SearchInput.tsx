@@ -85,7 +85,7 @@ function SearchInput({ setList, type, usedBy }: SearchInputProps) {
     const handleClickMap = {
       'apply-group': () => {}, // 申请加入群组
       'apply-user': async () => {
-        const res = await request('/api/applies/friends', {}, {
+        const res = await request('/api/applies/friends/apply', {}, {
           data: {
             targetId: value,
             userId: userStore!.id,

@@ -86,12 +86,12 @@ model RolePermission {
 
 // 用户好友
 model UserFriend {
-  id        String           @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String           @map("user_id") @db.ObjectId
-  friendId  String           @map("friend_id") @db.ObjectId
-  status    CommonStatusType @default(ACTIVE)
-  createdAt DateTime         @default(now()) @map("created_at")
-  updatedAt DateTime         @default(now()) @updatedAt @map("updated_at")
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @map("user_id") @db.ObjectId
+  friendId  String   @map("friend_id") @db.ObjectId
+  isDeleted Boolean  @default(false) @map("is_deleted")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("user_friend")
 }
@@ -219,6 +219,7 @@ enum ApplyStatusType {
   PENDING
   ACCEPTED
   REJECTED
+  IGNORED
 }
 
 // 用户好友申请

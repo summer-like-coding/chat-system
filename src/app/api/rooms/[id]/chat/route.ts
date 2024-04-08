@@ -99,8 +99,8 @@ export async function POST(request: NextRequest, { params }: PathIdParams) {
 
     return Result.success(messageService.asVo(message))
   }
-  catch (error) {
+  catch (error: any) {
     console.error('Error:', error)
-    return Result.error('未知错误')
+    return Result.error(`错误: ${error.message}`)
   }
 }

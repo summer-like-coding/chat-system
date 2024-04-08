@@ -37,9 +37,9 @@ import { getToken } from 'next-auth/jwt'
 
 /**
  * @swagger
- * /api/applies/friends/:
+ * /api/applies/friends/apply/:
  *   post:
- *     summary: 申请加好友 @todo
+ *     summary: 申请加好友
  *     tags:
  *      - 申请
  *     requestBody:
@@ -60,7 +60,7 @@ import { getToken } from 'next-auth/jwt'
  *             $ref: '#/definitions/AppliesFriendsBody'
  *     responses:
  *       200:
- *         description: '`ResultType<ApplyVo>` 申请信息'
+ *         description: '`ResultType<FriendApplyVo>` 申请信息'
  */
 export async function POST(request: NextRequest) {
   try {

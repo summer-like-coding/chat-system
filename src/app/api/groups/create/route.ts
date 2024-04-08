@@ -38,8 +38,8 @@ export async function POST(request: NextRequest) {
     const res = await groupService.initializeGroup({ name }, userIdList)
     return Result.success(groupService.asVo(res))
   }
-  catch (error) {
+  catch (error: any) {
     console.error('Error:', error)
-    return Result.error('未知错误')
+    return Result.error(`错误: ${error.message}`)
   }
 }

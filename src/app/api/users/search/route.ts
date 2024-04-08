@@ -12,6 +12,7 @@ import { getServerSession } from 'next-auth'
  * /api/users/search/:
  *   post:
  *     summary: 搜索用户
+ *     description: 需要鉴权，登录用户可请求
  *     tags:
  *      - 用户
  *     parameters:
@@ -55,8 +56,8 @@ export async function POST(request: NextRequest) {
     const res = await userService.searchUsers(keyword, page)
     return Result.success(userService.asVoList(res))
   }
-  catch (error) {
+  catch (error: any) {
     console.error('Error:', error)
-    return Result.error('未知错误')
+    return Result.error(`错误: ${error.message}`)
   }
 }

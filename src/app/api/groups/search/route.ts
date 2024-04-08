@@ -55,8 +55,8 @@ export async function POST(request: NextRequest) {
     const res = await groupService.searchGroups(keyword, page)
     return Result.success(groupService.asVoList(res))
   }
-  catch (error) {
+  catch (error: any) {
     console.error('Error:', error)
-    return Result.error('未知错误')
+    return Result.error(`错误: ${error.message}`)
   }
 }
