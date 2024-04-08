@@ -1,20 +1,67 @@
 import type { User } from '@prisma/client'
 
 import { Avatar, Button, List, Popover } from 'antd'
+import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 
-type IUser = Pick<User, 'description' | 'id' | 'nickname'>
+type IUser = Pick<User, 'avatar' | 'birthday' | 'description' | 'gender' | 'id' | 'username'>
 
 interface IUserListProps {
-  type: 'apply' | 'view'
+  type: 'apply' | 'chat' | 'view'
   userList: IUser[]
 }
 
 function UserList({ type, userList }: IUserListProps) {
   const [clickUser, setClickUser] = useState<IUser>({} as User)
-
+  const router = useRouter()
   function handleMenuClick(item: IUser) {
     setClickUser(item)
+  }
+
+  function handleChat(item: IUser) {
+    router.push(`/chat?userId=${item.id}`)
+  }
+
+  function handleListAction(item: IUser, index: number) {
+    const listActionMap = {
+      apply: [
+        <Button
+          key="list-apply"
+          onClick={() => handleMenuClick(item)}
+          type="link"
+        >
+          申请
+        </Button>,
+      ],
+      chat: [
+        <Button
+          key="list-chat"
+          onClick={() => handleChat(item)}
+          type="link"
+        >
+          聊天
+        </Button>,
+      ],
+      view: [
+        <Popover
+          content={popOverContent}
+          key={`popover${index}`}
+          title="用户信息"
+          trigger="click"
+        >
+          <Button
+            key="list-view"
+            onClick={() => {
+              handleMenuClick(item)
+            }}
+            type="link"
+          >
+            查看
+          </Button>
+        </Popover>,
+      ],
+    }
+    return listActionMap[type]
   }
 
   function popOverContent() {
@@ -26,15 +73,15 @@ function UserList({ type, userList }: IUserListProps) {
         <div className="basis-1/2">
           <p>
             用户名:
-            {clickUser.nickname}
+            {clickUser.username}
           </p>
           <p>
             年龄:
-            {clickUser.nickname || '未知'}
+            { clickUser.birthday ? clickUser.birthday.getFullYear() : '未知' }
           </p>
           <p>
             性别:
-            {clickUser.nickname || '未知'}
+            {clickUser.gender || '未知'}
           </p>
         </div>
       </div>
@@ -47,43 +94,12 @@ function UserList({ type, userList }: IUserListProps) {
       itemLayout="horizontal"
       renderItem={(item, index) => (
         <List.Item
-          actions={[
-            <Popover
-              content={popOverContent}
-              key={`popover${index}`}
-              title="用户信息"
-              trigger="click"
-            >
-              {
-                type === 'apply'
-                  ? (
-                    <Button
-                      key="list-apply"
-                      onClick={() => handleMenuClick(item)}
-                      type="link"
-                    >
-                      添加好友
-                    </Button>
-                    )
-                  : (
-                    <Button
-                      key="list-view"
-                      onClick={() => {
-                        handleMenuClick(item)
-                      }}
-                      type="link"
-                    >
-                      查看
-                    </Button>
-                    )
-              }
-            </Popover>,
-          ]}
+          actions={handleListAction(item, index)}
         >
           <List.Item.Meta
             avatar={<Avatar size={48} src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`} />}
             description={item.description}
-            title={item.nickname}
+            title={item.username}
           />
         </List.Item>
       )}

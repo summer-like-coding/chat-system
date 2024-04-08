@@ -1,7 +1,7 @@
 'use client'
 import type { User } from '@prisma/client'
 
-type IUser = Pick<User, 'description' | 'id' | 'nickname'>
+type IUser = Pick<User, 'avatar' | 'birthday' | 'description' | 'gender' | 'id' | 'username'>
 
 import SearchInput from '@/components/searchInput/SearchInput'
 import UserList from '@/components/userList/UserList'
@@ -24,10 +24,7 @@ function ChatLayout({ children }: React.PropsWithChildren) {
       label: `nav ${index + 1}`,
     }),
   )
-  const [userList, setUserList] = useState<IUser[]>([
-    { description: 'description1', id: '1', nickname: 'user1' },
-    { description: 'description2', id: '2', nickname: 'user2' },
-  ])
+  const [userList, setUserList] = useState<IUser[]>()
   const [userToggle, { toggle }] = useToggle(false)
 
   useEffect(() => {
@@ -96,12 +93,15 @@ function ChatLayout({ children }: React.PropsWithChildren) {
         width="18%"
       >
         <div className="slider-search">
-          <SearchInput type="group" usedBy="chat" />
+          <SearchInput
+            type="user"
+            usedBy="chat"
+          />
         </div>
         <div className="slider-content">
           <UserList
             type="view"
-            userList={userList}
+            userList={userList!}
           />
         </div>
       </Sider>

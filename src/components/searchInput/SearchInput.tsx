@@ -16,7 +16,7 @@ interface SearchInputProps {
   id?: string
   setList?: React.Dispatch<React.SetStateAction<IApplyList[]>>
   type: 'group' | 'user'
-  usedBy: 'apply' | 'chat'
+  usedBy: 'apply' | 'chat' | 'search'
 }
 
 function SearchInput({ setList, type, usedBy }: SearchInputProps) {
@@ -28,7 +28,7 @@ function SearchInput({ setList, type, usedBy }: SearchInputProps) {
 
   async function handleRequest(value: string) {
     const requestMap = {
-      group: async () => {
+      'apply-group': async () => {
         const res = await request<Group[]>('/api/groups/search', {
           page: '1',
           size: '10',
@@ -39,7 +39,7 @@ function SearchInput({ setList, type, usedBy }: SearchInputProps) {
         })))
         return res
       },
-      user: async () => {
+      'apply-user': async () => {
         const res = await request<User[]>('/api/users/search', {}, {
           data: {
             keyword: value,
@@ -52,8 +52,12 @@ function SearchInput({ setList, type, usedBy }: SearchInputProps) {
         })))
         return res
       },
+      'chat-group': () => {}, // 聊天
+      'chat-user': () => {}, // 聊天
+      'search-group': () => {}, // 查看群组信息
+      'search-user': () => {}, // 查看好友信息
     }
-    requestMap[type]()
+    requestMap[`${usedBy}-${type}`]()
   }
 
   function queryApplies() {
@@ -98,6 +102,8 @@ function SearchInput({ setList, type, usedBy }: SearchInputProps) {
       }, // 申请加好友
       'chat-group': () => {}, // 聊天
       'chat-user': () => {}, // 聊天
+      'search-group': () => {}, // 查看群组信息
+      'search-user': () => {}, // 查看好友信息
     }
     handleClickMap[`${usedBy}-${type}`]()
   }

@@ -99,6 +99,16 @@ export default function Chat({ chatKey, type }: IChat) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatKey])
 
+  useEffect(() => {
+    // 获取url参数
+    const url = new URL(window.location.href)
+    const userId = url.searchParams.get('userId')
+    if (userId) {
+      // eslint-disable-next-line no-console
+      console.log('userId', userId)
+    }
+  }, [])
+
   return (
     <div className="chatContainer">
       <div className="chatBody">
