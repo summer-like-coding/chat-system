@@ -68,7 +68,8 @@ export async function POST(request: NextRequest, { params }: PathIdParams) {
     if (!token)
       return Result.error('未登录')
 
-    const room = await roomService.getById(params.id)
+    const { id: roomId } = params
+    const room = await roomService.getById(roomId, { isDeleted: false })
     if (!room)
       return Result.error('未找到房间')
     const data: MessageQueryType = await request.json()

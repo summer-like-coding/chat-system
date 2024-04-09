@@ -17,10 +17,14 @@ export interface Delegate {
   upsert: (data: any) => any
 }
 
+export interface BaseModel {
+  id: string
+}
+
 /**
  * 抽象服务
  */
-export abstract class AbstractService<T> {
+export abstract class AbstractService<T extends BaseModel> {
   /**
    * 返回 VO 对象
    * @param data 数据
@@ -68,8 +72,12 @@ export abstract class AbstractService<T> {
   /**
    * 查询全部
    */
-  async getAll(): Promise<T[]> {
-    return await this.delegate.findMany({})
+  async getAll(filters?: Partial<T>): Promise<T[]> {
+    return await this.delegate.findMany({
+      where: {
+        ...filters,
+      },
+    })
   }
 
   /**
@@ -77,10 +85,11 @@ export abstract class AbstractService<T> {
    * @param id 对象 ID
    * @returns 查询结果
    */
-  async getById(id: string): Promise<T | null> {
+  async getById(id: string, filters?: Partial<T>): Promise<T | null> {
     return await this.delegate.findUnique({
       where: {
         id,
+        ...filters,
       },
     })
   }
@@ -90,12 +99,19 @@ export abstract class AbstractService<T> {
    * @param page 分页参数
    * @returns 分页查询结果
    */
-  async getByPage(page: PageParamsType): Promise<PageType<T>> {
+  async getByPage(page: PageParamsType, filters?: Partial<T>): Promise<PageType<T>> {
     const { page: currentPage, size } = page
-    const total = await this.delegate.count()
+    const total = await this.delegate.count({
+      where: {
+        ...filters,
+      },
+    })
     const list = await this.delegate.findMany({
       skip: (currentPage - 1) * size,
       take: size,
+      where: {
+        ...filters,
+      },
     })
     return {
       list,

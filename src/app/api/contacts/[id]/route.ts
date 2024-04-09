@@ -24,7 +24,7 @@ import { getToken } from 'next-auth/jwt'
  *        type: string
  *     responses:
  *       200:
- *         description: '`ResultType<ContactVo>` 联系信息'
+ *         description: '`ResultType<ContactVo & { room: RoomVo, user: UserVo }>` 联系信息'
  */
 export async function GET(request: NextRequest, { params }: PathIdParams) {
   try {
@@ -34,7 +34,9 @@ export async function GET(request: NextRequest, { params }: PathIdParams) {
     }
     const token = await getToken({ req: request })
     const userId = token?.sub
-    const contact = await contactService.getById(params.id)
+    const { id: contactId } = params
+
+    const contact = await contactService.getDetails(contactId)
     if (!contact) {
       return Result.error('未找到联系信息')
     }

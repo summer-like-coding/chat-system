@@ -21,7 +21,17 @@ const BASE_URL = 'https://files.alexsun.top'
  * /api/upload/files:
  *   post:
  *     summary: 上传文件
- *     description: 需要鉴权，登录后可以上传文件
+ *     description: |
+ *       需要鉴权，登录后可以上传文件
+ *       ```js
+ *       const form = new FormData()
+ *       form.append('file', file)
+ *       const res = await fetch('/api/upload/files', {
+ *         method: 'POST',
+ *         body: form,
+ *       })
+ *       const result = await res.json()
+ *       ```
  *     tags:
  *      - 上传
  *     requestBody:

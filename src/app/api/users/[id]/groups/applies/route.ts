@@ -47,7 +47,7 @@ import { getToken } from 'next-auth/jwt'
  *         - REJECTED
  *     responses:
  *       200:
- *         description: '`ResultType<(GroupApply & { group: Group })[]>` 用户的申请记录'
+ *         description: '`ResultType<(GroupApplyVo & { group: GroupVo })[]>` 用户的申请记录'
  */
 export async function GET(request: NextRequest, { params }: PathIdParams) {
   try {

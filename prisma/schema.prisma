@@ -147,6 +147,7 @@ model UserGroup {
   userId    String           @map("user_id") @db.ObjectId
   groupId   String           @map("group_id") @db.ObjectId
   groupRole GroupRoleType    @default(MEMBER) @map("group_role")
+  remark    String?
   status    CommonStatusType @default(ACTIVE)
   isDeleted Boolean          @default(false) @map("is_deleted")
   createdAt DateTime         @default(now()) @map("created_at")
@@ -200,8 +201,8 @@ model Message {
   createdAt DateTime         @default(now()) @map("created_at")
   updatedAt DateTime         @default(now()) @updatedAt @map("updated_at")
 
-  user         User          @relation(fields: [userId], references: [id])
-  room         Room          @relation(fields: [roomId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+  room Room @relation(fields: [roomId], references: [id])
 
   @@map("message")
 }
@@ -217,7 +218,7 @@ model FriendRoom {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
-  room Room @relation(fields: [roomId], references: [id])
+  room  Room @relation(fields: [roomId], references: [id])
   user1 User @relation(name: "FriendRoom:user1", fields: [user1Id], references: [id])
   user2 User @relation(name: "FriendRoom:user2", fields: [user2Id], references: [id])
 
@@ -255,8 +256,8 @@ model UserContact {
   createdAt     DateTime         @default(now()) @map("created_at")
   updatedAt     DateTime         @default(now()) @updatedAt @map("updated_at")
 
-  user        User     @relation(fields: [userId], references: [id])
-  room        Room     @relation(fields: [roomId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+  room Room @relation(fields: [roomId], references: [id])
 
   @@map("user_contact")
 }

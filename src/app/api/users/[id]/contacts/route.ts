@@ -37,7 +37,7 @@ import { getToken } from 'next-auth/jwt'
  *        default: 10
  *     responses:
  *       200:
- *         description: '`ResultType<ContactVo>` 联系信息'
+ *         description: '`ResultType<(ContactVo & { room: RoomVo })[]>` 联系信息'
  */
 export async function GET(request: NextRequest, { params }: PathIdParams) {
   try {

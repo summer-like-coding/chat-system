@@ -31,7 +31,9 @@ export async function GET(request: NextRequest, { params }: PathIdParams) {
     if (!session) {
       return Result.error('未登录')
     }
-    const user = await userService.getById(params.id)
+
+    const { id: userId } = params
+    const user = await userService.getById(userId, { isDeleted: false })
     if (!user)
       return Result.error('未找到用户')
     return Result.success(userService.asVo(user))

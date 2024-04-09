@@ -6,9 +6,9 @@ import type { PageParamsType } from '@/types/global'
  * @returns 查询参数
  */
 export function getParams(request: Request): Record<string, string | undefined> {
-  const searchParams = new URLSearchParams(request.url.split('?')[1])
+  const url = new URL(request.url)
   const params: Record<string, string | undefined> = {}
-  for (const [key, value] of searchParams) {
+  for (const [key, value] of url.searchParams) {
     params[key] = value
   }
   return params
@@ -22,13 +22,13 @@ export function getParams(request: Request): Record<string, string | undefined> 
  * @returns 分页参数
  */
 export function getPageParams(request: Request, defaultPage = 1, defaultSize = 10): PageParamsType {
-  const searchParams = getParams(request)
-  const page = {
-    page: searchParams.page ? Number.parseInt(searchParams.page) : defaultPage,
-    size: searchParams.size ? Number.parseInt(searchParams.size) : defaultSize,
+  const { page, size } = getParams(request)
+  const res = {
+    page: page ? Number.parseInt(page) : defaultPage,
+    size: size ? Number.parseInt(size) : defaultSize,
   }
   return {
-    page: Math.max(1, page.page),
-    size: Math.min(500, Math.max(1, page.size)),
+    page: Math.min(1000, Math.max(1, res.page)),
+    size: Math.min(100, Math.max(1, res.size)),
   }
 }

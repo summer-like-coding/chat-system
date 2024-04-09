@@ -56,7 +56,7 @@ import { getToken } from 'next-auth/jwt'
  *         - REJECTED
  *     responses:
  *       200:
- *         description: '`ResultType<(FriendApply & { user: User, target: User })[]>` 用户的申请记录'
+ *         description: '`ResultType<(FriendApplyVo & { user: UserVo, target: UserVo })[]>` 用户的申请记录'
  */
 export async function GET(request: NextRequest, { params }: PathIdParams) {
   try {

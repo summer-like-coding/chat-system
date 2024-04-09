@@ -76,6 +76,7 @@ export class UserService extends AbstractService<User> {
     const user = await prisma.$transaction(async (ctx) => {
       const user = await ctx.user.findFirst({
         where: {
+          // !isDeleted: false,
           username,
         },
       })
@@ -103,7 +104,7 @@ export class UserService extends AbstractService<User> {
     error?: string
     user?: User
   }> {
-    const user = await this.getById(id)
+    const user = await this.getById(id, { isDeleted: false })
     if (!user)
       return { error: '未找到用户' }
 

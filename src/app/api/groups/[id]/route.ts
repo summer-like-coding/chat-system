@@ -30,7 +30,8 @@ export async function GET(request: NextRequest, { params }: PathIdParams) {
     if (!session) {
       return Result.error('未登录')
     }
-    const group = await groupService.getById(params.id)
+    const { id: groupId } = params
+    const group = await groupService.getById(groupId, { isDeleted: false })
     if (!group)
       return Result.error('未找到群组')
     return Result.success(groupService.asVo(group))

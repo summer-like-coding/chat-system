@@ -2,45 +2,45 @@ import type { PathIdParams } from '@/types/global'
 import type { NextRequest } from 'next/server'
 
 import { authOptions } from '@/lib/auth'
-import { roomService } from '@/services/room'
+import { groupApplyService } from '@/services/apply'
 import { Result } from '@/utils/result'
 import { getServerSession } from 'next-auth'
 import { getToken } from 'next-auth/jwt'
 
 /**
- * 拉取房间中的消息
  * @swagger
- * /api/rooms/[id]/pull:
+ * /api/applies/groups/[id]/audit:
  *   post:
- *     summary: 拉取房间中的消息 @todo
+ *     summary: 处理群申请 @todo
+ *     description: 需要鉴权，仅群管理员可处理申请
  *     tags:
- *      - 房间
+ *      - 申请
  *     parameters:
  *      - name: id
  *        in: path
- *        description: 房间 ID
+ *        description: 申请 ID
  *        required: true
  *        type: string
  *     requestBody:
- *       description: '`{ lastMessageId: string, lastMessageTime: string }`'
+ *       description: "`{ opinion: 'accept' | 'reject' | 'ignore' }`"
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
  *             required:
- *              - lastMessageId
- *              - lastMessageTime
+ *              - opinion
  *             properties:
- *               lastMessageId:
+ *               opinion:
  *                 type: string
- *                 description: 最后一条消息的 ID
- *               lastMessageTime:
- *                 type: string
- *                 description: 最后一条消息的时间
+ *                 description: 关键词
+ *                 enum:
+ *                  - accept
+ *                  - reject
+ *                  - ignore
  *     responses:
  *       200:
- *         description: '`ResultType<MessageVo[]>` 消息'
+ *         description: '`ResultType<FriendApplyVo>` 好友申请信息'
  */
 export async function POST(request: NextRequest, { params }: PathIdParams) {
   try {
@@ -48,14 +48,16 @@ export async function POST(request: NextRequest, { params }: PathIdParams) {
     if (!session) {
       return Result.error('未登录')
     }
+    const { opinion } = await request.json()
+    if (!opinion || !['accept', 'ignore', 'reject'].includes(opinion)) {
+      return Result.error('参数错误')
+    }
+    const { id: applyId } = params
     const token = await getToken({ req: request })
-    if (!token)
-      return Result.error('未登录')
+    const _userId = token?.sub
 
-    const { id: roomId } = params
-    const room = await roomService.getById(roomId, { isDeleted: false })
-    if (!room)
-      return Result.error('未找到房间')
+    const _groupApply = await groupApplyService.getById(applyId, { isDeleted: false })
+    // doing
   }
   catch (error: any) {
     console.error('Error:', error)

@@ -38,7 +38,7 @@ import { getToken } from 'next-auth/jwt'
  *        default: 10
  *     responses:
  *       200:
- *         description: '`ResultType<User[]>` 用户列表'
+ *         description: '`ResultType<UserVo[]>` 用户列表'
  */
 export async function GET(request: NextRequest, { params }: PathIdParams) {
   try {

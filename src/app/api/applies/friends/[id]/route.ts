@@ -23,7 +23,7 @@ import { getToken } from 'next-auth/jwt'
  *        type: string
  *     responses:
  *       200:
- *         description: '`ResultType<FriendApplyVo>` 申请信息'
+ *         description: '`ResultType<FriendApplyVo & { target: UserVo, user: UserVo }>` 申请信息'
  */
 export async function GET(request: NextRequest, { params }: PathIdParams) {
   try {
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest, { params }: PathIdParams) {
     }
     const token = await getToken({ req: request })
 
-    const apply = await friendApplyService.getById(params.id)
+    const apply = await friendApplyService.getDetails(params.id)
     if (!apply) {
       return Result.error('未找到申请')
     }

@@ -40,7 +40,7 @@ import { getToken } from 'next-auth/jwt'
  *                  - ignore
  *     responses:
  *       200:
- *         description: '`ResultType<FriendApplyVo>` 好友申请信息'
+ *         description: '`ResultType<FriendApplyVo & { user: UserVo, target: UserVo }>` 好友申请信息'
  */
 export async function POST(request: NextRequest, { params }: PathIdParams) {
   try {
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest, { params }: PathIdParams) {
     const token = await getToken({ req: request })
     const userId = token?.sub
 
-    const friendApply = await friendApplyService.getById(applyId)
+    const friendApply = await friendApplyService.getById(applyId, { isDeleted: false })
     if (!friendApply) {
       return Result.error('未找到好友申请')
     }
@@ -65,17 +65,19 @@ export async function POST(request: NextRequest, { params }: PathIdParams) {
       return Result.error('无权处理该申请')
     }
 
-    // 处理同意申请
     if (opinion === 'accept') {
+      // 处理同意申请
       const { friendApply } = await friendApplyService.accept(applyId)
       return Result.success(friendApplyService.asVo(friendApply))
     }
     else if (opinion === 'reject') {
+      // 处理拒绝申请
       const { friendApply } = await friendApplyService.reject(applyId)
       return Result.success(friendApplyService.asVo(friendApply))
     }
     else {
-      const { friendApply } = await friendApplyService.ignore(applyId)
+      // 处理忽略申请
+      const { friendApply } = await friendApplyService.reject(applyId, 'IGNORED')
       return Result.success(friendApplyService.asVo(friendApply))
     }
   }

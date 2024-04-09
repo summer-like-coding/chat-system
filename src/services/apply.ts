@@ -31,6 +31,9 @@ export class FriendApplyService extends AbstractService<FriendApply> {
       if (apply.status !== ApplyStatusType.PENDING) {
         throw new Error('申请状态不正确')
       }
+      if (apply.userId === apply.targetId) {
+        throw new Error('不能添加自己为好友')
+      }
       const user1 = await ctx.user.findUnique({
         where: {
           id: apply.userId,
@@ -95,6 +98,10 @@ export class FriendApplyService extends AbstractService<FriendApply> {
       const friendApply = await ctx.friendApply.update({
         data: {
           status: ApplyStatusType.ACCEPTED,
+        },
+        include: {
+          target: true,
+          user: true,
         },
         where: {
           id: apply.id,
@@ -221,44 +228,34 @@ export class FriendApplyService extends AbstractService<FriendApply> {
   }
 
   /**
-   * 忽略好友申请
+   * 获取详细信息
    * @param applyId 申请 ID
-   * @returns 申请记录
    */
-  async ignore(applyId: string) {
-    return prisma.$transaction(async (ctx) => {
-      const apply = await ctx.friendApply.findUnique({
-        where: {
-          id: applyId,
-          isDeleted: false,
-        },
-      })
-      if (!apply) {
-        throw new Error('申请不存在')
-      }
-      if (apply.status !== ApplyStatusType.PENDING) {
-        throw new Error('申请状态不正确')
-      }
-      const friendApply = await ctx.friendApply.update({
-        data: {
-          status: ApplyStatusType.IGNORED,
-        },
-        where: {
-          id: apply.id,
-        },
-      })
-      return {
-        friendApply,
-      }
+  async getDetails(applyId: string): Promise<FriendApply & {
+    target: User
+    user: User
+  } | null> {
+    return await this.delegate.findUnique({
+      include: {
+        target: true,
+        user: true,
+      },
+      where: {
+        id: applyId,
+        isDeleted: false,
+      },
     })
   }
 
   /**
-   *  拒绝好友申请
+   * 拒绝/忽略好友申请
    * @param applyId 申请 ID
    * @returns 申请记录
    */
-  async reject(applyId: string) {
+  async reject(
+    applyId: string,
+    statusType: ApplyStatusType = 'REJECTED',
+  ) {
     return prisma.$transaction(async (ctx) => {
       const apply = await ctx.friendApply.findUnique({
         where: {
@@ -274,7 +271,11 @@ export class FriendApplyService extends AbstractService<FriendApply> {
       }
       const friendApply = await ctx.friendApply.update({
         data: {
-          status: ApplyStatusType.REJECTED,
+          status: statusType,
+        },
+        include: {
+          target: true,
+          user: true,
         },
         where: {
           id: apply.id,

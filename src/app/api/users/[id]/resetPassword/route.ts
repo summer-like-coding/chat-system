@@ -60,7 +60,9 @@ export async function POST(request: NextRequest, { params }: PathIdParams) {
     if (token?.sub !== params.id) {
       return Result.error('无重置密码的权限')
     }
-    const user = await userService.getById(params.id)
+
+    const { id: userId } = params
+    const user = await userService.getById(userId, { isDeleted: false })
     if (!user)
       return Result.error('未找到用户')
     const { newPassword, oldPassword } = await request.json()
