@@ -10,6 +10,7 @@ import { useToggle } from 'ahooks'
 import { Layout, Menu } from 'antd'
 import React, { useEffect, useState } from 'react'
 
+import { useChatStore } from '../store/chat'
 import { useUserStore } from '../store/user'
 import { request } from '../utils/request'
 import './style.css'
@@ -17,6 +18,7 @@ import './style.css'
 function ChatLayout({ children }: React.PropsWithChildren) {
   const { Content, Header, Sider } = Layout
   const userStore = useUserStore(state => state.user)
+  const chatType = useChatStore(state => state.chatType)
   const items = [UserOutlined, TeamOutlined].map(
     (icon, index) => ({
       icon: React.createElement(icon),
@@ -24,16 +26,16 @@ function ChatLayout({ children }: React.PropsWithChildren) {
       label: `nav ${index + 1}`,
     }),
   )
-  const [userList, setUserList] = useState<IUser[]>()
+  const [groupUserList, setGroupUserList] = useState<IUser[]>()
   const [userToggle, { toggle }] = useToggle(false)
 
   useEffect(() => {
-    if (userStore) {
+    if (userStore && chatType === 'GROUP') {
       request<IUser[]>(`/api/users/${userStore.id}/friends`).then((res) => {
-        res && setUserList(res)
+        res && setGroupUserList(res)
       })
     }
-  }, [userStore])
+  }, [chatType, userStore])
 
   return (
     <>
@@ -88,7 +90,7 @@ function ChatLayout({ children }: React.PropsWithChildren) {
         style={{
           backgroundColor: 'transparent',
           borderLeft: '1px solid #fefefe',
-          display: userToggle ? 'block' : 'none',
+          display: (chatType === 'GROUP' && userToggle) ? 'block' : 'none',
         }}
         width="18%"
       >
@@ -101,7 +103,7 @@ function ChatLayout({ children }: React.PropsWithChildren) {
         <div className="slider-content">
           <UserList
             type="view"
-            userList={userList!}
+            userList={groupUserList!}
           />
         </div>
       </Sider>

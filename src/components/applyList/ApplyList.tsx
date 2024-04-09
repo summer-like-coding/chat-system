@@ -17,15 +17,12 @@ interface IApplyListProps {
 
 function ApplyList({ applyList }: IApplyListProps) {
   async function handleAudit(type: 'accept' | 'reject', targetId: string) {
-    // console.log(type)
-    const res = await request(`/api/applies/friends/${targetId}/audit`, {}, {
+    await request(`/api/applies/friends/${targetId}/audit`, {}, {
       data: {
         opinion: type,
       },
       method: 'POST',
     })
-    // eslint-disable-next-line no-console
-    console.log('res', res)
     message.success('操作成功')
   }
 
@@ -60,6 +57,7 @@ function ApplyList({ applyList }: IApplyListProps) {
           <Button
             className="ml-2"
             key="reject-apply"
+            onClick={() => handleAudit('reject', item.targetId)}
           >
             拒绝
           </Button>

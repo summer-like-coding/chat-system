@@ -1,5 +1,6 @@
 import type { User } from '@prisma/client'
 
+import { useChatStore } from '@/app/store/chat'
 import { Avatar, Button, List, Popover } from 'antd'
 import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
@@ -13,12 +14,14 @@ interface IUserListProps {
 
 function UserList({ type, userList }: IUserListProps) {
   const [clickUser, setClickUser] = useState<IUser>({} as User)
+  const setTargetId = useChatStore(state => state.setTargetId)
   const router = useRouter()
   function handleMenuClick(item: IUser) {
     setClickUser(item)
   }
 
   function handleChat(item: IUser) {
+    setTargetId(item.id)
     router.push(`/chat?userId=${item.id}`)
   }
 

@@ -251,6 +251,12 @@ function ToolBar() {
   }
 
   useEffect(() => {
+    if (addModalVisible) {
+      handleTabClick('applyUser')
+    }
+  }, [addModalVisible])
+
+  useEffect(() => {
     return () => {
       setApplyList([])
     }

@@ -1,4 +1,8 @@
 'use client'
+
+import type { Room, UserContact, UserFriend } from '@prisma/client'
+
+import { useChatStore } from '@/app/store/chat'
 import { request, requestEventStream } from '@/app/utils/request'
 import { useReactive } from 'ahooks'
 import { Affix, Avatar, Button, Input } from 'antd'
@@ -20,6 +24,9 @@ interface IChat {
 }
 
 export default function Chat({ chatKey, type }: IChat) {
+  const setChatId = useChatStore(state => state.setChatId)
+  const setChatType = useChatStore(state => state.setChatType)
+  const targetId = useChatStore(state => state.targetId)
   const chatList = useReactive<ChatProps[]>([])
   const [inputValue, setInputValue] = useState('')
   const replay = useReactive({ value: '' })
@@ -100,18 +107,27 @@ export default function Chat({ chatKey, type }: IChat) {
   }, [chatKey])
 
   useEffect(() => {
-    // 获取url参数
-    const url = new URL(window.location.href)
-    const userId = url.searchParams.get('userId')
-    if (userId) {
-      // eslint-disable-next-line no-console
-      console.log('userId', userId)
-      request(`/api/users/${userId}/contacts`).then((res) => {
+    async function getChat() {
+      if (targetId) {
         // eslint-disable-next-line no-console
-        console.log(res)
-      })
+        console.log('userId', targetId)
+        const res = await request<{
+          contact: UserContact
+          friend: UserFriend
+          room: Room
+        }>('/api/contacts/friends/prepare', {}, {
+          data: {
+            userId: targetId,
+          },
+          method: 'POST',
+        })
+        setChatId(res!.room.id)
+        setChatType(res!.room.type)
+      }
     }
-  }, [])
+    getChat()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [targetId])
 
   return (
     <div className="chatContainer">

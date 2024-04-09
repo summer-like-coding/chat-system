@@ -4,10 +4,12 @@
 
 import type { FriendApply, Group, User } from '@prisma/client'
 
+import { useChatStore } from '@/app/store/chat'
 import { useUserStore } from '@/app/store/user'
 import { request } from '@/app/utils/request'
 import { SearchOutlined } from '@ant-design/icons'
 import { Button, Select, message } from 'antd'
+import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 
 import type { IApplyList } from '../applyList/ApplyList'
@@ -20,7 +22,9 @@ interface SearchInputProps {
 }
 
 function SearchInput({ setList, type, usedBy }: SearchInputProps) {
+  const router = useRouter()
   const userStore = useUserStore(state => state.user)
+  const setTargetId = useChatStore(state => state.setTargetId)
   const [options, setOptions] = useState<{
     label: string
     value: string
@@ -136,8 +140,14 @@ function SearchInput({ setList, type, usedBy }: SearchInputProps) {
         queryApplies()
         return res
       }, // 申请加好友
-      'chat-group': () => {}, // 聊天
-      'chat-user': () => {}, // 聊天
+      'chat-group': () => {
+        setTargetId(value)
+        router.push(`/chat?userId=${value}`)
+      }, // 聊天
+      'chat-user': () => {
+        setTargetId(value)
+        router.push(`/chat?userId=${value}`)
+      }, // 聊天
       'search-group': () => {}, // 查看群组信息
       'search-user': () => {}, // 查看好友信息
     }
