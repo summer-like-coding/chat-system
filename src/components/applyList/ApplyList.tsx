@@ -8,6 +8,7 @@ export interface IApplyList {
   avatar?: string
   status: ApplyStatusType
   targetId: string
+  targetName: string
 }
 
 interface IApplyListProps {
@@ -85,7 +86,7 @@ function ApplyList({ applyList }: IApplyListProps) {
         >
           <List.Item.Meta
             avatar={<Avatar size={48} src={item.avatar || `https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`} />}
-            title={item.targetId}
+            title={item.targetName}
           />
         </List.Item>
       )}

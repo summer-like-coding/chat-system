@@ -20,7 +20,7 @@ export class FriendService extends AbstractService<UserFriend> {
   async getFriends(userId: string, page: PageParamsType) {
     const userFriend = await this.delegate.findMany({
       include: {
-        user: true,
+        friend: true,
       },
       skip: (page.page - 1) * page.size,
       take: page.size,
@@ -29,7 +29,7 @@ export class FriendService extends AbstractService<UserFriend> {
         userId,
       },
     })
-    return userFriend.map(item => item.user)
+    return userFriend.map(item => item.friend)
   }
 
   /**
@@ -42,7 +42,7 @@ export class FriendService extends AbstractService<UserFriend> {
   async searchFriends(userId: string, keyword: string, page: PageParamsType) {
     const userFriend = await this.delegate.findMany({
       include: {
-        user: true,
+        friend: true,
       },
       skip: (page.page - 1) * page.size,
       take: page.size,
@@ -56,7 +56,7 @@ export class FriendService extends AbstractService<UserFriend> {
         userId,
       },
     })
-    return userFriend.map(item => item.user)
+    return userFriend.map(item => item.friend)
   }
 }
 
