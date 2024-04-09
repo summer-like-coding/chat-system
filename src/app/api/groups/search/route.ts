@@ -9,7 +9,7 @@ import { getServerSession } from 'next-auth'
 /**
  * 搜索群组
  * @swagger
- * /api/groups/search/:
+ * /api/groups/search:
  *   post:
  *     summary: 搜索群组
  *     tags:

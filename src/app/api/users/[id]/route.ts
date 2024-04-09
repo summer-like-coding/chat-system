@@ -9,7 +9,7 @@ import { getServerSession } from 'next-auth'
 /**
  * 查询用户信息
  * @swagger
- * /api/users/[id]/:
+ * /api/users/[id]:
  *   get:
  *     summary: 查询用户信息
  *     description: 需要鉴权，登录用户可请求

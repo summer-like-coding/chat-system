@@ -10,7 +10,7 @@ import { getToken } from 'next-auth/jwt'
 /**
  * 拉取房间中的消息
  * @swagger
- * /api/rooms/[id]/pull/:
+ * /api/rooms/[id]/pull:
  *   post:
  *     summary: 拉取房间中的消息 @todo
  *     tags:

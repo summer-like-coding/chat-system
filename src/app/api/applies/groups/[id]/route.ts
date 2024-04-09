@@ -1,6 +1,6 @@
 /**
  * @swagger
- * /api/applies/groups/[id]/:
+ * /api/applies/groups/[id]:
  *   get:
  *     summary: 查询群申请信息
  *     tags:

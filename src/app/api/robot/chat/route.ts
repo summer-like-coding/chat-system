@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic'
 /**
  * @deprecated 请使用 POST /api/robot/chat/ 提供的 OpenAI 兼容接口
  * @swagger
- * /api/robot/chat/:
+ * /api/robot/chat:
  *   get:
  *     summary: 与 GPT 机器人聊天
  *     tags:
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
 
 /**
  * @swagger
- * /api/robot/chat/:
+ * /api/robot/chat:
  *   post:
  *     description: OpenAI 兼容接口
  *     summary: 与 GPT 机器人聊天

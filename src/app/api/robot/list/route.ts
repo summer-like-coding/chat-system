@@ -5,7 +5,7 @@ import { Result } from '@/utils/result'
 /**
  * 查询机器人列表
  * @swagger
- * /api/robot/list/:
+ * /api/robot/list:
  *   get:
  *     summary: 查询机器人列表
  *     description: 目前返回静态数据

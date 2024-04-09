@@ -5,6 +5,7 @@ import { prisma } from '@/lib/db'
 import bcrypt from 'bcryptjs'
 
 import { AbstractService } from './_base'
+import { userVo } from './_mapper'
 
 /**
  * 注册用户表单数据
@@ -27,22 +28,7 @@ export class UserService extends AbstractService<User> {
   delegate = prisma.user
 
   asVo(user?: User | null) {
-    if (!user)
-      return null
-    return {
-      avatar: user.avatar,
-      birthday: user.birthday,
-      createdAt: user.createdAt,
-      description: user.description,
-      email: user.email,
-      gender: user.gender,
-      id: user.id,
-      nickname: user.nickname,
-      phone: user.phone,
-      status: user.status,
-      updatedAt: user.updatedAt,
-      username: user.username,
-    }
+    return userVo(user)
   }
 
   /**

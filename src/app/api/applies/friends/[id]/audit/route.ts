@@ -9,7 +9,7 @@ import { getToken } from 'next-auth/jwt'
 
 /**
  * @swagger
- * /api/applies/friends/[id]/audit/:
+ * /api/applies/friends/[id]/audit:
  *   post:
  *     summary: 处理好友申请
  *     description: 需要鉴权，仅用户自己可处理申请

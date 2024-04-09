@@ -9,7 +9,7 @@ import { getServerSession } from 'next-auth'
 /**
  * 搜索用户
  * @swagger
- * /api/users/search/:
+ * /api/users/search:
  *   post:
  *     summary: 搜索用户
  *     description: 需要鉴权，登录用户可请求
@@ -52,6 +52,9 @@ export async function POST(request: NextRequest) {
       return Result.error('未登录')
     }
     const { keyword } = await request.json()
+    if (!keyword || !(typeof keyword === 'string')) {
+      return Result.error('关键词为空或格式错误')
+    }
     const page = getPageParams(request)
     const res = await userService.searchUsers(keyword, page)
     return Result.success(userService.asVoList(res))

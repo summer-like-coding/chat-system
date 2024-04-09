@@ -50,6 +50,9 @@ dependencies:
   rabbitmq-client:
     specifier: ^4.5.2
     version: 4.5.2
+  radash:
+    specifier: ^12.1.0
+    version: 12.1.0
   react:
     specifier: ^18.2.0
     version: 18.2.0
@@ -76,6 +79,9 @@ devDependencies:
   '@eslint/eslintrc':
     specifier: ^3.0.2
     version: 3.0.2
+  '@types/ali-oss':
+    specifier: ^6.16.11
+    version: 6.16.11
   '@types/bcryptjs':
     specifier: ^2.4.6
     version: 2.4.6
@@ -1389,6 +1395,10 @@ packages:
     dependencies:
       tslib: 2.6.2
     dev: false
+
+  /@types/ali-oss@6.16.11:
+    resolution: {integrity: sha512-/AyemPZy93ZXGzEokMsoPFgjH37snpzH4X/fwans/n63HLaCleriCG3PyrkHCPkgHEc9vj9Uo6paqsBN3vJ3OA==}
+    dev: true
 
   /@types/bcryptjs@2.4.6:
     resolution: {integrity: sha512-9xlo6R2qDs5uixm0bcIqCeMCE6HiQsIyel9KQySStiyqNl2tnj2mP3DX1Nf56MD6KMenNNlBBsy3LJ7gUEQPXQ==}
@@ -6586,6 +6596,11 @@ packages:
   /rabbitmq-client@4.5.2:
     resolution: {integrity: sha512-m0NzQ3UtMPDtHWhaGN7agtQ1RyJ+UAyuKlYfhRByZ9FqJWtGCyk2Z+1JL40cParKtk2ZS9uolkcxONan0ZcEqg==}
     engines: {node: '>=16'}
+    dev: false
+
+  /radash@12.1.0:
+    resolution: {integrity: sha512-b0Zcf09AhqKS83btmUeYBS8tFK7XL2e3RvLmZcm0sTdF1/UUlHSsjXdCcWNxe7yfmAlPve5ym0DmKGtTzP6kVQ==}
+    engines: {node: '>=14.18.0'}
     dev: false
 
   /ramda-adjunct@4.1.1(ramda@0.29.1):

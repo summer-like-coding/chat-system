@@ -8,7 +8,7 @@ import { getServerSession } from 'next-auth'
 /**
  * 根据用户名获取用户信息
  * @swagger
- * /api/users/getByUsername/:
+ * /api/users/getByUsername:
  *   post:
  *     summary: 根据用户名获取用户信息
  *     description: 需要鉴权，登录用户可请求

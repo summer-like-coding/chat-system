@@ -1,6 +1,6 @@
 /**
  * @swagger
- * /api/applies/groups/:
+ * /api/applies/groups:
  *   post:
  *     summary: 申请加群 @todo
  *     tags:

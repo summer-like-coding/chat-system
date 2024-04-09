@@ -37,7 +37,7 @@ import { getToken } from 'next-auth/jwt'
 
 /**
  * @swagger
- * /api/applies/friends/apply/:
+ * /api/applies/friends/apply:
  *   post:
  *     summary: 申请加好友
  *     tags:

@@ -1,9 +1,11 @@
 import type { PageParamsType } from '@/types/global'
+import type { Group, User } from '@prisma/client'
 
 import { prisma } from '@/lib/db'
 import { ApplyStatusType, type FriendApply, type GroupApply, RoomType } from '@prisma/client'
 
 import { AbstractService } from './_base'
+import { groupVo, userVo } from './_mapper'
 
 /**
  * 好友申请服务
@@ -159,6 +161,17 @@ export class FriendApplyService extends AbstractService<FriendApply> {
     })
   }
 
+  asVo(data?: FriendApply & {
+    target?: User
+    user?: User
+  } | null) {
+    return {
+      ...data,
+      target: userVo(data?.target) ?? undefined,
+      user: userVo(data?.user) ?? undefined,
+    }
+  }
+
   /**
    * 根据 userId 查找申请记录
    * @param userId 用户 ID
@@ -168,6 +181,10 @@ export class FriendApplyService extends AbstractService<FriendApply> {
    */
   async getApplies(userId: string, page: PageParamsType, status?: ApplyStatusType) {
     const applies = await this.delegate.findMany({
+      include: {
+        target: true,
+        user: true,
+      },
       skip: (page.page - 1) * page.size,
       take: page.size,
       where: {
@@ -188,6 +205,10 @@ export class FriendApplyService extends AbstractService<FriendApply> {
    */
   async getAppliesByTargetId(targetId: string, page: PageParamsType, status?: ApplyStatusType) {
     const applies = await this.delegate.findMany({
+      include: {
+        target: true,
+        user: true,
+      },
       skip: (page.page - 1) * page.size,
       take: page.size,
       where: {
@@ -274,6 +295,17 @@ export const friendApplyService = new FriendApplyService()
 export class GroupApplyService extends AbstractService<GroupApply> {
   delegate = prisma.groupApply
 
+  asVo(data?: GroupApply & {
+    group?: Group
+    user?: User
+  } | null) {
+    return {
+      ...data,
+      group: groupVo(data?.group) ?? undefined,
+      user: userVo(data?.user) ?? undefined,
+    }
+  }
+
   /**
    * 根据 userId 查找申请记录
    * @param userId 用户 ID
@@ -283,6 +315,9 @@ export class GroupApplyService extends AbstractService<GroupApply> {
    */
   async getAppliesByUserId(userId: string, page: PageParamsType, status?: ApplyStatusType) {
     const applies = await this.delegate.findMany({
+      include: {
+        group: true,
+      },
       skip: (page.page - 1) * page.size,
       take: page.size,
       where: {

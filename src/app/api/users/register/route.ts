@@ -6,7 +6,7 @@ import { Result } from '@/utils/result'
 /**
  * 注册新用户
  * @swagger
- * /api/users/resigter/:
+ * /api/users/resigter:
  *   post:
  *     summary: 注册新用户
  *     description: |

@@ -26,7 +26,7 @@ import { getToken } from 'next-auth/jwt'
 /**
  * 重置密码
  * @swagger
- * /api/users/resetPassword/:
+ * /api/users/resetPassword:
  *   post:
  *     summary: 重置密码
  *     description: 需要鉴权，仅用户自己可重置

@@ -14,6 +14,8 @@ export class FriendService extends AbstractService<UserFriend> {
   /**
    * 获取用户的好友列表
    * @param userId 用户 ID
+   * @param page 分页参数
+   * @returns 用户列表
    */
   async getFriends(userId: string, page: PageParamsType) {
     const userFriend = await this.delegate.findMany({
@@ -24,6 +26,33 @@ export class FriendService extends AbstractService<UserFriend> {
       take: page.size,
       where: {
         isDeleted: false,
+        userId,
+      },
+    })
+    return userFriend.map(item => item.user)
+  }
+
+  /**
+   * 搜索用户的好友
+   * @param userId 用户 ID
+   * @param keyword 关键词
+   * @param page 分页参数
+   * @returns 用户列表
+   */
+  async searchFriends(userId: string, keyword: string, page: PageParamsType) {
+    const userFriend = await this.delegate.findMany({
+      include: {
+        user: true,
+      },
+      skip: (page.page - 1) * page.size,
+      take: page.size,
+      where: {
+        isDeleted: false,
+        user: {
+          username: {
+            contains: keyword,
+          },
+        },
         userId,
       },
     })

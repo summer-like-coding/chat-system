@@ -35,7 +35,7 @@ async function createMessage(data: MessageQueryType, roomId: string, userId: str
 /**
  * 在房间中聊天
  * @swagger
- * /api/rooms/[id]/chat/:
+ * /api/rooms/[id]/chat:
  *   post:
  *     summary: 在房间中聊天 @todo
  *     tags:

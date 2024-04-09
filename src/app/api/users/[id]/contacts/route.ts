@@ -11,7 +11,7 @@ import { getToken } from 'next-auth/jwt'
 /**
  * 查询用户对话信息
  * @swagger
- * /api/users/[id]/contacts/:
+ * /api/users/[id]/contacts:
  *   get:
  *     summary: 查询用户对话信息
  *     description: 需要鉴权，仅用户自己可查询

@@ -9,11 +9,11 @@ import { getServerSession } from 'next-auth'
 import { getToken } from 'next-auth/jwt'
 
 /**
- * 查询用户的群聊列表
+ * 查询用户的群组列表
  * @swagger
- * /api/users/[id]/groups/:
+ * /api/users/[id]/groups:
  *   get:
- *     summary: 查询用户的好友列表
+ *     summary: 查询用户的群组列表
  *     description: 需要鉴权，仅用户自己可查询
  *     tags:
  *      - 用户
@@ -37,7 +37,7 @@ import { getToken } from 'next-auth/jwt'
  *        default: 10
  *     responses:
  *       200:
- *         description: '`ResultType<Group[]>` 用户的好友列表'
+ *         description: '`ResultType<Group[]>` 用户的群组列表'
  */
 export async function GET(request: NextRequest, { params }: PathIdParams) {
   try {

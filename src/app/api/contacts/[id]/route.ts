@@ -10,7 +10,7 @@ import { getToken } from 'next-auth/jwt'
 /**
  * 查询联系信息
  * @swagger
- * /api/contacts/[id]/:
+ * /api/contacts/[id]:
  *   get:
  *     summary: 查询联系信息
  *     description: 需要鉴权，仅用户自己可查询

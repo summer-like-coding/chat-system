@@ -10,7 +10,7 @@ import { getToken } from 'next-auth/jwt'
 /**
  * 更新用户信息
  * @swagger
- * /api/users/[id]/update/:
+ * /api/users/[id]/update:
  *   post:
  *     summary: 更新用户信息
  *     description: 需要鉴权，仅用户自己可更新

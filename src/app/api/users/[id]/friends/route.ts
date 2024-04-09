@@ -12,7 +12,7 @@ import { getToken } from 'next-auth/jwt'
 /**
  * 查询用户的好友列表
  * @swagger
- * /api/users/[id]/friends/:
+ * /api/users/[id]/friends:
  *   get:
  *     summary: 查询用户的好友列表
  *     description: 需要鉴权，仅用户自己可查询

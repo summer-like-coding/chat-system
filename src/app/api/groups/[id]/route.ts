@@ -9,7 +9,7 @@ import { getServerSession } from 'next-auth'
 /**
  * 查询群组信息
  * @swagger
- * /api/groups/[id]/:
+ * /api/groups/[id]:
  *   get:
  *     summary: 查询群组信息
  *     tags:

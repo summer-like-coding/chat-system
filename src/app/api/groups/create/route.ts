@@ -6,7 +6,7 @@ import { Result } from '@/utils/result'
 /**
  * 创建群组
  * @swagger
- * /api/groups/create/:
+ * /api/groups/create:
  *   post:
  *     summary: 创建群组
  *     tags:
