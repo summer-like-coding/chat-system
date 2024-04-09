@@ -52,8 +52,8 @@ export async function POST(request: NextRequest) {
       return Result.error('未登录')
     }
     const { keyword } = await request.json()
-    if (!keyword || !(typeof keyword === 'string')) {
-      return Result.error('关键词为空或格式错误')
+    if (!(typeof keyword === 'string')) {
+      return Result.error('关键词格式错误')
     }
     const page = getPageParams(request)
     const res = await userService.searchUsers(keyword, page)

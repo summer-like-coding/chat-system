@@ -1,5 +1,5 @@
 'use client'
-import { requestEventStream } from '@/app/utils/request'
+import { request, requestEventStream } from '@/app/utils/request'
 import { useReactive } from 'ahooks'
 import { Affix, Avatar, Button, Input } from 'antd'
 import React, { useEffect, useState } from 'react'
@@ -106,6 +106,10 @@ export default function Chat({ chatKey, type }: IChat) {
     if (userId) {
       // eslint-disable-next-line no-console
       console.log('userId', userId)
+      request(`/api/users/${userId}/contacts`).then((res) => {
+        // eslint-disable-next-line no-console
+        console.log(res)
+      })
     }
   }, [])
 

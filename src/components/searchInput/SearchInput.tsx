@@ -29,9 +29,12 @@ function SearchInput({ setList, type, usedBy }: SearchInputProps) {
   async function handleRequest(value: string) {
     const requestMap = {
       'apply-group': async () => {
-        const res = await request<Group[]>('/api/groups/search', {
-          page: '1',
-          size: '10',
+        // 查询所有群组
+        const res = await request<Group[]>('/api/groups/search', {}, {
+          data: {
+            keyword: value,
+          },
+          method: 'POST',
         })
         setOptions(res!.map(item => ({
           label: item.name,
@@ -52,10 +55,42 @@ function SearchInput({ setList, type, usedBy }: SearchInputProps) {
         })))
         return res
       },
-      'chat-group': () => {}, // 聊天
-      'chat-user': () => {}, // 聊天
+      'chat-group': async () => {
+        // eslint-disable-next-line unused-imports/no-unused-vars
+        const res = await request(`/api/groups/${userStore!.id}/members/search`, {}, {
+          data: {
+            keyword: value,
+          },
+          method: 'POST',
+        })
+      }, // 聊天中好友列表
+      'chat-user': async () => {
+        const res = await request<User[]>(`/api/users/${userStore!.id}/friends/search`, {}, {
+          data: {
+            keyword: value,
+          },
+          method: 'POST',
+        })
+        setOptions(res!.map(item => ({
+          label: item.username,
+          value: item.id,
+        })))
+        return res
+      }, // 聊天
       'search-group': () => {}, // 查看群组信息
-      'search-user': () => {}, // 查看好友信息
+      'search-user': async () => {
+        const res = await request<User[]>(`/api/users/${userStore!.id}/friends/search`, {}, {
+          data: {
+            keyword: value,
+          },
+          method: 'POST',
+        })
+        setOptions(res!.map(item => ({
+          label: item.username,
+          value: item.id,
+        })))
+        return res
+      }, // 查看好友信息
     }
     requestMap[`${usedBy}-${type}`]()
   }
@@ -71,11 +106,12 @@ function SearchInput({ setList, type, usedBy }: SearchInputProps) {
         return res
       },
       user: async () => {
-        const res = await request<FriendApply[]>(`/api/users/${userStore!.id}/applies`, {})
+        const res = await request<(FriendApply & { target: User, user: User })[]>(`/api/users/${userStore!.id}/applies`, {})
         const lists: IApplyList[] = res?.map((item) => {
           return {
             status: item.status,
             targetId: item.id,
+            targetName: item.user.nickname || item.user.username,
           }
         }) || []
         setList && setList(lists)

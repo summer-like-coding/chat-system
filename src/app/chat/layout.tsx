@@ -94,7 +94,7 @@ function ChatLayout({ children }: React.PropsWithChildren) {
       >
         <div className="slider-search">
           <SearchInput
-            type="user"
+            type="group"
             usedBy="chat"
           />
         </div>

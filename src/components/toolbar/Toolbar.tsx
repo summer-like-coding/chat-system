@@ -1,6 +1,6 @@
 'use client'
 
-import type { FriendApply } from '@prisma/client'
+import type { FriendApply, User } from '@prisma/client'
 
 import { useUserStore } from '@/app/store/user'
 import { request } from '@/app/utils/request'
@@ -10,7 +10,7 @@ import { useBoolean } from 'ahooks'
 import { Avatar, Badge, Button, List, Modal, Popover, Tabs } from 'antd'
 import { useRouter } from 'next/navigation'
 import { signOut } from 'next-auth/react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import type { IApplyList } from '../applyList/ApplyList'
 
@@ -27,19 +27,20 @@ function ToolBar() {
   const [addModalVisible, { setFalse: setAddModalFalse, setTrue: setAddModalTrue }] = useBoolean(false)
   const [modalType, setModalType] = useState<string>('help')
   const [addModalType, setAddModalType] = useState<string>('addFriend')
-  const [applyUserList, setApplyUserList] = useState<IApplyList[]>([])
+  const [applyList, setApplyList] = useState<IApplyList[]>([])
 
   async function handleTabClick(key: string) {
-    const res = await request<FriendApply[]>(`/api/users/${useStore!.id}/applies`, {
+    const res = await request<(FriendApply & { target: User, user: User })[]>(`/api/users/${useStore!.id}/applies`, {
       type: key === 'applyUser' ? 'self' : 'target',
     })
     const lists: IApplyList[] = res?.map((item) => {
       return {
         status: item.status,
         targetId: item.id,
+        targetName: item.user.nickname || item.user.username,
       }
     }) || []
-    setApplyUserList(lists)
+    setApplyList(lists)
   }
 
   const hoverItemContent = {
@@ -117,12 +118,12 @@ function ToolBar() {
         items={[{
           children: <div>
             <SearchInput
-              setList={setApplyUserList}
+              setList={setApplyList}
               type="user"
               usedBy="apply"
             />
             <List
-              dataSource={applyUserList}
+              dataSource={applyList}
               itemLayout="horizontal"
               renderItem={(item, index) => (
                 <List.Item>
@@ -140,7 +141,7 @@ function ToolBar() {
         }, {
           children: <div>
             <ApplyList
-              applyList={applyUserList}
+              applyList={applyList}
             />
           </div>,
           key: 'appliedUser',
@@ -167,12 +168,12 @@ function ToolBar() {
         items={[{
           children: <div>
             <SearchInput
-              setList={setApplyUserList}
-              type="user"
+              setList={setApplyList}
+              type="group"
               usedBy="apply"
             />
             <ApplyList
-              applyList={applyUserList}
+              applyList={applyList}
             />
           </div>,
           key: 'applyGroup',
@@ -189,11 +190,11 @@ function ToolBar() {
     return (
       <div className="flex w-64 flex-row">
         <div className="basis-1/2">
-          <Avatar size={64} src="https://api.dicebear.com/7.x/miniavs/svg?seed=1" />
+          <Avatar size={64} src={useStore?.avatar || 'https://api.dicebear.com/7.x/miniavs/svg?seed=2'} />
         </div>
         <div className="basis-1/2">
           <p>
-            用户名:
+            昵称:
             {' '}
             {useStore?.nickname || '未知'}
           </p>
@@ -249,6 +250,12 @@ function ToolBar() {
     }
   }
 
+  useEffect(() => {
+    return () => {
+      setApplyList([])
+    }
+  }, [])
+
   return (
     <aside className="side-toolbar">
       <div>
@@ -257,7 +264,7 @@ function ToolBar() {
           placement="right"
           trigger="click"
         >
-          <Avatar size={48} src="https://api.dicebear.com/7.x/miniavs/svg?seed=1" />
+          <Avatar size={36} src={useStore?.avatar || 'https://api.dicebear.com/7.x/miniavs/svg?seed=2'} />
         </Popover>
         <div className="mt-4 flex flex-col items-center">
           <Badge overflowCount={99}>

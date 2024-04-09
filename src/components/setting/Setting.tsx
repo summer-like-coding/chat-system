@@ -5,8 +5,8 @@ import { useUserStore } from '@/app/store/user'
 import { request } from '@/app/utils/request'
 import { EditOutlined, LoadingOutlined, PlusOutlined, SkinOutlined, UserOutlined } from '@ant-design/icons'
 import { useBoolean, useToggle } from 'ahooks'
-import { Button, ColorPicker, DatePicker, Form, Image, Input, Layout, Menu, Select, Switch, Upload, message } from 'antd'
-import React, { useState } from 'react'
+import { Button, ColorPicker, DatePicker, Form, Input, Layout, Menu, Select, Switch, Upload, message } from 'antd'
+import React, { useEffect, useState } from 'react'
 
 export default function Setting() {
   const [accountFormRef] = Form.useForm()
@@ -21,7 +21,6 @@ export default function Setting() {
   const [loading, { setFalse: setLoadingFalse, setTrue: setLoadingTrue }] = useBoolean(false)
   const [emailDisabled, { toggle: toggleEmailDisabled }] = useToggle(false)
   const [previewImage, setPreviewImage] = useState('')
-  const [previewOpen, setPreviewOpen] = useState(false)
 
   async function saveUserInfo() {
     const res = await request<User>(`/api/users/${userStore?.id}/update`, {}, {
@@ -63,6 +62,11 @@ export default function Setting() {
     }
     if (info.file.status === 'done') {
       setLoadingFalse()
+      const imgUrl = info.file.response.data.url
+      setPreviewImage(imgUrl)
+      accountFormRef.setFieldsValue({
+        avatar: imgUrl,
+      })
     }
   }
 
@@ -119,31 +123,20 @@ export default function Setting() {
       >
         <Form.Item label="头像" name="avatar">
           <Upload
-            action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
+            action="/api/upload/files"
             beforeUpload={beforeUpload}
             listType="picture-card"
             maxCount={1}
-            name="avatar"
+            name="file"
             onChange={handleChange}
-            showUploadList={false}
           >
-            {userStore?.avatar
-              ? (
-                <Image
-                  alt="avatar"
-                  preview={{
-                    afterOpenChange: visible => !visible && setPreviewImage(''),
-                    onVisibleChange: visible => setPreviewOpen(visible),
-                    visible: previewOpen,
-                  }}
-                  src={previewImage}
-                  wrapperStyle={{ display: 'none' }}
-                />
-                )
-              : uploadButton}
+            {!previewImage && uploadButton}
           </Upload>
         </Form.Item>
-        <Form.Item label="用户名" name="nickname">
+        <Form.Item label="用户名" name="username">
+          <Input className="w-full" disabled />
+        </Form.Item>
+        <Form.Item label="昵称" name="nickname">
           <Input className="w-full" />
         </Form.Item>
         <Form.Item
@@ -211,6 +204,12 @@ export default function Setting() {
       label: title,
     }),
   )
+
+  useEffect(() => {
+    return () => {
+      setPreviewImage('')
+    }
+  }, [])
   return (
     <Layout className="h-auto w-full">
       <Sider className="bg-slate-200 text-center text-white" width="25%">

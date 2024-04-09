@@ -65,8 +65,8 @@ export async function POST(request: NextRequest, { params }: PathIdParams) {
       return Result.error('无权限查询用户好友列表')
     }
     const { keyword } = await request.json()
-    if (!keyword || !(typeof keyword === 'string')) {
-      return Result.error('关键词为空或格式错误')
+    if (!(typeof keyword === 'string')) {
+      return Result.error('关键词格式错误')
     }
     const page = getPageParams(request)
     const users = await friendService.searchFriends(userId, keyword, page)
