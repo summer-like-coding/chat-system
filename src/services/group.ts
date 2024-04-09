@@ -1,4 +1,5 @@
 import type { PageParamsType } from '@/types/global'
+import type { UserGroup } from '@prisma/client'
 
 import { prisma } from '@/lib/db'
 import { CommonStatusType, type Group } from '@prisma/client'
@@ -10,6 +11,16 @@ import { AbstractService } from './_base'
  */
 export class Groupervice extends AbstractService<Group> {
   delegate = prisma.group
+
+  async checkIsGroupMember(groupId: string, userId: string) {
+    return await prisma.userGroup.findFirst({
+      where: {
+        groupId,
+        isDeleted: false,
+        userId,
+      },
+    })
+  }
 
   /**
    * 创建群组
@@ -79,7 +90,7 @@ export const groupService = new Groupervice()
 /**
  * 用户群组服务
  */
-export class UserGroupervice extends AbstractService<Group> {
+export class UserGroupervice extends AbstractService<UserGroup> {
   delegate = prisma.userGroup
 
   /**

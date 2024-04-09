@@ -24,6 +24,20 @@ export class ContactService extends AbstractService<UserContact> {
   }
 
   /**
+   * 通过房间 ID 获取联系信息
+   * @param roomId 房间 ID
+   * @returns 联系信息
+   */
+  async getByRoomId(roomId: string): Promise<UserContact | null> {
+    return await this.delegate.findFirst({
+      where: {
+        isDeleted: false,
+        roomId,
+      },
+    })
+  }
+
+  /**
    *
    * @param userId 用户 ID
    * @param page 分页参数
@@ -58,6 +72,48 @@ export class ContactService extends AbstractService<UserContact> {
         id: contactId,
         isDeleted: false,
       },
+    })
+  }
+
+  /**
+   * 准备联系信息
+   * @param userId 用户 ID
+   * @param friendId 好友 ID
+   * @param roomId 房间 ID
+   * @returns 联系信息
+   */
+  async prepare(userId: string, friendId: string, roomId: string): Promise<UserContact> {
+    return await prisma.$transaction(async (ctx) => {
+      const contact = await ctx.userContact.findFirst({
+        where: {
+          roomId,
+          userId,
+        },
+      })
+      const friendContact = await ctx.userContact.findFirst({
+        where: {
+          roomId,
+          userId: friendId,
+        },
+      })
+      if (!friendContact) {
+        await ctx.userContact.create({
+          data: {
+            roomId,
+            userId: friendId,
+          },
+        })
+      }
+      if (contact) {
+        return contact
+      }
+      const contactCreated = await ctx.userContact.create({
+        data: {
+          roomId,
+          userId,
+        },
+      })
+      return contactCreated
     })
   }
 }

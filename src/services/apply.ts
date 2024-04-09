@@ -85,12 +85,15 @@ export class FriendApplyService extends AbstractService<FriendApply> {
           type: RoomType.FRIEND,
         },
       })
+
+      // 有序的用户 ID
+      const [userSmaller, userLarger] = user1.id < user2.id ? [user1, user2] : [user2, user1]
       const friendRoom = await ctx.friendRoom.create({
         data: {
-          key: [user1.id, user2.id].sort().join('-'),
+          key: `${userSmaller.id}-${userLarger.id}`,
           roomId: room.id,
-          user1Id: user1.id,
-          user2Id: user2.id,
+          user1Id: userSmaller.id,
+          user2Id: userLarger.id,
         },
       })
 

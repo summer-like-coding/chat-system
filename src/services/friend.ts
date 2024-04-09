@@ -12,6 +12,22 @@ export class FriendService extends AbstractService<UserFriend> {
   delegate = prisma.userFriend
 
   /**
+   * 检查是否是好友
+   * @param userId 用户 ID
+   * @param friendId 好友 ID
+   * @returns 是否是好友
+   */
+  async checkIsFriend(userId: string, friendId: string) {
+    return await prisma.userFriend.findFirst({
+      where: {
+        friendId,
+        isDeleted: false,
+        userId,
+      },
+    })
+  }
+
+  /**
    * 获取用户的好友列表
    * @param userId 用户 ID
    * @param page 分页参数
@@ -20,7 +36,7 @@ export class FriendService extends AbstractService<UserFriend> {
   async getFriends(userId: string, page: PageParamsType) {
     const userFriend = await this.delegate.findMany({
       include: {
-        user: true,
+        friend: true,
       },
       skip: (page.page - 1) * page.size,
       take: page.size,
@@ -29,7 +45,7 @@ export class FriendService extends AbstractService<UserFriend> {
         userId,
       },
     })
-    return userFriend.map(item => item.user)
+    return userFriend.map(item => item.friend)
   }
 
   /**
@@ -42,7 +58,7 @@ export class FriendService extends AbstractService<UserFriend> {
   async searchFriends(userId: string, keyword: string, page: PageParamsType) {
     const userFriend = await this.delegate.findMany({
       include: {
-        user: true,
+        friend: true,
       },
       skip: (page.page - 1) * page.size,
       take: page.size,
@@ -56,7 +72,7 @@ export class FriendService extends AbstractService<UserFriend> {
         userId,
       },
     })
-    return userFriend.map(item => item.user)
+    return userFriend.map(item => item.friend)
   }
 }
 
