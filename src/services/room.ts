@@ -1,14 +1,19 @@
-import type { FriendRoom, GroupRoom, Room } from '@prisma/client'
+import type { FriendRoom, GroupRoom, Room, User } from '@prisma/client'
 
 import { prisma } from '@/lib/db'
 
 import { AbstractService } from './_base'
+import { friendRoomVo, roomVo, userVo } from './_mapper'
 
 /**
  * 房间服务
  */
 export class Roomervice extends AbstractService<Room> {
   delegate = prisma.room
+
+  asVo(data?: Room | null) {
+    return roomVo(data)
+  }
 
   /**
    * 通过好友 ID 获取好友房间
@@ -38,6 +43,19 @@ export const roomService = new Roomervice()
  */
 export class FriendRoomService extends AbstractService<FriendRoom> {
   delegate = prisma.friendRoom
+
+  asVo(data?: FriendRoom & {
+    room?: Room
+    user1?: User
+    user2?: User
+  } | null) {
+    return {
+      ...friendRoomVo(data),
+      room: roomVo(data?.room) ?? undefined,
+      user1: userVo(data?.user1) ?? undefined,
+      user2: userVo(data?.user2) ?? undefined,
+    }
+  }
 
   /**
    * 获取单聊房间

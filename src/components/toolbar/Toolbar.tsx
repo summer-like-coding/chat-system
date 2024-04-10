@@ -4,7 +4,7 @@ import type { FriendApply, User } from '@prisma/client'
 
 import { useUserStore } from '@/app/store/user'
 import { request } from '@/app/utils/request'
-import { applyStatusMapping } from '@/types/mapping'
+import { applyStatusMapping } from '@/constants/mapping'
 import { CommentOutlined, LogoutOutlined, MessageOutlined, PlusSquareOutlined, RobotOutlined, SettingOutlined, UnorderedListOutlined, UserAddOutlined } from '@ant-design/icons'
 import { useBoolean } from 'ahooks'
 import { Avatar, Badge, Button, List, Modal, Popover, Tabs } from 'antd'

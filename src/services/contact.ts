@@ -1,10 +1,10 @@
 import type { PageParamsType } from '@/types/global'
 import type { Room, User, UserContact } from '@prisma/client'
 
-import { prisma } from '@/lib/db'
+import { prisma, transaction } from '@/lib/db'
 
 import { AbstractService } from './_base'
-import { roomVo, userVo } from './_mapper'
+import { contactVo, roomVo, userVo } from './_mapper'
 
 /**
  * 用户聊天
@@ -17,7 +17,7 @@ export class ContactService extends AbstractService<UserContact> {
     user?: User
   } | null) {
     return {
-      ...data,
+      ...contactVo(data),
       room: roomVo(data?.room) ?? undefined,
       user: userVo(data?.user) ?? undefined,
     }
@@ -83,7 +83,7 @@ export class ContactService extends AbstractService<UserContact> {
    * @returns 联系信息
    */
   async prepare(userId: string, friendId: string, roomId: string): Promise<UserContact> {
-    return await prisma.$transaction(async (ctx) => {
+    return await transaction(async (ctx) => {
       const contact = await ctx.userContact.findFirst({
         where: {
           roomId,

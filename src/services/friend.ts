@@ -1,15 +1,27 @@
 import type { PageParamsType } from '@/types/global'
-import type { UserFriend } from '@prisma/client'
+import type { User, UserFriend } from '@prisma/client'
 
 import { prisma } from '@/lib/db'
 
 import { AbstractService } from './_base'
+import { userFriendVo, userVo } from './_mapper'
 
 /**
  * 好友服务
  */
 export class FriendService extends AbstractService<UserFriend> {
   delegate = prisma.userFriend
+
+  asVo(data?: UserFriend & {
+    friend?: User
+    user?: User
+  } | null) {
+    return {
+      ...userFriendVo(data),
+      friend: userVo(data?.friend) ?? undefined,
+      user: userVo(data?.user) ?? undefined,
+    }
+  }
 
   /**
    * 检查是否是好友
