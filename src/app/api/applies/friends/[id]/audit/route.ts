@@ -33,7 +33,7 @@ import { getToken } from 'next-auth/jwt'
  *             properties:
  *               opinion:
  *                 type: string
- *                 description: 关键词
+ *                 description: 意见
  *                 enum:
  *                  - accept
  *                  - reject

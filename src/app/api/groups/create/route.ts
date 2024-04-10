@@ -2,6 +2,7 @@ import type { NextRequest } from 'next/server'
 
 import { authOptions } from '@/lib/auth'
 import { groupService } from '@/services/group'
+import { groupRoomService, roomService } from '@/services/room'
 import { Result } from '@/utils/result'
 import { getServerSession } from 'next-auth'
 import { getToken } from 'next-auth/jwt'
@@ -34,7 +35,7 @@ import { getToken } from 'next-auth/jwt'
  *                 description: 初始用户 ID 列表
  *     responses:
  *       200:
- *         description: '`ResultType<GroupVo>` 群组信息'
+ *         description: '`ResultType<{ group: GroupVo, groupRoom: GroupRoomVo, room: RoomVo }>` 群组信息'
  */
 export async function POST(request: NextRequest) {
   try {
@@ -56,8 +57,12 @@ export async function POST(request: NextRequest) {
     if (!userIdList || !Array.isArray(userIdList) || userIdList.length < 1 || userIdList.length > 100) {
       return Result.error('用户 ID 列表不合法')
     }
-    const res = await groupService.initializeGroup({ name }, userIdList, userId)
-    return Result.success(groupService.asVo(res))
+    const { group, groupRoom, room } = await groupService.initializeGroup({ name }, userIdList, userId)
+    return Result.success({
+      group: groupService.asVo(group),
+      groupRoom: groupRoomService.asVo(groupRoom),
+      room: roomService.asVo(room),
+    })
   }
   catch (error: any) {
     console.error('Error:', error)

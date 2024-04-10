@@ -80,7 +80,7 @@ export async function GET(request: NextRequest, { params }: PathIdParams) {
       return Result.error('申请状态错误')
     }
     if (!type || type === 'self') {
-      const applies = await friendApplyService.getApplies(
+      const applies = await friendApplyService.getByUserId(
         userId,
         page,
         (status && status.toUpperCase()) as ApplyStatusType,
@@ -88,7 +88,7 @@ export async function GET(request: NextRequest, { params }: PathIdParams) {
       return Result.success(friendApplyService.asVoList(applies))
     }
     else {
-      const applies = await friendApplyService.getAppliesByTargetId(
+      const applies = await friendApplyService.getByTargetId(
         userId,
         page,
         (status && status.toUpperCase()) as ApplyStatusType,

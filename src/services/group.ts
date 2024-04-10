@@ -1,8 +1,8 @@
 import type { PageParamsType } from '@/types/global'
-import type { User, UserGroup } from '@prisma/client'
+import type { GroupRoom, Room, User, UserGroup } from '@prisma/client'
 
 import { prisma, transaction } from '@/lib/db'
-import { CommonStatusType, type Group } from '@prisma/client'
+import { CommonStatusType, type Group, RoomType } from '@prisma/client'
 
 import { AbstractService } from './_base'
 import { groupVo, userGroupVo, userVo } from './_mapper'
@@ -24,7 +24,11 @@ export class Groupervice extends AbstractService<Group> {
    * @param ownerId 群主 ID
    * @returns 群组信息
    */
-  async initializeGroup(group: Partial<Group>, userIdList: string[], ownerId: string): Promise<Group> {
+  async initializeGroup(group: Partial<Group>, userIdList: string[], ownerId: string): Promise<{
+    group: Group
+    groupRoom: GroupRoom
+    room: Room
+  }> {
     if (group.name === undefined) {
       throw new Error('群组名称不能为空')
     }
@@ -33,7 +37,7 @@ export class Groupervice extends AbstractService<Group> {
     userIdSet.add(ownerId)
     const userIdListDedup = Array.from(userIdSet)
 
-    const groupCreated = await transaction(async (ctx) => {
+    return await transaction(async (ctx) => {
       const users = await ctx.user.findMany({
         where: {
           id: {
@@ -53,6 +57,17 @@ export class Groupervice extends AbstractService<Group> {
           status: CommonStatusType.ACTIVE,
         },
       })
+      const room = await ctx.room.create({
+        data: {
+          type: RoomType.GROUP,
+        },
+      })
+      const groupRoom = await ctx.groupRoom.create({
+        data: {
+          groupId: groupCreated.id,
+          roomId: room.id,
+        },
+      })
       await ctx.userGroup.createMany({
         data: userIdListDedup.map(userId => ({
           groupId: groupCreated.id,
@@ -60,9 +75,12 @@ export class Groupervice extends AbstractService<Group> {
           userId,
         })),
       })
-      return groupCreated
+      return {
+        group: groupCreated,
+        groupRoom,
+        room,
+      }
     })
-    return groupCreated
   }
 
   /**
