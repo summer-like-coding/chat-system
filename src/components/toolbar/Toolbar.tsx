@@ -35,9 +35,11 @@ function ToolBar() {
     })
     const lists: IApplyList[] = res?.map((item) => {
       return {
+        launchId: item.user.id,
+        launchName: item.user.nickname || item.user.username,
         status: item.status,
         targetId: item.id,
-        targetName: item.user.nickname || item.user.username,
+        targetName: item.target.nickname || item.target.username,
       }
     }) || []
     setApplyList(lists)
@@ -115,38 +117,42 @@ function ToolBar() {
       </div>,
       modalContent: <Tabs
         defaultActiveKey="applyUser"
-        items={[{
-          children: <div>
-            <SearchInput
-              setList={setApplyList}
-              type="user"
-              usedBy="apply"
-            />
-            <List
-              dataSource={applyList}
-              itemLayout="horizontal"
-              renderItem={(item, index) => (
-                <List.Item>
-                  <List.Item.Meta
-                    avatar={<Avatar size={48} src={item.avatar || `https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`} />}
-                    description={applyStatusMapping[item.status]}
-                    title={item.targetId}
-                  />
-                </List.Item>
-              )}
-            />
-          </div>,
-          key: 'applyUser',
-          label: '申请好友',
-        }, {
-          children: <div>
-            <ApplyList
-              applyList={applyList}
-            />
-          </div>,
-          key: 'appliedUser',
-          label: '新朋友',
-        }]}
+        items={[
+          {
+            children: <div>
+              <SearchInput
+                setList={setApplyList}
+                type="user"
+                usedBy="apply"
+              />
+              <List
+                dataSource={applyList}
+                itemLayout="horizontal"
+                renderItem={(item, index) => (
+                  <List.Item>
+                    <List.Item.Meta
+                      avatar={<Avatar size={48} src={item.avatar || `https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`} />}
+                      description={applyStatusMapping[item.status]}
+                      title={item.targetName}
+                    />
+                  </List.Item>
+                )}
+              />
+            </div>,
+            key: 'applyUser',
+            label: '申请好友',
+          },
+          {
+            children: <div>
+              <ApplyList
+                applyList={applyList}
+                type="launch"
+              />
+            </div>,
+            key: 'appliedUser',
+            label: '新朋友',
+          },
+        ]}
         onTabClick={key => handleTabClick(key)}
                     />,
       title: '好友',
@@ -164,21 +170,35 @@ function ToolBar() {
         发起群聊
       </div>,
       modalContent: <Tabs
-        defaultActiveKey="applyGroup"
-        items={[{
-          children: <div>
-            <SearchInput
-              setList={setApplyList}
-              type="group"
-              usedBy="apply"
-            />
-            <ApplyList
-              applyList={applyList}
-            />
-          </div>,
-          key: 'applyGroup',
-          label: '发起群聊',
-        }]}
+        defaultActiveKey="launchGroup"
+        items={[
+          {
+            children: <div>
+              <SearchInput
+                setList={setApplyList}
+                type="group"
+                usedBy="apply"
+              />
+              <ApplyList
+                applyList={applyList}
+                type="target"
+              />
+            </div>,
+            key: 'launchGroup',
+            label: '发起群聊',
+          },
+          {
+            children: <div>
+              <SearchInput
+                setList={setApplyList}
+                type="group"
+                usedBy="apply"
+              />
+            </div>,
+            key: 'applyGroup',
+            label: '加入群聊',
+          },
+        ]}
                     />,
       title: '群聊',
     },
@@ -314,7 +334,9 @@ function ToolBar() {
         footer={null}
         onCancel={setModalFalse}
         open={beforeOpen()}
+        style={{ height: 600 }}
         title={hoverItemContent[modalType as keyof typeof hoverItemContent].title}
+        width={600}
       >
         {
           modalType === 'logout' ? <div>正在退出中...</div> : hoverItemContent[modalType as keyof typeof hoverItemContent].modalContent
@@ -325,7 +347,9 @@ function ToolBar() {
         footer={null}
         onCancel={setAddModalFalse}
         open={addModalVisible}
+        style={{ height: 600 }}
         title={addUserModalContent[addModalType as keyof typeof addUserModalContent].title}
+        width={600}
       >
         {addUserModalContent[addModalType as keyof typeof addUserModalContent].modalContent}
       </Modal>

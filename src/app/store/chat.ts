@@ -9,7 +9,7 @@ interface ChatStore {
   setChatId: (chatId: string) => void
   setChatType: (chatType: RoomType) => void
   setTargetId: (targetId: string) => void
-  targetId: string // 聊天对象的id
+  targetId: string // targetId,表示当前聊天的对象id
 }
 
 const storageOptions = {

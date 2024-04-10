@@ -100,7 +100,7 @@ function UserList({ type, userList }: IUserListProps) {
           actions={handleListAction(item, index)}
         >
           <List.Item.Meta
-            avatar={<Avatar size={48} src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`} />}
+            avatar={<Avatar size={48} src={item.avatar || `https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`} />}
             description={item.description}
             title={item.username}
           />

@@ -6,16 +6,19 @@ import React from 'react'
 
 export interface IApplyList {
   avatar?: string
+  launchId: string // 发起用户id
+  launchName: string // 发起用户名称
   status: ApplyStatusType
-  targetId: string
+  targetId: string // 目标用户id
   targetName: string
 }
 
 interface IApplyListProps {
   applyList: IApplyList[]
+  type: 'launch' | 'target'
 }
 
-function ApplyList({ applyList }: IApplyListProps) {
+function ApplyList({ applyList, type }: IApplyListProps) {
   async function handleAudit(type: 'accept' | 'reject', targetId: string) {
     await request(`/api/applies/friends/${targetId}/audit`, {}, {
       data: {
@@ -84,7 +87,7 @@ function ApplyList({ applyList }: IApplyListProps) {
         >
           <List.Item.Meta
             avatar={<Avatar size={48} src={item.avatar || `https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`} />}
-            title={item.targetName}
+            title={type === 'launch' ? item.launchName : item.targetName}
           />
         </List.Item>
       )}

@@ -4,7 +4,7 @@ import { openai } from '@/lib/openai'
 import { getParams } from '@/utils/params'
 import { OpenAIStream, StreamingTextResponse } from 'ai'
 
-export const runtime = 'edge'
+export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 /**
