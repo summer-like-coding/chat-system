@@ -1,13 +1,16 @@
+/* eslint-disable no-console */
 'use client'
 
 import type { FriendApply, User } from '@prisma/client'
+import type { TransferProps } from 'antd'
+import type { Key } from 'react'
 
 import { useUserStore } from '@/app/store/user'
 import { request } from '@/app/utils/request'
 import { applyStatusMapping } from '@/constants/mapping'
 import { CommentOutlined, LogoutOutlined, MessageOutlined, PlusSquareOutlined, RobotOutlined, SettingOutlined, UnorderedListOutlined, UserAddOutlined } from '@ant-design/icons'
 import { useBoolean } from 'ahooks'
-import { Avatar, Badge, Button, List, Modal, Popover, Tabs } from 'antd'
+import { Avatar, Badge, Button, Form, Input, List, Modal, Popover, Tabs, Transfer, message } from 'antd'
 import { useRouter } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import { useEffect, useState } from 'react'
@@ -19,6 +22,11 @@ import SearchInput from '../searchInput/SearchInput'
 import Setting from '../setting/Setting'
 import './style.css'
 
+interface TransferType {
+  key: string
+  title: string
+}
+
 function ToolBar() {
   const router = useRouter()
   const useStore = useUserStore(state => state.user)!
@@ -28,21 +36,38 @@ function ToolBar() {
   const [modalType, setModalType] = useState<string>('help')
   const [addModalType, setAddModalType] = useState<string>('addFriend')
   const [applyList, setApplyList] = useState<IApplyList[]>([])
+  const [transferData, setTransferData] = useState<TransferType[]>([])
+  const [selectedKeys, setSelectedKeys] = useState<Key[]>([])
+  const [targetKeys, setTargetKeys] = useState<Key[]>([])
 
   async function handleTabClick(key: string) {
-    const res = await request<(FriendApply & { target: User, user: User })[]>(`/api/users/${useStore!.id}/applies`, {
-      type: key === 'applyUser' ? 'self' : 'target',
-    })
-    const lists: IApplyList[] = res?.map((item) => {
-      return {
-        launchId: item.user.id,
-        launchName: item.user.nickname || item.user.username,
-        status: item.status,
-        targetId: item.id,
-        targetName: item.target.nickname || item.target.username,
-      }
-    }) || []
-    setApplyList(lists)
+    if (key === 'applyUser' || key === 'appliedUser') {
+      const res = await request<(FriendApply & { target: User, user: User })[]>(`/api/users/${useStore!.id}/applies`, {
+        type: key === 'applyUser' ? 'self' : 'target',
+      })
+      const lists: IApplyList[] = res?.map((item) => {
+        return {
+          launchId: item.user.id,
+          launchName: item.user.nickname || item.user.username,
+          status: item.status,
+          targetId: item.id,
+          targetName: item.target.nickname || item.target.username,
+        }
+      }) || []
+      setApplyList(lists)
+    }
+    else if (key === 'launchGroup') {
+      const res = await request<User[]>('/api/users/search', {}, {
+        data: {
+          keyword: '',
+        },
+        method: 'POST',
+      })
+      setTransferData(res!.map(item => ({
+        key: item.id,
+        title: item.nickname || item.username,
+      })))
+    }
   }
 
   const hoverItemContent = {
@@ -100,6 +125,31 @@ function ToolBar() {
       </div>,
       title: '设置与隐私',
     },
+  }
+
+  const onTransferChange: TransferProps['onChange'] = (nextTargetKeys) => {
+    setTargetKeys(nextTargetKeys)
+  }
+
+  const onTransferSelectChange: TransferProps['onSelectChange'] = (
+    sourceSelectedKeys,
+    targetSelectedKeys,
+  ) => {
+    console.log('sourceSelectedKeys:', sourceSelectedKeys)
+    console.log('targetSelectedKeys:', targetSelectedKeys)
+    setSelectedKeys([...sourceSelectedKeys, ...targetSelectedKeys])
+  }
+
+  async function handleLaunchGroup(values: { groupName: string }) {
+    console.log('targetKeys:', targetKeys, 'values:', values)
+    await request('/api/groups/create', {}, {
+      data: {
+        name: values.groupName,
+        userIdList: targetKeys,
+      },
+      method: 'POST',
+    })
+    message.success('创建成功')
   }
 
   const addUserModalContent = {
@@ -173,17 +223,45 @@ function ToolBar() {
         defaultActiveKey="launchGroup"
         items={[
           {
-            children: <div>
-              <SearchInput
-                setList={setApplyList}
-                type="group"
-                usedBy="apply"
+            children: <>
+              <Transfer
+                dataSource={transferData}
+                footer={(_, direction) => {
+                  if (direction?.direction === 'right') {
+                    return (
+                      <Form
+                        layout="inline"
+                        onFinish={handleLaunchGroup}
+                      >
+                        <Form.Item
+                          label="群聊名称"
+                          name="groupName"
+                        >
+                          <Input />
+                        </Form.Item>
+                        <Form.Item>
+                          <Button htmlType="submit" type="link">
+                            创建
+                          </Button>
+                        </Form.Item>
+                      </Form>
+                    )
+                  }
+                  return null
+                }}
+                listStyle={{
+                  height: 300,
+                  width: 250,
+                }}
+                onChange={onTransferChange}
+                onSelectChange={onTransferSelectChange}
+                oneWay
+                render={item => item.title}
+                selectedKeys={selectedKeys} // 选中的数据
+                showSearch
+                targetKeys={targetKeys}
               />
-              <ApplyList
-                applyList={applyList}
-                type="target"
-              />
-            </div>,
+            </>,
             key: 'launchGroup',
             label: '发起群聊',
           },
@@ -199,6 +277,7 @@ function ToolBar() {
             label: '加入群聊',
           },
         ]}
+        onChange={key => handleTabClick(key)}
                     />,
       title: '群聊',
     },
@@ -272,7 +351,12 @@ function ToolBar() {
 
   useEffect(() => {
     if (addModalVisible) {
-      handleTabClick('applyUser')
+      if (addModalType === 'addFriend') {
+        handleTabClick('applyUser')
+      }
+      else if (addModalType === 'addGroup') {
+        handleTabClick('launchGroup')
+      }
     }
   }, [addModalVisible])
 
@@ -334,7 +418,9 @@ function ToolBar() {
         footer={null}
         onCancel={setModalFalse}
         open={beforeOpen()}
-        style={{ height: 600 }}
+        style={{
+          height: '100%',
+        }}
         title={hoverItemContent[modalType as keyof typeof hoverItemContent].title}
         width={600}
       >
@@ -344,10 +430,10 @@ function ToolBar() {
       </Modal>
       {/* 添加用户相关 */}
       <Modal
+        className="userModal-content"
         footer={null}
         onCancel={setAddModalFalse}
         open={addModalVisible}
-        style={{ height: 600 }}
         title={addUserModalContent[addModalType as keyof typeof addUserModalContent].title}
         width={600}
       >

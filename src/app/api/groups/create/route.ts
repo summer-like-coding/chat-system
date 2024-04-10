@@ -49,9 +49,9 @@ export async function POST(request: NextRequest) {
     }
     const { name, userIdList } = await request.json()
     if (
-      !name || !(typeof name === 'string') || !(name.length > 20) || !(name.length < 2)
+      !name || !(typeof name === 'string')
     ) {
-      return Result.error('群组名称不合法，必须在 2-20 个字符之间')
+      return Result.error('群组名称不合法')
     }
     if (!userIdList || !Array.isArray(userIdList) || userIdList.length < 1 || userIdList.length > 100) {
       return Result.error('用户 ID 列表不合法')
