@@ -1,7 +1,7 @@
 import type { PageParamsType } from '@/types/global'
 import type { User } from '@prisma/client'
 
-import { prisma } from '@/lib/db'
+import { prisma, transaction } from '@/lib/db'
 import bcrypt from 'bcryptjs'
 
 import { AbstractService } from './_base'
@@ -73,7 +73,7 @@ export class UserService extends AbstractService<User> {
    */
   async registerUser(data: RegisterUserType): Promise<User> {
     const { email, password, username } = data
-    const user = await prisma.$transaction(async (ctx) => {
+    const user = await transaction(async (ctx) => {
       const user = await ctx.user.findFirst({
         where: {
           // !isDeleted: false,

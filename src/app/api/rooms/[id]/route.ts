@@ -2,7 +2,7 @@ import type { PathIdParams } from '@/types/global'
 import type { NextRequest } from 'next/server'
 
 import { authOptions } from '@/lib/auth'
-import { groupService, userGroupService } from '@/services/group'
+import { userGroupService } from '@/services/group'
 import { friendRoomService, groupRoomService, roomService } from '@/services/room'
 import { Result } from '@/utils/result'
 import { RoomType } from '@prisma/client'
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest, { params }: PathIdParams) {
       if (!groupRoom) {
         return Result.error('系统错误，房间不存在')
       }
-      const userGroup = await groupService.checkIsGroupMember(groupRoom.groupId, userId)
+      const userGroup = await userGroupService.checkIsGroupMember(groupRoom.groupId, userId)
       if (!userGroup) {
         return Result.error('无权访问')
       }

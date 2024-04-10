@@ -1,11 +1,11 @@
 import type { PageParamsType } from '@/types/global'
 import type { Group, User } from '@prisma/client'
 
-import { prisma } from '@/lib/db'
+import { prisma, transaction } from '@/lib/db'
 import { ApplyStatusType, type FriendApply, type GroupApply, RoomType } from '@prisma/client'
 
 import { AbstractService } from './_base'
-import { groupVo, userVo } from './_mapper'
+import { friendApplyVo, groupApplyVo, groupVo, userVo } from './_mapper'
 
 /**
  * 好友申请服务
@@ -18,7 +18,7 @@ export class FriendApplyService extends AbstractService<FriendApply> {
    * @param applyId 申请 ID
    */
   async accept(applyId: string) {
-    return prisma.$transaction(async (ctx) => {
+    return transaction(async (ctx) => {
       const apply = await ctx.friendApply.findUnique({
         where: {
           id: applyId,
@@ -125,7 +125,7 @@ export class FriendApplyService extends AbstractService<FriendApply> {
     Partial<FriendApply>,
     'answer' | 'reason' | 'selfRemark' | 'targetId' | 'type' | 'userId'
   >) {
-    return prisma.$transaction(async (ctx) => {
+    return transaction(async (ctx) => {
       const user1 = await ctx.user.findUnique({
         where: {
           id: userId,
@@ -176,7 +176,7 @@ export class FriendApplyService extends AbstractService<FriendApply> {
     user?: User
   } | null) {
     return {
-      ...data,
+      ...friendApplyVo(data),
       target: userVo(data?.target) ?? undefined,
       user: userVo(data?.user) ?? undefined,
     }
@@ -259,7 +259,7 @@ export class FriendApplyService extends AbstractService<FriendApply> {
     applyId: string,
     statusType: ApplyStatusType = 'REJECTED',
   ) {
-    return prisma.$transaction(async (ctx) => {
+    return transaction(async (ctx) => {
       const apply = await ctx.friendApply.findUnique({
         where: {
           id: applyId,
@@ -304,7 +304,7 @@ export class GroupApplyService extends AbstractService<GroupApply> {
     user?: User
   } | null) {
     return {
-      ...data,
+      ...groupApplyVo(data),
       group: groupVo(data?.group) ?? undefined,
       user: userVo(data?.user) ?? undefined,
     }
@@ -317,7 +317,9 @@ export class GroupApplyService extends AbstractService<GroupApply> {
    * @param status 申请状态
    * @returns 申请记录列表
    */
-  async getAppliesByUserId(userId: string, page: PageParamsType, status?: ApplyStatusType) {
+  async getAppliesByUserId(userId: string, page: PageParamsType, status?: ApplyStatusType): Promise<(GroupApply & {
+    group: Group
+  })[]> {
     const applies = await this.delegate.findMany({
       include: {
         group: true,
@@ -331,6 +333,27 @@ export class GroupApplyService extends AbstractService<GroupApply> {
       },
     })
     return applies
+  }
+
+  /**
+   * 根据 ID 查找申请记录
+   * @param applyId 申请 ID
+   * @returns 申请记录
+   */
+  async getDetails(applyId: string): Promise<GroupApply & {
+    group: Group
+    user: User
+  } | null> {
+    return await this.delegate.findUnique({
+      include: {
+        group: true,
+        user: true,
+      },
+      where: {
+        id: applyId,
+        isDeleted: false,
+      },
+    })
   }
 }
 

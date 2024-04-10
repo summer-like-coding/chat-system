@@ -14,7 +14,9 @@ import { getToken } from 'next-auth/jwt'
  * /api/contacts/friends/prepare:
  *   post:
  *     summary: 准备与好友聊天
- *     description: 需要鉴权，仅用户自己可查询
+ *     description: |
+ *       需要鉴权，仅用户自己可查询。
+ *       此接口用于保证 Contact 对象在聊天中存在，保证系统能更新消息状态
  *     tags:
  *      - 联系
  *     requestBody:
@@ -32,7 +34,7 @@ import { getToken } from 'next-auth/jwt'
  *                 description: 好友 ID
  *     responses:
  *       200:
- *         description: '`ResultType<..[]>` ..列表'
+ *         description: '`ResultType<{ contact: ContactVo, friend: UserVo, room: RoomVo }>` 聊天初始化信息'
  */
 export async function POST(request: NextRequest) {
   try {
