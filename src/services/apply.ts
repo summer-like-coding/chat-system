@@ -183,37 +183,13 @@ export class FriendApplyService extends AbstractService<FriendApply> {
   }
 
   /**
-   * 根据 userId 查找申请记录
-   * @param userId 用户 ID
-   * @param page 分页参数
-   * @param status 申请状态
-   * @returns 申请记录列表
-   */
-  async getApplies(userId: string, page: PageParamsType, status?: ApplyStatusType) {
-    const applies = await this.delegate.findMany({
-      include: {
-        target: true,
-        user: true,
-      },
-      skip: (page.page - 1) * page.size,
-      take: page.size,
-      where: {
-        isDeleted: false,
-        status,
-        userId,
-      },
-    })
-    return applies
-  }
-
-  /**
    * 根据 targetId 查找申请记录
    * @param targetId 目标用户 ID
    * @param page 分页参数
    * @param status 申请状态
    * @returns 申请记录列表
    */
-  async getAppliesByTargetId(targetId: string, page: PageParamsType, status?: ApplyStatusType) {
+  async getByTargetId(targetId: string, page: PageParamsType, status?: ApplyStatusType) {
     const applies = await this.delegate.findMany({
       include: {
         target: true,
@@ -225,6 +201,30 @@ export class FriendApplyService extends AbstractService<FriendApply> {
         isDeleted: false,
         status,
         targetId,
+      },
+    })
+    return applies
+  }
+
+  /**
+   * 根据 userId 查找申请记录
+   * @param userId 用户 ID
+   * @param page 分页参数
+   * @param status 申请状态
+   * @returns 申请记录列表
+   */
+  async getByUserId(userId: string, page: PageParamsType, status?: ApplyStatusType) {
+    const applies = await this.delegate.findMany({
+      include: {
+        target: true,
+        user: true,
+      },
+      skip: (page.page - 1) * page.size,
+      take: page.size,
+      where: {
+        isDeleted: false,
+        status,
+        userId,
       },
     })
     return applies
@@ -299,6 +299,134 @@ export const friendApplyService = new FriendApplyService()
 export class GroupApplyService extends AbstractService<GroupApply> {
   delegate = prisma.groupApply
 
+  /**
+   * 接受群组申请
+   * @param applyId 申请 ID
+   */
+  async accept(applyId: string) {
+    return transaction(async (ctx) => {
+      const apply = await ctx.groupApply.findUnique({
+        where: {
+          id: applyId,
+          isDeleted: false,
+        },
+      })
+      if (!apply) {
+        throw new Error('申请不存在')
+      }
+      if (apply.status !== ApplyStatusType.PENDING) {
+        throw new Error('申请状态不正确')
+      }
+      const user = await ctx.user.findUnique({
+        where: {
+          id: apply.userId,
+          isDeleted: false,
+        },
+      })
+      if (!user) {
+        throw new Error('用户不存在')
+      }
+      const group = await ctx.group.findUnique({
+        where: {
+          id: apply.groupId,
+          isDeleted: false,
+        },
+      })
+      if (!group) {
+        throw new Error('群组不存在')
+      }
+      const userGroup = await ctx.userGroup.findFirst({
+        where: {
+          groupId: group.id,
+          isDeleted: false,
+          userId: user.id,
+        },
+      })
+      if (userGroup) {
+        throw new Error('已经是群成员了')
+      }
+      await ctx.userGroup.create({
+        data: {
+          groupId: group.id,
+          userId: user.id,
+        },
+      })
+      const groupRoom = await ctx.groupRoom.findFirst({
+        where: {
+          groupId: group.id,
+          isDeleted: false,
+        },
+      })
+      if (!groupRoom) {
+        throw new Error('系统错误，群组房间不存在')
+      }
+      await ctx.userContact.create({
+        data: {
+          roomId: groupRoom.roomId,
+          userId: user.id,
+        },
+      })
+      const groupApply = await ctx.groupApply.update({
+        data: {
+          status: ApplyStatusType.ACCEPTED,
+        },
+        include: {
+          group: true,
+          user: true,
+        },
+        where: {
+          id: apply.id,
+        },
+      })
+      return {
+        groupApply,
+      }
+    })
+  }
+
+  /**
+   * 申请加群
+   */
+  async applyFor({ groupId, userId }: { groupId: string, userId: string }) {
+    return transaction(async (ctx) => {
+      const user = await ctx.user.findUnique({
+        where: {
+          id: userId,
+          isDeleted: false,
+        },
+      })
+      if (!user) {
+        throw new Error('用户不存在')
+      }
+      const group = await ctx.group.findUnique({
+        where: {
+          id: groupId,
+          isDeleted: false,
+        },
+      })
+      if (!group) {
+        throw new Error('群组不存在')
+      }
+      const apply = await ctx.groupApply.findFirst({
+        where: {
+          groupId: group.id,
+          status: ApplyStatusType.PENDING,
+          userId: user.id,
+        },
+      })
+      if (apply) {
+        throw new Error('已经申请过了，请等待申请结果')
+      }
+      const applyCreated = await ctx.groupApply.create({
+        data: {
+          groupId: group.id,
+          userId: user.id,
+        },
+      })
+      return applyCreated
+    })
+  }
+
   asVo(data?: GroupApply & {
     group?: Group
     user?: User
@@ -336,6 +464,28 @@ export class GroupApplyService extends AbstractService<GroupApply> {
   }
 
   /**
+   * 根据 groupId 查找申请记录
+   * @param groupId 群组 ID
+   * @param page 分页参数
+   * @param status 申请状态
+   * @returns 申请记录列表
+   */
+  async getByGroupId(groupId: string, page: PageParamsType, status?: ApplyStatusType) {
+    return await this.delegate.findMany({
+      include: {
+        user: true,
+      },
+      skip: (page.page - 1) * page.size,
+      take: page.size,
+      where: {
+        groupId,
+        isDeleted: false,
+        status,
+      },
+    })
+  }
+
+  /**
    * 根据 ID 查找申请记录
    * @param applyId 申请 ID
    * @returns 申请记录
@@ -353,6 +503,46 @@ export class GroupApplyService extends AbstractService<GroupApply> {
         id: applyId,
         isDeleted: false,
       },
+    })
+  }
+
+  /**
+   * 拒绝/忽略群组申请
+   * @param applyId 申请 ID
+   * @returns 申请记录
+   */
+  async reject(
+    applyId: string,
+    statusType: ApplyStatusType = 'REJECTED',
+  ) {
+    return transaction(async (ctx) => {
+      const apply = await ctx.groupApply.findUnique({
+        where: {
+          id: applyId,
+          isDeleted: false,
+        },
+      })
+      if (!apply) {
+        throw new Error('申请不存在')
+      }
+      if (apply.status !== ApplyStatusType.PENDING) {
+        throw new Error('申请状态不正确')
+      }
+      const groupApply = await ctx.groupApply.update({
+        data: {
+          status: statusType,
+        },
+        include: {
+          group: true,
+          user: true,
+        },
+        where: {
+          id: apply.id,
+        },
+      })
+      return {
+        groupApply,
+      }
     })
   }
 }

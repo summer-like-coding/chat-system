@@ -1,6 +1,6 @@
 import type { Message, MessageType, Room, User } from '@prisma/client'
 
-import { prisma } from '@/lib/db'
+import { prisma, transaction } from '@/lib/db'
 
 import { AbstractService } from './_base'
 import { messageVo, roomVo, userVo } from './_mapper'
@@ -34,15 +34,80 @@ export class MessageService extends AbstractService<Message> {
    * @returns 消息
    */
   async createMessage({ content, roomId, type, userId }: MessageCreateType) {
-    return this.delegate.create({
-      data: {
-        content,
+    return await transaction(async (ctx) => {
+      const message = await ctx.message.create({
+        data: {
+          content,
+          roomId,
+          type,
+          userId,
+        },
+      })
+      await ctx.room.update({
+        data: {
+          lastMessageId: message.id,
+          lastUpdatedAt: message.createdAt,
+        },
+        where: {
+          id: roomId,
+          isDeleted: false,
+        },
+      })
+      return message
+    })
+  }
+
+  /**
+   * 反向回溯消息
+   * @param roomId 房间 ID
+   * @param firstMessageTime 第一条消息的时间
+   * @returns 消息
+   */
+  async pullBackMessages(roomId: string, firstMessageTime: number) {
+    return await this.delegate.findMany({
+      include: {
+        user: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      where: {
+        createdAt: {
+          lte: new Date(firstMessageTime),
+        },
+        isDeleted: false,
         roomId,
-        type,
-        userId,
+      },
+    })
+  }
+
+  /**
+   * 拉取消息
+   * @param roomId 房间 ID
+   * @param lastMessageTime 最后一条消息的时间
+   * @returns 消息
+   */
+  async pullMessages(roomId: string, lastMessageTime: number) {
+    return await this.delegate.findMany({
+      include: {
+        user: true,
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+      where: {
+        createdAt: {
+          gte: new Date(lastMessageTime),
+        },
+        isDeleted: false,
+        roomId,
       },
     })
   }
 }
 
 export const messageService = new MessageService()
+export interface MessageQueryType {
+  content: string
+  type: MessageType
+}

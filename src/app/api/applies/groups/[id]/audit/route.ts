@@ -3,6 +3,7 @@ import type { NextRequest } from 'next/server'
 
 import { authOptions } from '@/lib/auth'
 import { groupApplyService } from '@/services/apply'
+import { userGroupService } from '@/services/group'
 import { Result } from '@/utils/result'
 import { getServerSession } from 'next-auth'
 import { getToken } from 'next-auth/jwt'
@@ -11,8 +12,8 @@ import { getToken } from 'next-auth/jwt'
  * @swagger
  * /api/applies/groups/[id]/audit:
  *   post:
- *     summary: 处理群申请 @todo
- *     description: 需要鉴权，仅群管理员可处理申请
+ *     summary: 处理群申请
+ *     description: 需要鉴权，仅群管理员或群主可处理申请
  *     tags:
  *      - 申请
  *     parameters:
@@ -33,7 +34,7 @@ import { getToken } from 'next-auth/jwt'
  *             properties:
  *               opinion:
  *                 type: string
- *                 description: 关键词
+ *                 description: 意见
  *                 enum:
  *                  - accept
  *                  - reject
@@ -54,10 +55,31 @@ export async function POST(request: NextRequest, { params }: PathIdParams) {
     }
     const { id: applyId } = params
     const token = await getToken({ req: request })
-    const _userId = token?.sub
+    const userId = token?.sub
+    if (!userId) {
+      return Result.error('未登录')
+    }
+    const groupApply = await groupApplyService.getById(applyId, { isDeleted: false })
+    if (!groupApply) {
+      return Result.error('申请不存在')
+    }
+    const userGroup = await userGroupService.checkHasGroupPermission(userId, userId)
+    if (!userGroup) {
+      return Result.error('无权处理该申请')
+    }
 
-    const _groupApply = await groupApplyService.getById(applyId, { isDeleted: false })
-    // doing
+    if (opinion === 'accept') {
+      const { groupApply } = await groupApplyService.accept(applyId)
+      return Result.success(groupApplyService.asVo(groupApply))
+    }
+    else if (opinion === 'reject') {
+      const { groupApply } = await groupApplyService.reject(applyId)
+      return Result.success(groupApplyService.asVo(groupApply))
+    }
+    else {
+      const { groupApply } = await groupApplyService.reject(applyId, 'IGNORED')
+      return Result.success(groupApplyService.asVo(groupApply))
+    }
   }
   catch (error: any) {
     console.error('Error:', error)

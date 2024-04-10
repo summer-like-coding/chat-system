@@ -1,43 +1,21 @@
 import type { PathIdParams } from '@/types/global'
-import type { MessageType } from '@prisma/client'
 import type { NextRequest } from 'next/server'
 
 import { authOptions } from '@/lib/auth'
+import { userGroupService } from '@/services/group'
 import { messageService } from '@/services/message'
 import { friendRoomService, groupRoomService, roomService } from '@/services/room'
 import { Result } from '@/utils/result'
+import { MessageType } from '@prisma/client'
 import { getServerSession } from 'next-auth'
 import { getToken } from 'next-auth/jwt'
-
-export interface MessageQueryType {
-  content: string
-  type: MessageType
-}
-
-async function createMessage(data: MessageQueryType, roomId: string, userId: string) {
-  // 创建消息
-  const message = await messageService.createMessage({
-    content: data.content,
-    roomId,
-    type: data.type,
-    userId,
-  })
-
-  // 更新消息日期
-  await roomService.updateById(roomId, {
-    lastMessageId: message.id,
-    lastUpdatedAt: message.createdAt,
-  })
-
-  return message
-}
 
 /**
  * 在房间中聊天
  * @swagger
  * /api/rooms/[id]/chat:
  *   post:
- *     summary: 在房间中聊天 @todo
+ *     summary: 在房间中聊天
  *     tags:
  *      - 房间
  *     parameters:
@@ -65,39 +43,58 @@ export async function POST(request: NextRequest, { params }: PathIdParams) {
       return Result.error('未登录')
     }
     const token = await getToken({ req: request })
-    if (!token)
+    const userId = token?.sub
+    if (!userId) {
       return Result.error('未登录')
+    }
 
     const { id: roomId } = params
     const room = await roomService.getById(roomId, { isDeleted: false })
-    if (!room)
+    if (!room) {
       return Result.error('未找到房间')
-    const data: MessageQueryType = await request.json()
-
-    // 创建消息
-    const message = await createMessage(data, room.id, token.sub!)
+    }
+    const { content, type } = await request.json()
+    if (!type || ![
+      MessageType.FILE,
+      MessageType.IMAGE,
+      MessageType.TEXT,
+    ].includes(type)) {
+      return Result.error('消息类型错误')
+    }
+    if (!content || !(typeof content === 'string')) {
+      return Result.error('消息内容不能为空')
+    }
 
     // 如果是单聊
     if (room.type === 'FRIEND') {
       const friendRoom = await friendRoomService.getByRoomId(room.id)
-      if (!friendRoom)
+      if (!friendRoom) {
         return Result.error('未找到单聊房间')
-      const targetUserId = token?.sub === friendRoom.user1Id ? friendRoom.user2Id : friendRoom.user1Id
-      console.warn('targetUserId:', targetUserId)
-
-      // TODO: 消息队列推送消息，向 targetUserId 队列推送消息
+      }
+      if (friendRoom.user1Id !== userId && friendRoom.user2Id !== userId) {
+        return Result.error('无权限在此房间发送消息')
+      }
+      // @todo: 消息队列推送消息，向 targetUserId 队列推送消息
     }
     // 如果是群聊
     if (room.type === 'GROUP') {
       const groupRoom = await groupRoomService.getByRoomId(room.id)
-      if (!groupRoom)
+      if (!groupRoom) {
         return Result.error('未找到群聊房间')
+      }
       const targetGroupId = groupRoom.groupId
-      console.warn('targetGroupId:', targetGroupId)
-
-      // TODO: 消息队列推送消息，向 targetGroupId 队列推送消息
+      const userGroup = await userGroupService.checkIsGroupMember(targetGroupId, userId)
+      if (!userGroup) {
+        return Result.error('无权限在此房间发送消息')
+      }
+      // @todo: 消息队列推送消息，向 targetGroupId 队列推送消息
     }
-
+    const message = await messageService.createMessage({
+      content,
+      roomId: room.id,
+      type,
+      userId,
+    })
     return Result.success(messageService.asVo(message))
   }
   catch (error: any) {
