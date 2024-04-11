@@ -2,7 +2,9 @@ import type { PageParamsType } from '@/types/global'
 import type { User } from '@prisma/client'
 
 import { prisma, transaction } from '@/lib/db'
+import { sha256 } from '@/utils/hash'
 import bcrypt from 'bcryptjs'
+import process from 'node:process'
 
 import { AbstractService } from './_base'
 import { userVo } from './_mapper'
@@ -29,6 +31,20 @@ export class UserService extends AbstractService<User> {
 
   asVo(user?: User | null) {
     return userVo(user)
+  }
+
+  /**
+   * 生成 Token
+   * @param userId 用户 ID
+   * @returns Token
+   */
+  async genToken(userId: string): Promise<string> {
+    const t = Date.now()
+    const AUTH_SECRET = process.env.AUTH_SECRET!
+    const sha = await sha256(`${userId}#${AUTH_SECRET}#${t}`)
+    const hash = await bcrypt.hash(`${userId}#${sha}`, 10)
+    const token = `${userId}#${t}#${hash}`
+    return token
   }
 
   /**
@@ -100,17 +116,16 @@ export class UserService extends AbstractService<User> {
   /**
    * 重置密码
    */
-  async resetPassword(id: string, oldPassword: string, newPassword: string): Promise<{
-    error?: string
-    user?: User
-  }> {
+  async resetPassword(id: string, oldPassword: string, newPassword: string): Promise<User> {
     const user = await this.getById(id, { isDeleted: false })
-    if (!user)
-      return { error: '未找到用户' }
+    if (!user) {
+      throw new Error('用户未找到')
+    }
 
     const isMatch = await bcrypt.compare(oldPassword, user.password)
-    if (!isMatch)
-      return { error: '密码错误' }
+    if (!isMatch) {
+      throw new Error('密码不正确')
+    }
 
     const salt = await bcrypt.genSalt(10)
     const hashedPassword = await bcrypt.hash(newPassword, salt)
@@ -123,7 +138,7 @@ export class UserService extends AbstractService<User> {
         isDeleted: false,
       },
     })
-    return { user: updatedUser }
+    return updatedUser
   }
 
   /**

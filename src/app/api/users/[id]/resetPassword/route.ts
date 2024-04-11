@@ -63,13 +63,17 @@ export async function POST(request: NextRequest, { params }: PathIdParams) {
 
     const { id: userId } = params
     const user = await userService.getById(userId, { isDeleted: false })
-    if (!user)
+    if (!user) {
       return Result.error('未找到用户')
+    }
     const { newPassword, oldPassword } = await request.json()
+    if (!(typeof newPassword === 'string') || (
+      !/^(?=.*\d)(?=.*[a-zA-Z])(?=.*[^\da-zA-Z\s]).{8,20}$/
+    )) {
+      return Result.error('密码不符合规范，请使用 8-20 位字符，包含数字、字母和特殊字符')
+    }
     const res = await userService.resetPassword(params.id, oldPassword, newPassword)
-    if (res.error)
-      return Result.error(res.error)
-    return Result.success(userService.asVo(res.user))
+    return Result.success(userService.asVo(res))
   }
   catch (error: any) {
     console.error('Error:', error)
