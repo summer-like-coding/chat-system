@@ -8,7 +8,7 @@ import { Result } from '@/utils/result'
  * /api/robot/list:
  *   get:
  *     summary: 查询机器人列表
- *     description: 目前返回静态数据
+ *     description: 无鉴权，目前返回静态数据
  *     tags:
  *      - 机器人
  *     responses:

@@ -30,6 +30,7 @@ import { getToken } from 'next-auth/jwt'
  * /api/groups/[id]/update:
  *   post:
  *     summary: 更新群组信息
+ *     description: 需要鉴权，仅群管理员或群主可调用
  *     tags:
  *      - 群组
  *     parameters:

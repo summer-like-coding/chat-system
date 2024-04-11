@@ -25,7 +25,7 @@ import { getToken } from 'next-auth/jwt'
  *        required: true
  *        type: string
  *     requestBody:
- *       description: "`{ time: number, type: 'back' | 'forward' }`"
+ *       description: "`{ time: number, type: 'back' | 'forward' }` 分别表示拉取时间戳和拉取类型"
  *       required: true
  *       content:
  *         application/json:

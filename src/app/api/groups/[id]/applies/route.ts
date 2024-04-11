@@ -16,6 +16,7 @@ import { getToken } from 'next-auth/jwt'
  * /api/groups/[id]/applies:
  *   get:
  *     summary: 查询群组申请列表
+ *     description: 需要鉴权，仅群管理员或群主可调用
  *     tags:
  *      - 群组
  *     parameters:

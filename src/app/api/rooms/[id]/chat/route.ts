@@ -16,6 +16,7 @@ import { getToken } from 'next-auth/jwt'
  * /api/rooms/[id]/chat:
  *   post:
  *     summary: 在房间中聊天
+ *     description: 需要鉴权，房间成员可调用
  *     tags:
  *      - 房间
  *     parameters:

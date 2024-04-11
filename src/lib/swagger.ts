@@ -14,8 +14,8 @@ export async function getApiDocs() {
         },
       },
       info: {
-        title: 'Next Swagger API Example',
-        version: '1.0',
+        title: 'Chat-IM',
+        version: '0.1.0',
       },
       openapi: '3.0.0',
       security: [],

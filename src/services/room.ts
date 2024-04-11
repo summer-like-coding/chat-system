@@ -1,9 +1,9 @@
-import type { FriendRoom, GroupRoom, Room, User } from '@prisma/client'
+import type { FriendRoom, Group, GroupRoom, Room, User } from '@prisma/client'
 
 import { prisma } from '@/lib/db'
 
 import { AbstractService } from './_base'
-import { friendRoomVo, roomVo, userVo } from './_mapper'
+import { friendRoomVo, groupRoomVo, groupVo, roomVo, userVo } from './_mapper'
 
 /**
  * 房间服务
@@ -78,6 +78,35 @@ export const friendRoomService = new FriendRoomService()
  */
 export class GroupRoomervice extends AbstractService<GroupRoom> {
   delegate = prisma.groupRoom
+
+  asVo(data?: GroupRoom & {
+    group?: Group
+    room?: Room
+  } | null) {
+    return {
+      ...groupRoomVo(data),
+      group: groupVo(data?.group) ?? undefined,
+      room: roomVo(data?.room) ?? undefined,
+    }
+  }
+
+  /**
+   * 获取群聊房间
+   * @param groupId 群组 ID
+   * @returns 群聊房间
+   */
+  async getByGroupId(groupId: string) {
+    return this.delegate.findFirst({
+      include: {
+        group: true,
+        room: true,
+      },
+      where: {
+        groupId,
+        isDeleted: false,
+      },
+    })
+  }
 
   /**
    * 获取群聊房间

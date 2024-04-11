@@ -128,6 +128,39 @@ export const groupService = new Groupervice()
 export class UserGroupervice extends AbstractService<UserGroup> {
   delegate = prisma.userGroup
 
+  /**
+   * 添加群组成员
+   * @param groupId 群组 ID
+   * @param userIdList 用户 ID 列表
+   * @returns 用户列表
+   */
+  async addGroupMembers(groupId: string, userIdList: string[]) {
+    const userIdSet = new Set(userIdList)
+    const userIdListDedup = Array.from(userIdSet)
+
+    return await transaction(async (ctx) => {
+      const users = await ctx.user.findMany({
+        where: {
+          id: {
+            in: userIdListDedup,
+          },
+          isDeleted: false,
+        },
+      })
+      if (users.length !== userIdListDedup.length) {
+        throw new Error('存在一些用户不存在')
+      }
+      await ctx.userGroup.createMany({
+        data: userIdListDedup.map(userId => ({
+          groupId,
+          groupRole: 'MEMBER',
+          userId,
+        })),
+      })
+      return users
+    })
+  }
+
   asVo(data?: UserGroup & {
     group?: Group
     user?: User
@@ -213,6 +246,115 @@ export class UserGroupervice extends AbstractService<UserGroup> {
         groupId,
         isDeleted: false,
       },
+    })
+  }
+
+  /**
+   * 移除群组成员
+   * @param groupId 群组 ID
+   * @param userIdList 用户 ID 列表
+   * @returns 用户列表
+   */
+  async removeGroupMembers(groupId: string, userIdList: string[]) {
+    const userIdSet = new Set(userIdList)
+    const userIdListDedup = Array.from(userIdSet)
+    return await transaction(async (ctx) => {
+      await ctx.userGroup.updateMany({
+        data: {
+          isDeleted: true,
+        },
+        where: {
+          groupId,
+          groupRole: {
+            notIn: ['OWNER'],
+          },
+          userId: {
+            in: userIdListDedup,
+          },
+        },
+      })
+      const groupRoom = await ctx.groupRoom.findFirst({
+        where: {
+          groupId,
+        },
+      })
+      if (!groupRoom) {
+        throw new Error('群组不存在')
+      }
+      await ctx.userContact.updateMany({
+        data: {
+          isDeleted: true,
+        },
+        where: {
+          roomId: groupRoom.roomId,
+          userId: {
+            in: userIdListDedup,
+          },
+        },
+      })
+      return await ctx.user.findMany({
+        where: {
+          id: {
+            in: userIdListDedup,
+          },
+        },
+      })
+    })
+  }
+
+  /**
+   * 搜索群组成员
+   * @param groupId 群组 ID
+   * @param keyword 关键词
+   * @param page 分页参数
+   * @returns 群组成员列表
+   */
+  async searchMembers(groupId: string, keyword: string, page: PageParamsType) {
+    const userGroups = await this.delegate.findMany({
+      include: {
+        user: true,
+      },
+      skip: (page.page - 1) * page.size,
+      take: page.size,
+      where: {
+        groupId,
+        isDeleted: false,
+        user: {
+          AND: {
+            isDeleted: false,
+            username: {
+              contains: keyword,
+            },
+          },
+        },
+      },
+    })
+    return userGroups.map(item => item.user)
+  }
+
+  async updateGroupMember(groupId: string, userId: string, groupRole?: 'ADMIN' | 'MEMBER', remark?: string) {
+    return await transaction(async (ctx) => {
+      const userGroup = await ctx.userGroup.findFirst({
+        where: {
+          groupId,
+          userId,
+        },
+      })
+      if (!userGroup) {
+        throw new Error('用户不是群组成员')
+      }
+      return await ctx.userGroup.update({
+        data: {
+          groupRole,
+          remark,
+        },
+        include: {
+          user: true,
+        },
+        where: {
+          id: userGroup.id,
+        },
+      })
     })
   }
 }

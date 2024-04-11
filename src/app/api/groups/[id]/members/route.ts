@@ -13,6 +13,7 @@ import { getServerSession } from 'next-auth'
  * /api/groups/[id]/members:
  *   get:
  *     summary: 查询群组成员
+ *     description: 需要鉴权，登录用户可调用
  *     tags:
  *      - 群组
  *     parameters:

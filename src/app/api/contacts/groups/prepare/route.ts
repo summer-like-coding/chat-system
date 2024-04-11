@@ -2,39 +2,39 @@ import type { NextRequest } from 'next/server'
 
 import { authOptions } from '@/lib/auth'
 import { contactService } from '@/services/contact'
-import { friendService } from '@/services/friend'
-import { roomService } from '@/services/room'
+import { groupService, userGroupService } from '@/services/group'
+import { groupRoomService, roomService } from '@/services/room'
 import { Result } from '@/utils/result'
 import { getServerSession } from 'next-auth'
 import { getToken } from 'next-auth/jwt'
 
 /**
- * 准备与好友聊天
+ * 准备群聊
  * @swagger
- * /api/contacts/friends/prepare:
+ * /api/contacts/groups/prepare:
  *   post:
- *     summary: 准备与好友聊天
+ *     summary: 准备群聊
  *     description: |
- *       需要鉴权，仅用户自己可调用。
+ *       需要鉴权，仅群成员可调用。
  *       此接口用于保证 Contact 对象在聊天中存在，保证客户端能更新消息状态
  *     tags:
  *      - 联系
  *     requestBody:
- *       description: '`{ userId: string }`'
+ *       description: '`{ groupId: string }`'
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
  *             required:
- *              - userId
+ *              - groupId
  *             properties:
- *               userId:
+ *               groupId:
  *                 type: string
- *                 description: 好友 ID
+ *                 description: 群组 ID
  *     responses:
  *       200:
- *         description: '`ResultType<{ contact: ContactVo, friend: UserVo, room: RoomVo }>` 聊天初始化信息'
+ *         description: '`ResultType<{ contact: ContactVo, group: GroupVo, room: RoomVo }>` 聊天初始化信息'
  */
 export async function POST(request: NextRequest) {
   try {
@@ -47,24 +47,23 @@ export async function POST(request: NextRequest) {
     if (!userId) {
       return Result.error('未登录')
     }
-    const { userId: friendId } = await request.json()
-    if (!friendId || !(typeof friendId === 'string')) {
-      return Result.error('好友 ID 不能为空')
+    const { groupId } = await request.json()
+    if (!groupId || !(typeof groupId === 'string')) {
+      return Result.error('群组 ID 不能为空')
     }
-    const friend = await friendService.checkIsFriend(userId, friendId)
-    if (!friend) {
-      return Result.error('好友不存在')
+    const userGroup = await userGroupService.checkIsGroupMember(groupId, userId)
+    if (!userGroup) {
+      return Result.error('不是群成员')
     }
-    const friendRoom = await roomService.getByFriendTupleId(userId, friendId)
-    if (!friendRoom) {
-      return Result.error('系统错误，好友房间不存在')
+    const groupRoom = await groupRoomService.getByGroupId(groupId)
+    if (!groupRoom) {
+      return Result.error('系统错误，群房间不存在')
     }
-    const room = friendRoom.room
-    const contact = await contactService.prepareFriend(userId, friendId, room.id)
+    const contact = await contactService.prepareGroup(userId, groupId, groupRoom.roomId)
     return Result.success({
       contact: contactService.asVo(contact),
-      friend: friendService.asVo(friend),
-      room: roomService.asVo(room),
+      group: groupService.asVo(groupRoom.group),
+      room: roomService.asVo(groupRoom.room),
     })
   }
   catch (error: any) {

@@ -8,11 +8,11 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 /**
- * @deprecated 请使用 POST /api/robot/chat/ 提供的 OpenAI 兼容接口
  * @swagger
  * /api/robot/chat:
  *   get:
  *     summary: 与 GPT 机器人聊天
+ *     description: "**过时**：请使用 `POST /api/robot/chat/` 提供的 OpenAI 兼容接口"
  *     tags:
  *       - 机器人
  *     parameters:
@@ -78,8 +78,8 @@ export async function GET(request: NextRequest) {
  * @swagger
  * /api/robot/chat:
  *   post:
- *     description: OpenAI 兼容接口
  *     summary: 与 GPT 机器人聊天
+ *     description: OpenAI 兼容接口，需要鉴权，登录用户可调用
  *     tags:
  *       - 机器人
  *     parameters:

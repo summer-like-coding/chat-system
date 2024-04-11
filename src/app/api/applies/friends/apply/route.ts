@@ -40,6 +40,7 @@ import { getToken } from 'next-auth/jwt'
  * /api/applies/friends/apply:
  *   post:
  *     summary: 申请加好友
+ *     description: 需要鉴权，登录用户可调用
  *     tags:
  *      - 申请
  *     requestBody:

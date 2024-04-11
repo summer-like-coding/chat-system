@@ -82,7 +82,7 @@ export class ContactService extends AbstractService<UserContact> {
    * @param roomId 房间 ID
    * @returns 联系信息
    */
-  async prepare(userId: string, friendId: string, roomId: string): Promise<UserContact> {
+  async prepareFriend(userId: string, friendId: string, roomId: string): Promise<UserContact> {
     return await transaction(async (ctx) => {
       const contact = await ctx.userContact.findFirst({
         where: {
@@ -104,6 +104,27 @@ export class ContactService extends AbstractService<UserContact> {
           },
         })
       }
+      if (contact) {
+        return contact
+      }
+      const contactCreated = await ctx.userContact.create({
+        data: {
+          roomId,
+          userId,
+        },
+      })
+      return contactCreated
+    })
+  }
+
+  async prepareGroup(userId: string, groupId: string, roomId: string): Promise<UserContact> {
+    return await transaction(async (ctx) => {
+      const contact = await ctx.userContact.findFirst({
+        where: {
+          roomId,
+          userId,
+        },
+      })
       if (contact) {
         return contact
       }
