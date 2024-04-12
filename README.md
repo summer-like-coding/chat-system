@@ -15,6 +15,9 @@
 
 ## 2. 开始
 
+> [!TIP]
+> 推荐阅读如何使用 [Docker Compose 部署开发环境](./docs/develop/README.md)，而无需安装 MongoDB、Redis、RabbitMQ。
+
 项目依赖：
 
 - Node.js >= 20.x
@@ -50,9 +53,6 @@ pnpm dev
 ```bash
 pnpm lint
 ```
-
-> [!TIP]
-> 请参考如何 [创建开发/测试使用的 MongoDB](./tools/mongo/README.md)。
 
 ## 3. 部署
 

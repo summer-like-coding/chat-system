@@ -2,12 +2,12 @@ services:
   mongo1:
     image: mongo:7.0.5
     restart: unless-stopped
-    container_name: mongo1
+    container_name: im-mongo1-dev
     ports:
       - 27017:27017
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=password
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password}
     command: mongod --replSet rs0 --keyFile /secrets/rs0.key
     volumes:
       - /etc/localtime:/etc/localtime:ro
@@ -21,15 +21,19 @@ services:
         exec docker-entrypoint.sh $$@
     extra_hosts:
       - host.docker.internal:host-gateway
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
   mongo2:
     image: mongo:7.0.5
     restart: unless-stopped
-    container_name: mongo2
+    container_name: im-mongo2-dev
     ports:
       - 27018:27017
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=password
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password}
     command: mongod --replSet rs0 --keyFile /secrets/rs0.key
     volumes:
       - /etc/localtime:/etc/localtime:ro
@@ -43,15 +47,19 @@ services:
         exec docker-entrypoint.sh $$@
     extra_hosts:
       - host.docker.internal:host-gateway
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
   mongo3:
     image: mongo:7.0.5
     restart: unless-stopped
-    container_name: mongo3
+    container_name: im-mongo3-dev
     ports:
       - 27019:27017
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=password
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password}
     command: mongod --replSet rs0 --keyFile /secrets/rs0.key
     volumes:
       - /etc/localtime:/etc/localtime:ro
@@ -65,3 +73,39 @@ services:
         exec docker-entrypoint.sh $$@
     extra_hosts:
       - host.docker.internal:host-gateway
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
+  rabbitmq:
+    image: rabbitmq:3.13.0-management-alpine
+    container_name: im-rabbitmq-dev
+    restart: unless-stopped
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-password}
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
+  redis:
+    image: redis:7.2.4-alpine3.19
+    restart: unless-stopped
+    container_name: im-redis-dev
+    ports:
+      - 6379:6379
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m

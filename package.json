@@ -15,7 +15,6 @@
   "dependencies": {
     "@ant-design/icons": "^5.3.6",
     "@ant-design/nextjs-registry": "^1.0.0",
-    "@microsoft/fetch-event-source": "^2.0.1",
     "@prisma/client": "^5.12.1",
     "ahooks": "^3.7.11",
     "ai": "^3.0.19",
@@ -32,6 +31,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-markdown": "^9.0.1",
+    "redis": "^4.6.13",
     "socket.io-client": "^4.7.5",
     "swagger-ui-react": "^5.14.0",
     "zustand": "^4.5.2"

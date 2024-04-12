@@ -16,8 +16,8 @@ services:
     image: mongo:7.0.5
     restart: unless-stopped
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:-password}
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password}
     command:
       - mongod
       - --replSet
@@ -34,12 +34,16 @@ services:
         chmod 400 /secrets/rs0.key
         chown 999:999 /secrets/rs0.key
         exec docker-entrypoint.sh $$@
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
   mongo2:
     image: mongo:7.0.5
     restart: unless-stopped
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:-password}
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password}
     command:
       - mongod
       - --replSet
@@ -56,12 +60,16 @@ services:
         chmod 400 /secrets/rs0.key
         chown 999:999 /secrets/rs0.key
         exec docker-entrypoint.sh $$@
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
   mongo3:
     image: mongo:7.0.5
     restart: unless-stopped
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:-password}
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password}
     command:
       - mongod
       - --replSet
@@ -78,3 +86,28 @@ services:
         chmod 400 /secrets/rs0.key
         chown 999:999 /secrets/rs0.key
         exec docker-entrypoint.sh $$@
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
+  rabbitmq:
+    image: rabbitmq:3.13.0-management-alpine
+    restart: unless-stopped
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-password}
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
+  redis:
+    image: redis:7.2.4-alpine3.19
+    restart: unless-stopped
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
