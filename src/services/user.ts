@@ -40,7 +40,7 @@ export class UserService extends AbstractService<User> {
    */
   async genToken(userId: string): Promise<string> {
     const t = Date.now()
-    const AUTH_SECRET = process.env.AUTH_SECRET!
+    const AUTH_SECRET = process.env.NEXTAUTH_SECRET!
     const sha = await sha256(`${userId}#${AUTH_SECRET}#${t}`)
     const hash = await bcrypt.hash(`${userId}#${sha}`, 10)
     const token = `${userId}#${t}#${hash}`

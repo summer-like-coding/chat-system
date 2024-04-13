@@ -1,12 +1,15 @@
 'use client'
 import ToolBar from '@/components/toolbar/Toolbar'
+import { emitter } from '@/utils/eventBus'
 import { AntdRegistry } from '@ant-design/nextjs-registry'
 import { Layout } from 'antd'
 import { SessionProvider } from 'next-auth/react'
-import React from 'react'
+import React, { useEffect } from 'react'
+import { io } from 'socket.io-client'
 
 import './globals.css'
 import { useUserStore } from './store/user'
+import { request } from './utils/request'
 
 function RootLayout({ children }: React.PropsWithChildren) {
   const { Sider } = Layout
@@ -16,11 +19,29 @@ function RootLayout({ children }: React.PropsWithChildren) {
     return useStore === null || useStore === undefined
   }
 
-  // useEffect(() => {
-  //   if (useStore === null || useStore === undefined) {
-  //     router.push('/login')
-  //   }
-  // }, [router, useStore])
+  useEffect(() => {
+    async function getToken() {
+      const res = await request<{ token: string }>(`/api/users/${useStore?.id}/getToken`)
+      // 发送凭证
+      const socket = io('http://localhost:3001', {
+        auth: {
+          token: res?.token,
+        },
+        path: '/_socketio/',
+      })
+      socket.on('simpleEmit', (d: string) => {
+        emitter.emit('simpleEmit', d)
+      })
+      socket.on('connect_error', (error: Error) => {
+        console.error('connect_error', error)
+      })
+    }
+
+    if (useStore) {
+      // 如果用户存在，那么获取token，然后建立socket连接
+      getToken()
+    }
+  }, [useStore])
 
   return (
     <html lang="en">
