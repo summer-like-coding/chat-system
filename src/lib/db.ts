@@ -2,6 +2,7 @@ import type { ITXClientDenyList } from '@prisma/client/runtime/library'
 
 import { TRANSACTION_ERROR_CODES, TRANSACTION_MAX_RETRIES } from '@/constants/settings'
 import { PrismaClient } from '@prisma/client'
+import process from 'node:process'
 export const prisma = new PrismaClient()
 
 /**
@@ -36,3 +37,9 @@ export async function transaction<R>(
   } while (retries <= max_retries)
   return result!
 }
+
+async function onShutdown() {
+  await prisma.$disconnect()
+}
+process.on('SIGINT', onShutdown)
+process.on('SIGTERM', onShutdown)

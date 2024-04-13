@@ -8,3 +8,8 @@ export const TRANSACTION_MAX_RETRIES = 3
 export const TRANSACTION_ERROR_CODES = [
   'P2034',
 ]
+
+/**
+ * Redis Key: 心跳
+ */
+export const REDIS_KEY_HEARTBEAT = 'im:heartbeat'

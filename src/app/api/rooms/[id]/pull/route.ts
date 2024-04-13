@@ -25,7 +25,7 @@ import { getToken } from 'next-auth/jwt'
  *        required: true
  *        type: string
  *     requestBody:
- *       description: "`{ time: number, type: 'back' | 'forward' }` 分别表示拉取时间戳和拉取类型"
+ *       description: "`{ time: number, type: 'previous' | 'new' }` 分别表示拉取时间戳和拉取类型"
  *       required: true
  *       content:
  *         application/json:
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest, { params }: PathIdParams) {
       return Result.error('未登录')
     }
     const { time, type } = await request.json()
-    if (!time || !['back', 'forward'].includes(type)) {
+    if (!time || !['new', 'previous'].includes(type)) {
       return Result.error('参数错误')
     }
 
@@ -92,12 +92,12 @@ export async function POST(request: NextRequest, { params }: PathIdParams) {
         return Result.error('无权限在此房间拉取消息')
       }
     }
-    if (type === 'back') {
-      const messages = await messageService.pullBackMessages(roomId, time)
+    if (type === 'previous') {
+      const messages = await messageService.pullPreviousMessages(roomId, time)
       return Result.success(messageService.asVoList(messages))
     }
     else {
-      const messages = await messageService.pullMessages(roomId, time)
+      const messages = await messageService.pullNewMessages(roomId, time)
       return Result.success(messageService.asVoList(messages))
     }
   }

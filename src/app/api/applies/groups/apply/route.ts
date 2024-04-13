@@ -10,8 +10,10 @@ import { getToken } from 'next-auth/jwt'
  * @swagger
  * /api/applies/groups/apply:
  *   post:
- *     summary: 申请加群
- *     description: 需要鉴权，登录用户可申请加群
+ *     summary: 申请加群 @deprecated
+ *     description: |
+ *       **过时**：使用 E2EE 的新接口 `POST /api/applies/e2ee/groups/apply`。
+ *       需要鉴权，登录用户可申请加群
  *     tags:
  *      - 申请
  *     requestBody:

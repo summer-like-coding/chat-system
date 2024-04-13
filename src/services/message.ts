@@ -58,36 +58,12 @@ export class MessageService extends AbstractService<Message> {
   }
 
   /**
-   * 反向回溯消息
-   * @param roomId 房间 ID
-   * @param firstMessageTime 第一条消息的时间
-   * @returns 消息
-   */
-  async pullBackMessages(roomId: string, firstMessageTime: number) {
-    return await this.delegate.findMany({
-      include: {
-        user: true,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      where: {
-        createdAt: {
-          lte: new Date(firstMessageTime),
-        },
-        isDeleted: false,
-        roomId,
-      },
-    })
-  }
-
-  /**
    * 拉取消息
    * @param roomId 房间 ID
    * @param lastMessageTime 最后一条消息的时间
    * @returns 消息
    */
-  async pullMessages(roomId: string, lastMessageTime: number) {
+  async pullNewMessages(roomId: string, lastMessageTime: number) {
     return await this.delegate.findMany({
       include: {
         user: true,
@@ -98,6 +74,30 @@ export class MessageService extends AbstractService<Message> {
       where: {
         createdAt: {
           gte: new Date(lastMessageTime),
+        },
+        isDeleted: false,
+        roomId,
+      },
+    })
+  }
+
+  /**
+   * 反向回溯消息
+   * @param roomId 房间 ID
+   * @param firstMessageTime 第一条消息的时间
+   * @returns 消息
+   */
+  async pullPreviousMessages(roomId: string, firstMessageTime: number) {
+    return await this.delegate.findMany({
+      include: {
+        user: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      where: {
+        createdAt: {
+          lte: new Date(firstMessageTime),
         },
         isDeleted: false,
         roomId,

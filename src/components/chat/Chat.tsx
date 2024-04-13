@@ -137,7 +137,7 @@ export default function Chat({ chatKey, type }: IChat) {
     const res1 = await request<(MessageVo & { user: UserVo })[]>(`/api/rooms/${roomId || chatId}/pull`, {}, {
       data: {
         time: new Date().getTime(),
-        type: 'back',
+        type: 'previous',
       },
       method: 'POST',
     })

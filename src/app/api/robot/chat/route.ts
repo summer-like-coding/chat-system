@@ -11,8 +11,8 @@ export const dynamic = 'force-dynamic'
  * @swagger
  * /api/robot/chat:
  *   get:
- *     summary: 与 GPT 机器人聊天
- *     description: "**过时**：请使用 `POST /api/robot/chat/` 提供的 OpenAI 兼容接口"
+ *     summary: 与 GPT 机器人聊天 @deprecated
+ *     description: "**过时**：请使用 `POST /api/robot/chat/`，此接口为 OpenAI 兼容接口"
  *     tags:
  *       - 机器人
  *     parameters:
