@@ -31,8 +31,7 @@ export async function transaction<R>(
         retries++
         continue
       }
-      console.error(error)
-      throw new Error('事务处理失败')
+      throw error
     }
   } while (retries <= max_retries)
   return result!

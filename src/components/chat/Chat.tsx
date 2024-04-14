@@ -66,7 +66,7 @@ export default function Chat({ chatKey, type }: IChat) {
     })
   }
 
-  function formatMessage(message: (MessageVo & { user: UserVo })[]) {
+  function formatMessage(message: ({ user: UserVo } & MessageVo)[]) {
     return message.map((item) => {
       return {
         avatar: item.user.avatar || '',
@@ -134,7 +134,7 @@ export default function Chat({ chatKey, type }: IChat) {
    */
   async function pullMessage(roomId?: string) {
     // 拉取聊天记录
-    const res1 = await request<(MessageVo & { user: UserVo })[]>(`/api/rooms/${roomId || chatId}/pull`, {}, {
+    const res1 = await request<({ user: UserVo } & MessageVo)[]>(`/api/rooms/${roomId || chatId}/pull`, {}, {
       data: {
         time: new Date().getTime(),
         type: 'previous',

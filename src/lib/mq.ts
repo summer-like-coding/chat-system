@@ -11,6 +11,9 @@ rabbit.on('connection', () => {
 })
 
 export const rabbitPublisher = rabbit.createPublisher({
+  confirm: true,
+  exchanges: [{ exchange: 'messages', type: 'topic' }],
+  maxAttempts: 2,
 })
 
 async function onShutdown() {

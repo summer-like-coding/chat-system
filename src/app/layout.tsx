@@ -1,3 +1,4 @@
+/* eslint-disable node/prefer-global/process */
 'use client'
 import ToolBar from '@/components/toolbar/Toolbar'
 import { emitter } from '@/utils/eventBus'
@@ -14,7 +15,6 @@ import { request } from './utils/request'
 function RootLayout({ children }: React.PropsWithChildren) {
   const { Sider } = Layout
   const useStore = useUserStore(state => state.user)!
-  // const router = useRouter()
   function isHidden() {
     return useStore === null || useStore === undefined
   }
@@ -23,14 +23,14 @@ function RootLayout({ children }: React.PropsWithChildren) {
     async function getToken() {
       const res = await request<{ token: string }>(`/api/users/${useStore?.id}/getToken`)
       // 发送凭证
-      const socket = io('http://localhost:3001', {
+      const socket = io(process.env.NEXT_PUBLIC_SOCKETIO_SERVER_URL!, {
         auth: {
           token: res?.token,
         },
-        path: '/_socketio/',
+        path: process.env.NEXT_PUBLIC_SOCKETIO_PATH,
       })
-      socket.on('simpleEmit', (d: string) => {
-        emitter.emit('simpleEmit', d)
+      socket.on('hello', (d: string) => {
+        emitter.emit('hello', d)
       })
       socket.on('connect_error', (error: Error) => {
         console.error('connect_error', error)

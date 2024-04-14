@@ -44,11 +44,11 @@ export const roomService = new Roomervice()
 export class FriendRoomService extends AbstractService<FriendRoom> {
   delegate = prisma.friendRoom
 
-  asVo(data?: FriendRoom & {
+  asVo(data?: {
     room?: Room
     user1?: User
     user2?: User
-  } | null) {
+  } & FriendRoom | null) {
     return {
       ...friendRoomVo(data),
       room: roomVo(data?.room) ?? undefined,
@@ -79,10 +79,10 @@ export const friendRoomService = new FriendRoomService()
 export class GroupRoomervice extends AbstractService<GroupRoom> {
   delegate = prisma.groupRoom
 
-  asVo(data?: GroupRoom & {
+  asVo(data?: {
     group?: Group
     room?: Room
-  } | null) {
+  } & GroupRoom | null) {
     return {
       ...groupRoomVo(data),
       group: groupVo(data?.group) ?? undefined,

@@ -18,10 +18,10 @@ export interface MessageCreateType {
 export class MessageService extends AbstractService<Message> {
   delegate = prisma.message
 
-  asVo(data?: Message & {
+  asVo(data?: {
     room?: Room
     user?: User
-  } | null) {
+  } & Message | null) {
     return {
       ...messageVo(data),
       room: roomVo(data?.room) ?? undefined,

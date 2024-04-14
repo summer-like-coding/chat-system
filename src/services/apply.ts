@@ -171,10 +171,10 @@ export class FriendApplyService extends AbstractService<FriendApply> {
     })
   }
 
-  asVo(data?: FriendApply & {
+  asVo(data?: {
     target?: User
     user?: User
-  } | null) {
+  } & FriendApply | null) {
     return {
       ...friendApplyVo(data),
       target: userVo(data?.target) ?? undefined,
@@ -234,10 +234,10 @@ export class FriendApplyService extends AbstractService<FriendApply> {
    * 获取详细信息
    * @param applyId 申请 ID
    */
-  async getDetails(applyId: string): Promise<FriendApply & {
+  async getDetails(applyId: string): Promise<{
     target: User
     user: User
-  } | null> {
+  } & FriendApply | null> {
     return await this.delegate.findUnique({
       include: {
         target: true,
@@ -427,10 +427,10 @@ export class GroupApplyService extends AbstractService<GroupApply> {
     })
   }
 
-  asVo(data?: GroupApply & {
+  asVo(data?: {
     group?: Group
     user?: User
-  } | null) {
+  } & GroupApply | null) {
     return {
       ...groupApplyVo(data),
       group: groupVo(data?.group) ?? undefined,
@@ -445,9 +445,9 @@ export class GroupApplyService extends AbstractService<GroupApply> {
    * @param status 申请状态
    * @returns 申请记录列表
    */
-  async getAppliesByUserId(userId: string, page: PageParamsType, status?: ApplyStatusType): Promise<(GroupApply & {
+  async getAppliesByUserId(userId: string, page: PageParamsType, status?: ApplyStatusType): Promise<({
     group: Group
-  })[]> {
+  } & GroupApply)[]> {
     const applies = await this.delegate.findMany({
       include: {
         group: true,
@@ -490,10 +490,10 @@ export class GroupApplyService extends AbstractService<GroupApply> {
    * @param applyId 申请 ID
    * @returns 申请记录
    */
-  async getDetails(applyId: string): Promise<GroupApply & {
+  async getDetails(applyId: string): Promise<{
     group: Group
     user: User
-  } | null> {
+  } & GroupApply | null> {
     return await this.delegate.findUnique({
       include: {
         group: true,

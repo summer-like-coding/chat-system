@@ -12,7 +12,7 @@ import { getToken } from 'next-auth/jwt'
  * @swagger
  * /api/groups/[id]/members/update:
  *   post:
- *     summary: 更新群成员信息，
+ *     summary: 更新群成员信息
  *     description: 需要鉴权，仅群管理员或群主可调用
  *     tags:
  *      - 群组

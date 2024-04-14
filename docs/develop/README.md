@@ -73,3 +73,11 @@ exit
 ```bash
 docker compose down
 ```
+
+## 问题排查
+
+对于使用 Docker Desktop 的 Windows 用户，可能会遇到 MongoDB 副本集无法连接的问题，这是可能是因为 Docker Desktop 设置的 `hosts` 文件解析问题。
+
+![hosts](../images/docker-hosts.png)
+
+请确保你的 `hosts` 文件中有 `host.docker.internal` 的解析为 `127.0.0.1`。

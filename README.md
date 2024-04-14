@@ -97,7 +97,7 @@ docker run -d \
 创建密钥：
 
 ```bash
-mkdir -p secrets
+mkdir secrets
 openssl rand -base64 756 > secrets/rs0.key
 chmod 400 secrets/rs0.key
 ```
@@ -111,7 +111,7 @@ docker compose --env-file .env.production up -d
 需要手动初始化集群，进入任意容器：
 
 ```bash
-docker exec -it $0 mongosh
+docker exec -it $MONGO1 mongosh
 ```
 
 初始化集群：

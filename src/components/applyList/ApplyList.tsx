@@ -6,8 +6,8 @@ import React from 'react'
 
 export interface IApplyList {
   avatar?: string
-  launchId: string // 发起用户id
-  launchName: string // 发起用户名称
+  launchId?: string // 发起用户id
+  launchName?: string // 发起用户名称
   status: ApplyStatusType
   targetId: string // 目标用户id
   targetName: string

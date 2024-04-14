@@ -1,5 +1,5 @@
 import mitt from 'mitt'
 
 export const emitter = mitt<{
-  simpleEmit: string
+  hello: string
 }>()

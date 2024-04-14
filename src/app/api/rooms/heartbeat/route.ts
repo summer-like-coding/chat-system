@@ -1,6 +1,6 @@
 import type { NextRequest } from 'next/server'
 
-import { REDIS_KEY_HEARTBEAT } from '@/constants/settings'
+import { REDIS_KEY_HEARTBEAT_EXPIRE, REDIS_KEY_HEARTBEAT_PREFIX } from '@/constants/settings'
 import { authOptions } from '@/lib/auth'
 import { redisClient } from '@/lib/redis'
 import { Result } from '@/utils/result'
@@ -31,7 +31,11 @@ export async function GET(request: NextRequest) {
     if (!userId) {
       return Result.error('未登录')
     }
-    await redisClient.hSet(REDIS_KEY_HEARTBEAT, userId, Date.now())
+    await redisClient.setEx(
+      `${REDIS_KEY_HEARTBEAT_PREFIX}${userId}`,
+      REDIS_KEY_HEARTBEAT_EXPIRE,
+      Date.now().toString(),
+    )
     return Result.success(null)
   }
   catch (error: any) {

@@ -12,10 +12,10 @@ import { contactVo, roomVo, userVo } from './_mapper'
 export class ContactService extends AbstractService<UserContact> {
   delegate = prisma.userContact
 
-  asVo(data?: UserContact & {
+  asVo(data?: {
     room?: Room
     user?: User
-  } | null) {
+  } & UserContact | null) {
     return {
       ...contactVo(data),
       room: roomVo(data?.room) ?? undefined,
@@ -43,7 +43,7 @@ export class ContactService extends AbstractService<UserContact> {
    * @param page 分页参数
    * @returns 联系信息
    */
-  async getByUserId(userId: string, page: PageParamsType): Promise<(UserContact & { room: Room })[]> {
+  async getByUserId(userId: string, page: PageParamsType): Promise<({ room: Room } & UserContact)[]> {
     return await this.delegate.findMany({
       include: {
         room: true,
@@ -62,7 +62,7 @@ export class ContactService extends AbstractService<UserContact> {
    * @param contactId 联系 ID
    * @returns 联系详细信息
    */
-  async getDetails(contactId: string): Promise<UserContact & { room: Room, user: User } | null> {
+  async getDetails(contactId: string): Promise<{ room: Room, user: User } & UserContact | null> {
     return await this.delegate.findUnique({
       include: {
         room: true,

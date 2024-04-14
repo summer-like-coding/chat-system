@@ -161,10 +161,10 @@ export class UserGroupervice extends AbstractService<UserGroup> {
     })
   }
 
-  asVo(data?: UserGroup & {
+  asVo(data?: {
     group?: Group
     user?: User
-  } | null) {
+  } & UserGroup | null) {
     return {
       ...userGroupVo(data),
       group: groupVo(data?.group) ?? undefined,
@@ -233,9 +233,9 @@ export class UserGroupervice extends AbstractService<UserGroup> {
    * @param page 分页参数
    * @returns 群组成员列表
    */
-  async getMembers(groupId: string, page: PageParamsType): Promise<(UserGroup & {
+  async getMembers(groupId: string, page: PageParamsType): Promise<({
     user: User
-  })[]> {
+  } & UserGroup)[]> {
     return await this.delegate.findMany({
       include: {
         user: true,

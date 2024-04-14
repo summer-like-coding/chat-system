@@ -2,6 +2,7 @@ import type { PathIdParams } from '@/types/global'
 import type { NextRequest } from 'next/server'
 
 import { authOptions } from '@/lib/auth'
+import { rabbitPublisher } from '@/lib/mq'
 import { userGroupService } from '@/services/group'
 import { messageService } from '@/services/message'
 import { friendRoomService, groupRoomService, roomService } from '@/services/room'
@@ -96,6 +97,7 @@ export async function POST(request: NextRequest, { params }: PathIdParams) {
       type,
       userId,
     })
+    await rabbitPublisher.send('im-events', message)
     return Result.success(messageService.asVo(message))
   }
   catch (error: any) {

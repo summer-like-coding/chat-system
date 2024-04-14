@@ -12,10 +12,10 @@ import { userFriendVo, userVo } from './_mapper'
 export class FriendService extends AbstractService<UserFriend> {
   delegate = prisma.userFriend
 
-  asVo(data?: UserFriend & {
+  asVo(data?: {
     friend?: User
     user?: User
-  } | null) {
+  } & UserFriend | null) {
     return {
       ...userFriendVo(data),
       friend: userVo(data?.friend) ?? undefined,

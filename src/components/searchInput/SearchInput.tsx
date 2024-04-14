@@ -110,7 +110,7 @@ function SearchInput({ setList, type, usedBy }: SearchInputProps) {
         return res
       },
       user: async () => {
-        const res = await request<(FriendApply & { target: User, user: User })[]>(`/api/users/${userStore!.id}/applies`, {})
+        const res = await request<({ target: User, user: User } & FriendApply)[]>(`/api/users/${userStore!.id}/applies`, {})
         const lists: IApplyList[] = res?.map((item) => {
           return {
             status: item.status,

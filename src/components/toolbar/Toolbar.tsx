@@ -42,7 +42,7 @@ function ToolBar() {
 
   async function handleTabClick(key: string) {
     if (key === 'applyUser' || key === 'appliedUser') {
-      const res = await request<(FriendApply & { target: User, user: User })[]>(`/api/users/${useStore!.id}/applies`, {
+      const res = await request<({ target: User, user: User } & FriendApply)[]>(`/api/users/${useStore!.id}/applies`, {
         type: key === 'applyUser' ? 'self' : 'target',
       })
       const lists: IApplyList[] = res?.map((item) => {
@@ -358,6 +358,7 @@ function ToolBar() {
         handleTabClick('launchGroup')
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addModalVisible])
 
   useEffect(() => {
