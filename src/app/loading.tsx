@@ -1,6 +1,8 @@
+import { Spin } from 'antd'
+
 function Loading() {
   return (
-    <div>Loading</div>
+    <Spin size="large" />
   )
 }
 

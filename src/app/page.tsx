@@ -1,7 +1,14 @@
+'use client'
+
+import Authenticated from '@/components/auth/Authenticated'
+
 export default function Page() {
   return (
-    <div className="flex size-full">
-      <h1>Hello, Next.js!</h1>
-    </div>
+    <>
+      <Authenticated />
+      <div className="flex size-full">
+        <h1>Hello, Next.js!</h1>
+      </div>
+    </>
   )
 }

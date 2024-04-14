@@ -1,5 +1,6 @@
 'use client'
 
+import Authenticated from '@/components/auth/Authenticated'
 import Chat from '@/components/chat/Chat'
 import { Layout, Menu } from 'antd'
 import React, { useState } from 'react'
@@ -72,6 +73,7 @@ export default function Bot() {
 
   return (
     <>
+      <Authenticated />
       <Sider
         style={{
           backgroundColor: 'transparent',

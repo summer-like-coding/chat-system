@@ -1,4 +1,5 @@
 'use client'
+import Authenticated from '@/components/auth/Authenticated'
 import Chat from '@/components/chat/Chat'
 import { emitter } from '@/utils/eventBus'
 import { message } from 'antd'
@@ -14,10 +15,14 @@ export default function Page() {
       emitter.off('hello', callback)
     }
   }, [])
+
   return (
-    <Chat
-      chatKey=""
-      type="people"
-    />
+    <>
+      <Authenticated />
+      <Chat
+        chatKey=""
+        type="people"
+      />
+    </>
   )
 }

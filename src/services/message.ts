@@ -93,7 +93,7 @@ export class MessageService extends AbstractService<Message> {
         user: true,
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: 'asc',
       },
       where: {
         createdAt: {

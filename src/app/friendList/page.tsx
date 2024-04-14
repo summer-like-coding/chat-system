@@ -1,6 +1,7 @@
 'use client'
 import type { Group, User } from '@prisma/client'
 
+import Authenticated from '@/components/auth/Authenticated'
 import GroupList from '@/components/groupList/GroupList'
 import UserList from '@/components/userList/UserList'
 import { Tabs } from 'antd'
@@ -53,16 +54,20 @@ export default function FriendList() {
       label: '好友列表',
     },
   }
+
   return (
-    <Tabs
-      defaultActiveKey="userList"
-      items={Object.values(tabItems)}
-      onChange={handleTabClick}
-      style={{
-        backgroundColor: 'white',
-        paddingLeft: '1%',
-        width: '18%',
-      }}
-    />
+    <>
+      <Authenticated />
+      <Tabs
+        defaultActiveKey="userList"
+        items={Object.values(tabItems)}
+        onChange={handleTabClick}
+        style={{
+          backgroundColor: 'white',
+          paddingLeft: '1%',
+          width: '18%',
+        }}
+      />
+    </>
   )
 }

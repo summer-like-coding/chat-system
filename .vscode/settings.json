@@ -45,5 +45,7 @@
     "Sider",
     "zustand"
   ],
-  "css.customData": ["./css_custom_data.json"]
+  "css.customData": [
+    "./css_custom_data.json"
+  ]
 }

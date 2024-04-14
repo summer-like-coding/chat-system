@@ -1,5 +1,4 @@
 'use client'
-import type { LoginCredentialsType } from '@/services/user'
 import type { User } from '@prisma/client'
 
 import { useUserStore } from '@/app/store/user'
@@ -19,7 +18,10 @@ export default function LoginPassword() {
   const router = useRouter()
   const setUser = useUserStore(state => state.setUser)
 
-  async function login({ password, username }: LoginCredentialsType) {
+  async function login() {
+    await loginFormRef.validateFields()
+    const password = loginFormRef.getFieldValue('loginPassword') || ''
+    const username = loginFormRef.getFieldValue('loginUserName') || ''
     const loginResult = await signIn('credentials', {
       password,
       redirect: false,
@@ -29,7 +31,7 @@ export default function LoginPassword() {
       message.error('登录失败！用户名或密码错误')
       return
     }
-    router.push(callbackUrl || '/chat')
+    router.push(callbackUrl || '/')
     message.success('登录成功')
     const res = await request<User>('/api/users/getByUsername', {}, {
       data: {
@@ -104,16 +106,17 @@ export default function LoginPassword() {
               required: true,
             }]}
           >
-            <Input placeholder="Password" type="password" />
+            <Input
+              onPressEnter={login}
+              placeholder="Password"
+              type="password"
+            />
           </Form.Item>
           <Form.Item
             className="flex w-full justify-center"
           >
             <Button
-              onClick={() => login({
-                password: loginFormRef.getFieldValue('loginPassword') || '',
-                username: loginFormRef.getFieldValue('loginUserName') || '',
-              })}
+              onClick={login}
               type="primary"
             >
               登录
@@ -186,7 +189,11 @@ export default function LoginPassword() {
               required: true,
             }]}
           >
-            <Input placeholder="Password" type="password" />
+            <Input
+              onPressEnter={register}
+              placeholder="Password"
+              type="password"
+            />
           </Form.Item>
           <Form.Item
             className="flex w-full justify-center"

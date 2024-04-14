@@ -8,7 +8,7 @@ import { request, requestEventStream } from '@/app/utils/request'
 import { MessageType, type Room, type UserContact, type UserFriend } from '@prisma/client'
 import { useReactive } from 'ahooks'
 import { Affix, Avatar, Button, Input } from 'antd'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Markdown from 'react-markdown'
 
 import './style.css'
@@ -34,6 +34,7 @@ export default function Chat({ chatKey, type }: IChat) {
   const chatList = useReactive<ChatProps[]>([])
   const [inputValue, setInputValue] = useState('')
   const replay = useReactive({ value: '' })
+  const hasLoadedMessage = useRef<Set<string>>(new Set())
 
   function getChatList() {
     return chatList.map((item, index) => {
@@ -102,6 +103,8 @@ export default function Chat({ chatKey, type }: IChat) {
           id: `${chatList.length + 2}`,
           isMine: false,
         })
+        hasLoadedMessage.current.add(chatList[chatList.length - 1].id)
+        hasLoadedMessage.current.add(chatList[chatList.length - 2].id)
         requestEventStream('/api/robot/chat', {
           model: chatKey,
           prompt: inputValue,
@@ -122,6 +125,7 @@ export default function Chat({ chatKey, type }: IChat) {
           id: res!.id,
           isMine: true,
         } as ChatProps)
+        hasLoadedMessage.current.add(res!.id)
       },
     }
     clickMap[type]()
@@ -134,14 +138,19 @@ export default function Chat({ chatKey, type }: IChat) {
    */
   async function pullMessage(roomId?: string) {
     // 拉取聊天记录
-    const res1 = await request<({ user: UserVo } & MessageVo)[]>(`/api/rooms/${roomId || chatId}/pull`, {}, {
+    const res = await request<({ user: UserVo } & MessageVo)[]>(`/api/rooms/${roomId || chatId}/pull`, {}, {
       data: {
         time: new Date().getTime(),
         type: 'previous',
       },
       method: 'POST',
     })
-    chatList.push(...formatMessage(res1!))
+    chatList.push(...formatMessage(res!.filter(
+      item => !hasLoadedMessage.current.has(item.id),
+    )))
+    res!.forEach((item) => {
+      hasLoadedMessage.current.add(item.id)
+    })
     // console.log('chat', chat)
   }
 
