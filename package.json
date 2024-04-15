@@ -3,14 +3,15 @@
   "type": "module",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@8.15.6",
+  "packageManager": "pnpm@8.15.7",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "postinstall": "simple-git-hooks && prisma generate"
+    "postinstall": "simple-git-hooks",
+    "db": "prisma generate"
   },
   "dependencies": {
     "@ant-design/icons": "^5.3.6",

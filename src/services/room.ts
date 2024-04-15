@@ -14,26 +14,6 @@ export class Roomervice extends AbstractService<Room> {
   asVo(data?: Room | null) {
     return roomVo(data)
   }
-
-  /**
-   * 通过好友 ID 获取好友房间
-   * @param user1Id 用户 1 ID
-   * @param user2Id 用户 2 ID
-   * @returns 好友房间信息
-   */
-  async getByFriendTupleId(user1Id: string, user2Id: string) {
-    const [userSmallerId, userLargerId] = user1Id < user2Id ? [user1Id, user2Id] : [user2Id, user1Id]
-    return await prisma.friendRoom.findFirst({
-      include: {
-        room: true,
-      },
-      where: {
-        isDeleted: false,
-        user1Id: userSmallerId,
-        user2Id: userLargerId,
-      },
-    })
-  }
 }
 
 export const roomService = new Roomervice()
@@ -55,6 +35,26 @@ export class FriendRoomService extends AbstractService<FriendRoom> {
       user1: userVo(data?.user1) ?? undefined,
       user2: userVo(data?.user2) ?? undefined,
     }
+  }
+
+  /**
+   * 通过好友 ID 获取好友房间
+   * @param user1Id 用户 1 ID
+   * @param user2Id 用户 2 ID
+   * @returns 好友房间信息
+   */
+  async getByFriendTupleId(user1Id: string, user2Id: string) {
+    const [userSmallerId, userLargerId] = user1Id < user2Id ? [user1Id, user2Id] : [user2Id, user1Id]
+    return await this.delegate.findFirst({
+      include: {
+        room: true,
+      },
+      where: {
+        isDeleted: false,
+        user1Id: userSmallerId,
+        user2Id: userLargerId,
+      },
+    })
   }
 
   /**

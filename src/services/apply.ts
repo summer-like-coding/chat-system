@@ -1,7 +1,10 @@
 import type { PageParamsType } from '@/types/global'
 import type { Group, User } from '@prisma/client'
 
+import { REDIS_KEY_ROOM_USER_PREFIX, REDIS_KEY_USER_ROOM_PREFIX } from '@/constants/settings'
 import { prisma, transaction } from '@/lib/db'
+import { redisClient } from '@/lib/redis'
+import { hex2Buffer } from '@/utils/buffer'
 import { ApplyStatusType, type FriendApply, type GroupApply, RoomType } from '@prisma/client'
 
 import { AbstractService } from './_base'
@@ -96,6 +99,24 @@ export class FriendApplyService extends AbstractService<FriendApply> {
           user2Id: userLarger.id,
         },
       })
+
+      // do not await
+      redisClient.sAdd(
+        `${REDIS_KEY_USER_ROOM_PREFIX}${user1.id}`,
+        hex2Buffer(`${room.id}`),
+      )
+      redisClient.sAdd(
+        `${REDIS_KEY_USER_ROOM_PREFIX}${user2.id}`,
+        hex2Buffer(`${room.id}`),
+      )
+      redisClient.sAdd(
+        `${REDIS_KEY_ROOM_USER_PREFIX}${room.id}`,
+        hex2Buffer(`${user1.id}`),
+      )
+      redisClient.sAdd(
+        `${REDIS_KEY_ROOM_USER_PREFIX}${room.id}`,
+        hex2Buffer(`${user2.id}`),
+      )
 
       // 更新申请状态
       const friendApply = await ctx.friendApply.update({

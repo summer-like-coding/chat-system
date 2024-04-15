@@ -1,7 +1,10 @@
 import type { PageParamsType } from '@/types/global'
 import type { GroupRoom, Room, User, UserGroup } from '@prisma/client'
 
+import { REDIS_KEY_ROOM_USER_PREFIX, REDIS_KEY_USER_ROOM_PREFIX } from '@/constants/settings'
 import { prisma, transaction } from '@/lib/db'
+import { redisClient } from '@/lib/redis'
+import { hex2Buffer } from '@/utils/buffer'
 import { CommonStatusType, type Group, RoomType } from '@prisma/client'
 
 import { AbstractService } from './_base'
@@ -75,6 +78,16 @@ export class Groupervice extends AbstractService<Group> {
           userId,
         })),
       })
+      userIdList.forEach((userId) => {
+        redisClient.sAdd(
+          `${REDIS_KEY_USER_ROOM_PREFIX}${userId}`,
+          hex2Buffer(room.id),
+        )
+      })
+      redisClient.sAdd(
+        `${REDIS_KEY_ROOM_USER_PREFIX}${room.id}`,
+        userIdList.map(userId => hex2Buffer(userId)),
+      )
       return {
         group: groupCreated,
         groupRoom,

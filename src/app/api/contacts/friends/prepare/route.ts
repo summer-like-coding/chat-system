@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server'
 import { authOptions } from '@/lib/auth'
 import { contactService } from '@/services/contact'
 import { friendService } from '@/services/friend'
-import { roomService } from '@/services/room'
+import { friendRoomService, roomService } from '@/services/room'
 import { Result } from '@/utils/result'
 import { getServerSession } from 'next-auth'
 import { getToken } from 'next-auth/jwt'
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     if (!friend) {
       return Result.error('好友不存在')
     }
-    const friendRoom = await roomService.getByFriendTupleId(userId, friendId)
+    const friendRoom = await friendRoomService.getByFriendTupleId(userId, friendId)
     if (!friendRoom) {
       return Result.error('系统错误，好友房间不存在')
     }

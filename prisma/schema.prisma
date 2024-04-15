@@ -197,6 +197,7 @@ model Message {
   content   String
   type      MessageType      @default(TEXT)
   status    CommonStatusType @default(ACTIVE)
+  uuid      String?
   isDeleted Boolean          @default(false) @map("is_deleted")
   createdAt DateTime         @default(now()) @map("created_at")
   updatedAt DateTime         @default(now()) @updatedAt @map("updated_at")
