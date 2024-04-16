@@ -1,8 +1,12 @@
 /* eslint-disable node/prefer-global/process */
 'use client'
+
+import type { Message } from '@prisma/client'
+
 import ToolBar from '@/components/toolbar/Toolbar'
 import { emitter } from '@/utils/eventBus'
 import { AntdRegistry } from '@ant-design/nextjs-registry'
+import { useInterval } from 'ahooks'
 import { Layout } from 'antd'
 import { SessionProvider } from 'next-auth/react'
 import React, { useEffect } from 'react'
@@ -19,6 +23,18 @@ function RootLayout({ children }: React.PropsWithChildren) {
     return useStore === null || useStore === undefined
   }
 
+  function sendHeartbeat() {
+    request('/api/rooms/heartbeat', {})
+  }
+
+  useInterval(() => {
+    if (useStore) {
+      sendHeartbeat()
+    }
+  }, 10000, {
+    immediate: true,
+  })
+
   useEffect(() => {
     async function getToken() {
       const res = await request<{ token: string }>(`/api/users/${useStore?.id}/getToken`)
@@ -32,13 +48,15 @@ function RootLayout({ children }: React.PropsWithChildren) {
       socket.on('hello', (d: string) => {
         emitter.emit('hello', d)
       })
+      socket.on('imMessage', (d: Message) => {
+        emitter.emit('imMessage', d)
+      })
       socket.on('connect_error', (error: Error) => {
         console.error('connect_error', error)
       })
     }
 
     if (useStore) {
-      // 如果用户存在，那么获取token，然后建立socket连接
       getToken()
     }
   }, [useStore])

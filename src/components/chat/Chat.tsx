@@ -5,6 +5,7 @@ import type { MessageVo, UserVo } from '@/types/views'
 import { useChatStore } from '@/app/store/chat'
 import { useUserStore } from '@/app/store/user'
 import { request, requestEventStream } from '@/app/utils/request'
+import { emitter } from '@/utils/eventBus'
 import { MessageType, type Room, type UserContact, type UserFriend } from '@prisma/client'
 import { useReactive } from 'ahooks'
 import { Affix, Avatar, Button, Input } from 'antd'
@@ -35,7 +36,7 @@ export default function Chat({ chatKey, type }: IChat) {
   const [inputValue, setInputValue] = useState('')
   const replay = useReactive({ value: '' })
   const hasLoadedMessage = useRef<Set<string>>(new Set())
-
+  const { TextArea } = Input
   function getChatList() {
     return chatList.map((item, index) => {
       return (
@@ -154,6 +155,14 @@ export default function Chat({ chatKey, type }: IChat) {
     // console.log('chat', chat)
   }
 
+  /**
+   * 查询用户信息
+   */
+  async function queryUserInfo(id: string) {
+    const res = await request<UserVo>(`/api/users/${id}`)
+    return res
+  }
+
   useEffect(() => {
     chatList.length = 0
     replay.value = ''
@@ -184,6 +193,29 @@ export default function Chat({ chatKey, type }: IChat) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [targetId])
 
+  useEffect(() => {
+    async function callback(data: MessageVo) {
+      if (data.roomId === chatId) {
+        const targetUser = await queryUserInfo(data.userId)
+        if (!hasLoadedMessage.current.has(data.id)) {
+          chatList.push({
+            avatar: targetUser?.avatar || '',
+            content: data.content,
+            id: data.id,
+            isMine: data.userId === userStore.id,
+          })
+          hasLoadedMessage.current.add(data.id)
+        }
+      }
+    }
+
+    emitter.on('imMessage', callback)
+    return () => {
+      emitter.off('imMessage', callback)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   return (
     <div className="chatContainer">
       <div className="chatBody">
@@ -201,7 +233,7 @@ export default function Chat({ chatKey, type }: IChat) {
           >
             清除
           </Button>
-          <Input
+          <TextArea
             allowClear
             className="chatInputBox"
             onChange={e => setInputValue(e.target.value)}

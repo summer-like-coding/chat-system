@@ -94,10 +94,16 @@ export async function GET(request: NextRequest) {
  *         description: 流式数据 `text/event-stream`
  */
 export async function POST(request: Request) {
-  const { messages } = await request.json()
+  const { messages = [] }: Partial<{ messages: Array<any> }> = await request.json()
   const { model } = getParams(request)
+  const PickMessages = messages.map((message) => {
+    return {
+      content: message.content,
+      role: message.role,
+    }
+  })
   const response = await openai.chat.completions.create({
-    messages,
+    messages: [...PickMessages],
     model: model ?? 'gpt-3.5-turbo',
     stream: true,
   })

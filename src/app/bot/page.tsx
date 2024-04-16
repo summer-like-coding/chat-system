@@ -115,7 +115,9 @@ export default function Bot() {
             chatKey={menuKey}
             type="bot"
           />
+          {/* <BotChat chatKey={menuKey} /> */}
         </Content>
+
       </Layout>
     </>
   )

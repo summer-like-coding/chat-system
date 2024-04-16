@@ -11,7 +11,6 @@
 .chatBody {
   flex: 1;
   width: 100%;
-  /* max-width: 1000px; */
   margin: 0 auto;
   overflow-y: auto;
 }
@@ -64,6 +63,8 @@
   padding: 5px 10px;
   margin: 0 auto;
   width: 100%;
+  /* background-color: #dbe6fb; */
+  /* height: 300px; */
 }
 
 .chatInput .chatInputBox {
@@ -77,15 +78,16 @@
 
 .chatInput .chatInputButton {
   height: 35px;
-  color: #fff;
-  background: linear-gradient(90deg, #2870EA 10.79%, #1B4AEF 87.08%);
-  box-shadow: 0 2px 0 rgba(5, 145, 255, 0.1);
   border: none;
   padding: 0 20px;
   border-radius: 8px;
   margin: 0 5px;
-  cursor: pointer;
   text-align: center;
 }
 
+.chatInput .fixedButton {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+}
 
