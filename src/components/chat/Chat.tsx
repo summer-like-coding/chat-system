@@ -37,6 +37,14 @@ export default function Chat({ chatKey, type }: IChat) {
   const replay = useReactive({ value: '' })
   const hasLoadedMessage = useRef<Set<string>>(new Set())
   const { TextArea } = Input
+  const chatBodyRef = useRef<HTMLDivElement>(null)
+
+  function scrollToBottom() {
+    setTimeout(() => {
+      chatBodyRef.current?.scrollTo(0, chatBodyRef.current.scrollHeight)
+    }, 200)
+  }
+
   function getChatList() {
     return chatList.map((item, index) => {
       return (
@@ -131,6 +139,7 @@ export default function Chat({ chatKey, type }: IChat) {
     }
     clickMap[type]()
     setInputValue('')
+    scrollToBottom()
   }
   /**
    * 拉取聊天记录
@@ -205,6 +214,7 @@ export default function Chat({ chatKey, type }: IChat) {
             isMine: data.userId === userStore.id,
           })
           hasLoadedMessage.current.add(data.id)
+          scrollToBottom()
         }
       }
     }
@@ -218,7 +228,7 @@ export default function Chat({ chatKey, type }: IChat) {
 
   return (
     <div className="chatContainer">
-      <div className="chatBody">
+      <div className="chatBody" ref={chatBodyRef}>
         {getChatList()}
       </div>
       <Affix offsetBottom={0}>

@@ -1,11 +1,11 @@
 import type { NextRequest } from 'next/server'
 
 import { openai } from '@/lib/openai'
-import { getParams } from '@/utils/params'
 import { OpenAIStream, StreamingTextResponse } from 'ai'
 
-export const runtime = 'nodejs'
-export const dynamic = 'force-dynamic'
+// export const runtime = 'edge'
+// export const runtime = 'nodejs'
+// export const dynamic = 'force-dynamic'
 
 /**
  * @swagger
@@ -94,20 +94,12 @@ export async function GET(request: NextRequest) {
  *         description: 流式数据 `text/event-stream`
  */
 export async function POST(request: Request) {
-  const { messages = [] }: Partial<{ messages: Array<any> }> = await request.json()
-  const { model } = getParams(request)
-  const PickMessages = messages.map((message) => {
-    return {
-      content: message.content,
-      role: message.role,
-    }
-  })
+  const { messages, model } = await request.json()
   const response = await openai.chat.completions.create({
-    messages: [...PickMessages],
-    model: model ?? 'gpt-3.5-turbo',
+    messages,
+    model: model || 'gpt-3.5-turbo',
     stream: true,
   })
-
   const stream = OpenAIStream(response)
   return new StreamingTextResponse(stream)
 }

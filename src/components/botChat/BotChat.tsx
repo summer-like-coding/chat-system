@@ -25,7 +25,6 @@ export default function BotChat({ chatKey }: { chatKey: string }) {
               }),
               method: 'POST',
             })
-            // console.log('res', res)
             return res
           }}
         />

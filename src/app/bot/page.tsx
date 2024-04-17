@@ -1,7 +1,7 @@
 'use client'
 
 import Authenticated from '@/components/auth/Authenticated'
-import Chat from '@/components/chat/Chat'
+import BotChat from '@/components/botChat/BotChat'
 import { Layout, Menu } from 'antd'
 import React, { useState } from 'react'
 
@@ -111,11 +111,11 @@ export default function Bot() {
         <Content
           className="content-container"
         >
-          <Chat
+          {/* <Chat
             chatKey={menuKey}
             type="bot"
-          />
-          {/* <BotChat chatKey={menuKey} /> */}
+          /> */}
+          <BotChat chatKey={menuKey} />
         </Content>
 
       </Layout>
