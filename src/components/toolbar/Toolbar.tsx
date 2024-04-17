@@ -8,7 +8,7 @@ import type { Key } from 'react'
 import { useUserStore } from '@/app/store/user'
 import { request } from '@/app/utils/request'
 import { applyStatusMapping } from '@/constants/mapping'
-import { CommentOutlined, LogoutOutlined, MessageOutlined, PlusSquareOutlined, RobotOutlined, SettingOutlined, UnorderedListOutlined, UserAddOutlined } from '@ant-design/icons'
+import { CommentOutlined, LogoutOutlined, MessageOutlined, PlusSquareOutlined, SettingOutlined, UnorderedListOutlined, UserAddOutlined } from '@ant-design/icons'
 import { useBoolean } from 'ahooks'
 import { Avatar, Badge, Button, Form, Input, List, Modal, Popover, Tabs, Transfer, message } from 'antd'
 import { useRouter } from 'next/navigation'
@@ -386,12 +386,6 @@ function ToolBar() {
               style={{ color: '#848484', fontSize: 28 }}
             />
           </Badge>
-          <RobotOutlined
-            onClick={() => {
-              menuClick('bot')
-            }}
-            style={{ color: '#848484', fontSize: 28, marginTop: 20 }}
-          />
           <Popover
             content={(
               <div className="flex flex-row justify-center">

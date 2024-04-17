@@ -5,9 +5,11 @@ import type { Message } from '@prisma/client'
 
 import ToolBar from '@/components/toolbar/Toolbar'
 import { emitter } from '@/utils/eventBus'
+import { RobotOutlined } from '@ant-design/icons'
 import { AntdRegistry } from '@ant-design/nextjs-registry'
 import { useInterval } from 'ahooks'
-import { Layout } from 'antd'
+import { FloatButton, Layout } from 'antd'
+import { useRouter } from 'next/navigation'
 import { SessionProvider } from 'next-auth/react'
 import React, { useEffect } from 'react'
 import { io } from 'socket.io-client'
@@ -17,6 +19,7 @@ import { useUserStore } from './store/user'
 import { request } from './utils/request'
 
 function RootLayout({ children }: React.PropsWithChildren) {
+  const router = useRouter()
   const { Sider } = Layout
   const useStore = useUserStore(state => state.user)!
   function isHidden() {
@@ -79,6 +82,15 @@ function RootLayout({ children }: React.PropsWithChildren) {
               >
                 <ToolBar />
               </Sider>
+              <FloatButton
+                icon={(
+                  <RobotOutlined />
+                )}
+                onClick={() => {
+                  router.push('/bot')
+                }}
+                type="default"
+              />
               {children}
             </Layout>
           </AntdRegistry>
