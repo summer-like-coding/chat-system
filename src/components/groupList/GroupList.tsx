@@ -1,17 +1,19 @@
 import type { Group } from '@prisma/client'
 
+import { request } from '@/app/utils/request'
 import { Avatar, Button, List } from 'antd'
 import React from 'react'
 
 interface IGroupListProps {
   groupList: Group[]
+  setGroupInfo?: React.Dispatch<React.SetStateAction<Group | undefined>>
   type: 'apply' | 'chat'
 }
 
-function GroupList({ groupList, type }: IGroupListProps) {
-  function handleMenuClick(item: Group) {
-    // eslint-disable-next-line no-console
-    console.log('item', item)
+function GroupList({ groupList, setGroupInfo, type }: IGroupListProps) {
+  async function handleMenuClick(item: Group) {
+    const res = await request<Group>(`/api/groups/${item.id}`, {})
+    setGroupInfo && setGroupInfo(res!)
   }
 
   function handleListAction(item: Group) {
@@ -46,8 +48,8 @@ function GroupList({ groupList, type }: IGroupListProps) {
         >
           <List.Item.Meta
             avatar={<Avatar size={48} src={item.avatar || `https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`} />}
-            description={item.description}
-            title={item.name}
+            description={item.name}
+            title="群聊"
           />
         </List.Item>
       )}

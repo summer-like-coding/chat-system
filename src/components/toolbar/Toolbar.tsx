@@ -379,7 +379,7 @@ function ToolBar() {
         </Popover>
         <div className="mt-4 flex flex-col items-center">
           <Badge overflowCount={99}>
-            <MessageOutlined
+            <CommentOutlined
               onClick={() => {
                 menuClick('chat')
               }}

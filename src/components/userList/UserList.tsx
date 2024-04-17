@@ -1,28 +1,31 @@
 import type { User } from '@prisma/client'
 
 import { useChatStore } from '@/app/store/chat'
+import { request } from '@/app/utils/request'
 import { Avatar, Button, List, Popover } from 'antd'
-import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 
 type IUser = Pick<User, 'avatar' | 'birthday' | 'description' | 'gender' | 'id' | 'username'>
 
 interface IUserListProps {
+  setUserInfo?: React.Dispatch<React.SetStateAction<IUser | undefined>>
   type: 'apply' | 'chat' | 'view'
   userList: IUser[]
 }
 
-function UserList({ type, userList }: IUserListProps) {
+function UserList({ setUserInfo, type, userList }: IUserListProps) {
   const [clickUser, setClickUser] = useState<IUser>({} as User)
   const setTargetId = useChatStore(state => state.setTargetId)
-  const router = useRouter()
   function handleMenuClick(item: IUser) {
     setClickUser(item)
   }
 
-  function handleChat(item: IUser) {
+  async function handleChat(item: IUser) {
     setTargetId(item.id)
-    router.push(`/chat?userId=${item.id}`)
+    // router.push(`/chat?userId=${item.id}`)
+    // 获取用户信息
+    const res = await request<User>(`/api/users/${item.id}`, {})
+    res && setUserInfo && setUserInfo(res)
   }
 
   function handleListAction(item: IUser, index: number) {
@@ -101,8 +104,8 @@ function UserList({ type, userList }: IUserListProps) {
         >
           <List.Item.Meta
             avatar={<Avatar size={48} src={item.avatar || `https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`} />}
-            description={item.description}
-            title={item.username}
+            description={item.username}
+            title="用户"
           />
         </List.Item>
       )}

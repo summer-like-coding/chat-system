@@ -3,10 +3,12 @@ import type { User } from '@prisma/client'
 import { useGlobalStore } from '@/app/store/global'
 import { useUserStore } from '@/app/store/user'
 import { request } from '@/app/utils/request'
-import { EditOutlined, LoadingOutlined, PlusOutlined, SkinOutlined, UserOutlined } from '@ant-design/icons'
-import { useBoolean, useToggle } from 'ahooks'
-import { Button, ColorPicker, DatePicker, Form, Input, Layout, Menu, Select, Switch, Upload, message } from 'antd'
-import React, { useEffect, useState } from 'react'
+import { EditOutlined, SkinOutlined, UserOutlined } from '@ant-design/icons'
+import { useToggle } from 'ahooks'
+import { Button, ColorPicker, DatePicker, Form, Input, Layout, Menu, Select, Switch, message } from 'antd'
+import React, { useState } from 'react'
+
+import UploadImg from '../uploadImg/UploadImg'
 
 export default function Setting() {
   const [accountFormRef] = Form.useForm()
@@ -18,9 +20,7 @@ export default function Setting() {
   const setChatBg = useGlobalStore(state => state.setChatBg)
   const toggleTheme = useGlobalStore(state => state.toggleTheme)
   const appearanceConfig = useGlobalStore(state => state.appearanceConfig)
-  const [loading, { setFalse: setLoadingFalse, setTrue: setLoadingTrue }] = useBoolean(false)
   const [emailDisabled, { toggle: toggleEmailDisabled }] = useToggle(false)
-  const [previewImage, setPreviewImage] = useState('')
 
   async function saveUserInfo() {
     const res = await request<User>(`/api/users/${userStore?.id}/update`, {}, {
@@ -37,37 +37,6 @@ export default function Setting() {
     setChatBg(appearanceFormRef.getFieldValue('chatbg'))
     toggleTheme(appearanceFormRef.getFieldValue('theme'))
     message.success('更新成功')
-  }
-
-  const uploadButton = (
-    <button style={{ background: 'none', border: 0 }} type="button">
-      {loading ? <LoadingOutlined /> : <PlusOutlined />}
-      <div style={{ marginTop: 8 }}>Upload</div>
-    </button>
-  )
-
-  function beforeUpload(file: File) {
-    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png'
-    if (!isJpgOrPng) {
-      message.error('You can only upload JPG/PNG file!')
-      return false
-    }
-    return isJpgOrPng
-  }
-
-  function handleChange(info: any) {
-    if (info.file.status === 'uploading') {
-      setLoadingTrue()
-      return
-    }
-    if (info.file.status === 'done') {
-      setLoadingFalse()
-      const imgUrl = info.file.response.data.url
-      setPreviewImage(imgUrl)
-      accountFormRef.setFieldsValue({
-        avatar: imgUrl,
-      })
-    }
   }
 
   function appearanceItem() {
@@ -122,16 +91,9 @@ export default function Setting() {
         wrapperCol={{ span: 16 }}
       >
         <Form.Item label="头像" name="avatar">
-          <Upload
-            action="/api/upload/files"
-            beforeUpload={beforeUpload}
-            listType="picture-card"
-            maxCount={1}
-            name="file"
-            onChange={handleChange}
-          >
-            {!previewImage && uploadButton}
-          </Upload>
+          <UploadImg
+            accountFormRef={accountFormRef}
+          />
         </Form.Item>
         <Form.Item label="用户名" name="username">
           <Input className="w-full" disabled />
@@ -204,12 +166,6 @@ export default function Setting() {
       label: title,
     }),
   )
-
-  useEffect(() => {
-    return () => {
-      setPreviewImage('')
-    }
-  }, [])
   return (
     <Layout className="h-auto w-full">
       <Sider className="bg-slate-200 text-center text-white" width="25%">
