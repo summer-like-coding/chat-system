@@ -15,7 +15,7 @@ import { getToken } from 'next-auth/jwt'
  * /api/rooms/[id]/pull:
  *   post:
  *     summary: 拉取房间中的消息
- *     description: 需要鉴权，`back` 表示从后向前拉取，`forward` 表示从前向后拉取
+ *     description: 需要鉴权，`previous` 表示拉取历史消息，`new` 表示拉取新消息
  *     tags:
  *      - 房间
  *     parameters:
