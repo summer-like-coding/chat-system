@@ -1,3 +1,7 @@
+import type { NextRequest } from 'next/server'
+
+import { Result } from '@/utils/result'
+
 /**
  * 向目标用户发起验证 (E2EE)
  * @swagger
@@ -8,3 +12,12 @@
  *     tags:
  *      - 用户
  */
+export async function POST(request: NextRequest) {
+  try {
+    console.error('request:', request)
+  }
+  catch (error: any) {
+    console.error('Error:', error)
+    return Result.error(`错误: ${error.message}`)
+  }
+}

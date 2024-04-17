@@ -78,7 +78,6 @@ export async function POST(request: NextRequest, { params }: PathIdParams) {
       if (friendRoom.user1Id !== userId && friendRoom.user2Id !== userId) {
         return Result.error('无权限在此房间发送消息')
       }
-      // @todo: 消息队列推送消息，向 targetUserId 队列推送消息
     }
     // 如果是群聊
     if (room.type === 'GROUP') {
@@ -91,7 +90,6 @@ export async function POST(request: NextRequest, { params }: PathIdParams) {
       if (!userGroup) {
         return Result.error('无权限在此房间发送消息')
       }
-      // @todo: 消息队列推送消息，向 targetGroupId 队列推送消息
     }
     const message = await messageService.createMessage({
       content,
