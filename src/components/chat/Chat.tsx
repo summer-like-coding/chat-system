@@ -1,12 +1,12 @@
 'use client'
 
-import type { MessageVo, UserVo } from '@/types/views'
+import type { GroupVo, MessageVo, RoomVo, UserVo } from '@/types/views'
 
 import { useChatStore } from '@/app/store/chat'
 import { useUserStore } from '@/app/store/user'
 import { request, requestEventStream } from '@/app/utils/request'
 import { emitter } from '@/utils/eventBus'
-import { MessageType, type Room, type UserContact, type UserFriend } from '@prisma/client'
+import { MessageType, type UserContact, type UserFriend } from '@prisma/client'
 import { useReactive } from 'ahooks'
 import { Affix, Avatar, Button, Input } from 'antd'
 import React, { useEffect, useRef, useState } from 'react'
@@ -23,14 +23,14 @@ interface ChatProps {
 
 interface IChat {
   chatKey: string
-  type: 'bot' | 'people'
+  searchParams?: { groupId?: string, userId?: string }
+  type: '' | 'bot' | 'group' | 'people'
 }
 
 export default function Chat({ chatKey, type }: IChat) {
   const chatId = useChatStore(state => state.chatId) // 当前聊天的房间id
   const setChatId = useChatStore(state => state.setChatId)
   const setChatType = useChatStore(state => state.setChatType)
-  const targetId = useChatStore(state => state.targetId) // 当前聊天对象的id
   const userStore = useUserStore(state => state.user)!
   const chatList = useReactive<ChatProps[]>([])
   const [inputValue, setInputValue] = useState('')
@@ -77,6 +77,9 @@ export default function Chat({ chatKey, type }: IChat) {
   }
 
   function formatMessage(message: ({ user: UserVo } & MessageVo)[]) {
+    if (!userStore) {
+      return []
+    }
     return message.map((item) => {
       return {
         avatar: item.user.avatar || '',
@@ -102,7 +105,7 @@ export default function Chat({ chatKey, type }: IChat) {
     const clickMap = {
       bot: () => {
         chatList.push({
-          avatar: 'https://api.dicebear.com/7.x/miniavs/svg?seed=4',
+          avatar: userStore.avatar || 'https://api.dicebear.com/7.x/miniavs/svg?seed=4',
           content: inputValue,
           id: `${chatList.length + 1}`,
           isMine: true,
@@ -119,6 +122,22 @@ export default function Chat({ chatKey, type }: IChat) {
           prompt: inputValue,
         }, onMessage, onEnd)
       },
+      group: async () => {
+        const res = await request<MessageVo>(`/api/rooms/${chatId}/chat`, {}, {
+          data: {
+            content: inputValue,
+            type: MessageType.TEXT,
+          },
+          method: 'POST',
+        })
+        chatList.push({
+          avatar: userStore.avatar || '',
+          content: res!.content,
+          id: res!.id,
+          isMine: true,
+        } as ChatProps)
+        hasLoadedMessage.current.add(res!.id)
+      },
       people: async () => {
         const res = await request<MessageVo>(`/api/rooms/${chatId}/chat`, {}, {
           data: {
@@ -127,7 +146,6 @@ export default function Chat({ chatKey, type }: IChat) {
           },
           method: 'POST',
         })
-        // pullMessage()
         chatList.push({
           avatar: userStore.avatar || '',
           content: res!.content,
@@ -137,7 +155,7 @@ export default function Chat({ chatKey, type }: IChat) {
         hasLoadedMessage.current.add(res!.id)
       },
     }
-    clickMap[type]()
+    type && clickMap[type]()
     setInputValue('')
     scrollToBottom()
   }
@@ -161,7 +179,6 @@ export default function Chat({ chatKey, type }: IChat) {
     res!.forEach((item) => {
       hasLoadedMessage.current.add(item.id)
     })
-    // console.log('chat', chat)
   }
 
   /**
@@ -173,34 +190,59 @@ export default function Chat({ chatKey, type }: IChat) {
   }
 
   useEffect(() => {
+    // console.log('调用1次', chatKey, type)
     chatList.length = 0
     replay.value = ''
     setInputValue('')
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chatKey])
 
-  useEffect(() => {
+    if (!type || type === 'bot')
+      return
+    if (!userStore)
+      return
     async function getChat() {
-      if (targetId) {
-        // 准备聊天
-        const res = await request<{
+      let res: {
+        contact: UserContact
+        friend?: UserFriend
+        group?: GroupVo
+        room: RoomVo
+      } = {} as any
+      if (type === 'people') {
+        res = await request<{
           contact: UserContact
           friend: UserFriend
-          room: Room
+          room: RoomVo
         }>('/api/contacts/friends/prepare', {}, {
           data: {
-            userId: targetId,
+            userId: chatKey,
           },
           method: 'POST',
-        })
-        setChatId(res!.room.id)
-        setChatType(res!.room.type)
-        pullMessage(res!.room.id)
+        }) || {} as any
       }
+      else if (type === 'group') {
+        res = await request<{
+          contact: UserContact
+          group: GroupVo
+          room: RoomVo
+        }>('/api/contacts/groups/prepare', {}, {
+          data: {
+            groupId: chatKey,
+          },
+          method: 'POST',
+        }) || {} as any
+      }
+      res && setChatId(res!.room.id)
+      res && setChatType(res!.room.type)
+      // console.log('需要debug')
+
+      res && pullMessage(res!.room.id)
     }
     getChat()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [targetId])
+    return () => {
+      chatList.length = 0
+      replay.value = ''
+      setInputValue('')
+    }
+  }, [chatKey, userStore])
 
   useEffect(() => {
     async function callback(data: MessageVo) {
@@ -218,12 +260,10 @@ export default function Chat({ chatKey, type }: IChat) {
         }
       }
     }
-
     emitter.on('imMessage', callback)
     return () => {
       emitter.off('imMessage', callback)
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (

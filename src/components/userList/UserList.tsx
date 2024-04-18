@@ -22,8 +22,6 @@ function UserList({ setUserInfo, type, userList }: IUserListProps) {
 
   async function handleChat(item: IUser) {
     setTargetId(item.id)
-    // router.push(`/chat?userId=${item.id}`)
-    // 获取用户信息
     const res = await request<User>(`/api/users/${item.id}`, {})
     res && setUserInfo && setUserInfo(res)
   }
@@ -50,7 +48,7 @@ function UserList({ setUserInfo, type, userList }: IUserListProps) {
       ],
       view: [
         <Popover
-          content={popOverContent}
+          content={() => popOverContent(index)}
           key={`popover${index}`}
           title="用户信息"
           trigger="click"
@@ -70,24 +68,28 @@ function UserList({ setUserInfo, type, userList }: IUserListProps) {
     return listActionMap[type]
   }
 
-  function popOverContent() {
+  function popOverContent(index: number) {
     return (
       <div className="flex w-64 flex-row">
-        <div className="basis-1/2">
-          <Avatar size={64} src="https://api.dicebear.com/7.x/miniavs/svg?seed=1" />
+        <div className="basis-1/3">
+          <Avatar size={64} src={clickUser.avatar || `https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`} />
         </div>
-        <div className="basis-1/2">
+        <div>
           <p>
             用户名:
             {clickUser.username}
           </p>
           <p>
-            年龄:
-            { clickUser.birthday ? clickUser.birthday.getFullYear() : '未知' }
+            生日:
+            { clickUser.birthday ? new Date(clickUser.birthday).toLocaleDateString() : '未知'}
           </p>
           <p>
             性别:
             {clickUser.gender || '未知'}
+          </p>
+          <p>
+            个人描述:
+            {clickUser.description || '未知'}
           </p>
         </div>
       </div>

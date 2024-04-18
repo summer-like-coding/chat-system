@@ -41,7 +41,6 @@ function RootLayout({ children }: React.PropsWithChildren) {
   useEffect(() => {
     async function getToken() {
       const res = await request<{ token: string }>(`/api/users/${useStore?.id}/getToken`)
-      // 发送凭证
       const socket = io(process.env.NEXT_PUBLIC_SOCKETIO_SERVER_URL!, {
         auth: {
           token: res?.token,

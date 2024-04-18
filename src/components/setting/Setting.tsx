@@ -131,6 +131,9 @@ export default function Setting() {
             }]}
           />
         </Form.Item>
+        <Form.Item label="个性签名" name="description">
+          <Input.TextArea className="w-full" />
+        </Form.Item>
         <Form.Item wrapperCol={{
           offset: 8,
           span: 16,

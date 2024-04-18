@@ -5,7 +5,7 @@ import { emitter } from '@/utils/eventBus'
 import { message } from 'antd'
 import React, { useEffect } from 'react'
 
-export default function Page() {
+export default function Page({ searchParams }: { searchParams?: { groupId?: string, userId?: string } }) {
   useEffect(() => {
     function callback(_e: string) {
       message.success('Socket 服务连接成功！')
@@ -15,13 +15,12 @@ export default function Page() {
       emitter.off('hello', callback)
     }
   }, [])
-
   return (
     <>
       <Authenticated />
       <Chat
-        chatKey=""
-        type="people"
+        chatKey={searchParams?.groupId || searchParams?.userId || '0'}
+        type={searchParams?.groupId ? 'group' : (searchParams?.userId ? 'people' : '')}
       />
     </>
   )

@@ -1,6 +1,7 @@
 'use client'
-import type { ProDescriptionsItemProps } from '@ant-design/pro-components'
-import type { Group, User } from '@prisma/client'
+import type { UserVo } from '@/types/views'
+import type { ProCoreActionType, ProDescriptionsItemProps } from '@ant-design/pro-components'
+import type { Group, User, UserGroup } from '@prisma/client'
 
 import Authenticated from '@/components/auth/Authenticated'
 import GroupList from '@/components/groupList/GroupList'
@@ -26,7 +27,7 @@ export default function FriendList() {
   const [chosedItemInfo, setChosedItemInfo] = useState<chooseItem>()
   const [tabKey, setTabKey] = useState('userList')
   const [formRef] = Form.useForm()
-  const actionRef = useRef()
+  const actionRef = useRef<ProCoreActionType>()
   const router = useRouter()
   useEffect(() => {
     if (userStore) {
@@ -108,7 +109,13 @@ export default function FriendList() {
     },
     {
       render: () => [
-        <Button key="chat" type="primary">
+        <Button
+          key="chat"
+          onClick={() => {
+            chosedItemInfo && router.push(`/chat?groupId=${chosedItemInfo.id}`)
+          }}
+          type="primary"
+        >
           去聊天
         </Button>,
       ],
@@ -129,15 +136,20 @@ export default function FriendList() {
       valueType: 'text',
     },
     {
-      dataIndex: 'description',
-      label: '个人描述',
-      span: 2,
+      dataIndex: 'gender',
+      label: '性别',
       valueType: 'text',
     },
     {
       dataIndex: 'birthday',
       label: '生日',
       valueType: 'date',
+    },
+    {
+      dataIndex: 'description',
+      label: '个人描述',
+      span: 2,
+      valueType: 'text',
     },
     {
       render: () => [
@@ -158,18 +170,9 @@ export default function FriendList() {
 
   useEffect(() => {
     if (chosedItemInfo) {
-      // 如果是群聊，那么获取群聊成员
       if (tabKey === 'groupList') {
-        // eslint-disable-next-line no-console
-        console.log('群聊')
-
-        request<IUser[]>(`/api/groups/${chosedItemInfo.id}/members/search`, {}, {
-          data: {
-            keyword: '',
-          },
-          method: 'POST',
-        }).then((res) => {
-          res && setGroupUserList(res)
+        request<({ user: UserVo } & UserGroup)[]>(`/api/groups/${chosedItemInfo.id}/members`).then((res) => {
+          res && setGroupUserList(res.map(item => item.user))
         })
       }
       actionRef.current?.reload()
@@ -205,6 +208,8 @@ export default function FriendList() {
                         data: record,
                         method: 'POST',
                       })
+                      const res = await request<Group[]>(`/api/users/${userStore!.id}/groups`)
+                      res && setGroupList(res)
                     },
               }}
               formProps={{ form: formRef }}
