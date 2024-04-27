@@ -28,6 +28,7 @@ interface IChat {
 }
 
 export default function Chat({ chatKey, type }: IChat) {
+  const targetId = useChatStore(state => state.targetId)
   const chatId = useChatStore(state => state.chatId) // 当前聊天的房间id
   const setChatId = useChatStore(state => state.setChatId)
   const setChatType = useChatStore(state => state.setChatType)
@@ -190,7 +191,6 @@ export default function Chat({ chatKey, type }: IChat) {
   }
 
   useEffect(() => {
-    // console.log('调用1次', chatKey, type)
     chatList.length = 0
     replay.value = ''
     setInputValue('')
@@ -242,7 +242,8 @@ export default function Chat({ chatKey, type }: IChat) {
       replay.value = ''
       setInputValue('')
     }
-  }, [chatKey, userStore])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatKey, userStore, targetId])
 
   useEffect(() => {
     async function callback(data: MessageVo) {
@@ -264,6 +265,7 @@ export default function Chat({ chatKey, type }: IChat) {
     return () => {
       emitter.off('imMessage', callback)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (

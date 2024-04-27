@@ -50,8 +50,9 @@ function RootLayout({ children }: React.PropsWithChildren) {
       socket.on('hello', (d: string) => {
         emitter.emit('hello', d)
       })
+      // 监听消息
       socket.on('imMessage', (d: Message) => {
-        emitter.emit('imMessage', d)
+        emitter.emit('imMessage', d) // 发送消息
       })
       socket.on('connect_error', (error: Error) => {
         console.error('connect_error', error)
