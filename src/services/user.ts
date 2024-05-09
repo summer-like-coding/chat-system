@@ -92,7 +92,6 @@ export class UserService extends AbstractService<User> {
     const user = await transaction(async (ctx) => {
       const user = await ctx.user.findFirst({
         where: {
-          // !isDeleted: false,
           username,
         },
       })

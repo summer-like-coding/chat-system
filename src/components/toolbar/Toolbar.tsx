@@ -39,6 +39,7 @@ function ToolBar() {
   const [transferData, setTransferData] = useState<TransferType[]>([])
   const [selectedKeys, setSelectedKeys] = useState<Key[]>([])
   const [targetKeys, setTargetKeys] = useState<Key[]>([])
+  const [addFriendKey, setAddFriendKey] = useState<Key>('')
 
   async function handleTabClick(key: string) {
     if (key === 'applyUser' || key === 'appliedUser') {
@@ -47,9 +48,11 @@ function ToolBar() {
       })
       const lists: IApplyList[] = res?.map((item) => {
         return {
+          launchAvatar: item.user.avatar!,
           launchId: item.user.id,
           launchName: item.user.nickname || item.user.username,
           status: item.status,
+          targetAvatar: item.target.avatar!,
           targetId: item.id,
           targetName: item.target.nickname || item.target.username,
         }
@@ -178,15 +181,30 @@ function ToolBar() {
               <List
                 dataSource={applyList}
                 itemLayout="horizontal"
-                renderItem={(item, index) => (
-                  <List.Item>
-                    <List.Item.Meta
-                      avatar={<Avatar size={48} src={item.avatar || `https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`} />}
-                      description={applyStatusMapping[item.status]}
-                      title={item.targetName}
-                    />
-                  </List.Item>
-                )}
+                renderItem={(item, index) => {
+                  console.log('item:', item, 'addFriendKey:', addFriendKey)
+
+                  const content = addFriendKey === 'applyUser'
+                    ? (
+                      <List.Item>
+                        <List.Item.Meta
+                          avatar={<Avatar size={48} src={item.targetAvatar || `https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`} />}
+                          description={applyStatusMapping[item.status]}
+                          title={item.targetName}
+                        />
+                      </List.Item>
+                      )
+                    : (
+                      <List.Item>
+                        <List.Item.Meta
+                          avatar={<Avatar size={48} src={item.launchAvatar || `https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`} />}
+                          description={applyStatusMapping[item.status]}
+                          title={item.launchName}
+                        />
+                      </List.Item>
+                      )
+                  return content
+                }}
               />
             </div>,
             key: 'applyUser',
@@ -203,7 +221,10 @@ function ToolBar() {
             label: '新朋友',
           },
         ]}
-        onTabClick={key => handleTabClick(key)}
+        onTabClick={(key) => {
+          handleTabClick(key)
+          setAddFriendKey(key)
+        }}
                     />,
       title: '好友',
     },
@@ -358,7 +379,7 @@ function ToolBar() {
         handleTabClick('launchGroup')
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addModalVisible])
 
   useEffect(() => {

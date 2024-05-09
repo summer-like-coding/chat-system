@@ -63,7 +63,7 @@ export default function FriendList() {
     userList: {
       children: <UserList
         setUserInfo={setChosedItemInfo as React.Dispatch<React.SetStateAction<IUser | undefined>>}
-        type="chat"
+        type="chatAndDelete"
         userList={userList}
                 />,
       key: 'userList',
@@ -225,7 +225,7 @@ export default function FriendList() {
         {
           chosedItemInfo && tabKey === 'groupList' && (
             <UserList
-              type="view"
+              type="viewAndDelete"
               userList={groupUserList}
             />
           )

@@ -75,7 +75,6 @@ export async function GET(request: NextRequest, { params }: PathIdParams) {
     if (type && !['self', 'target'].includes(type)) {
       return Result.error('申请类型错误')
     }
-
     if (status && !['ACCEPTED', 'IGNORED', 'PENDING', 'REJECTED'].includes(status.toUpperCase())) {
       return Result.error('申请状态错误')
     }

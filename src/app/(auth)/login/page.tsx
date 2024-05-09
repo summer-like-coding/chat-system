@@ -101,10 +101,12 @@ export default function LoginPassword() {
             label="密码"
             name="loginPassword"
             required
-            rules={[{
-              message: 'Please input your password!',
-              required: true,
-            }]}
+            rules={[
+              {
+                message: 'Please input your password!',
+                required: true,
+              },
+            ]}
           >
             <Input
               onPressEnter={login}
