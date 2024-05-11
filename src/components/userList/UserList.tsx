@@ -1,7 +1,6 @@
 import type { User } from '@prisma/client'
 import type { PopconfirmProps } from 'antd'
 
-import { useChatStore } from '@/app/store/chat'
 import { request } from '@/app/utils/request'
 import { Avatar, Button, List, Popconfirm, Popover, message } from 'antd'
 import React, { useState } from 'react'
@@ -16,13 +15,13 @@ interface IUserListProps {
 
 function UserList({ setUserInfo, type, userList }: IUserListProps) {
   const [clickUser, setClickUser] = useState<IUser>({} as User)
-  const setTargetId = useChatStore(state => state.setTargetId)
+  // const setTargetId = useChatStore(state => state.setTargetId)
   function handleMenuClick(item: IUser) {
     setClickUser(item)
   }
 
   async function handleChat(item: IUser) {
-    setTargetId(item.id)
+    // setTargetId(item.id)
     const res = await request<User>(`/api/users/${item.id}`, {})
     res && setUserInfo && setUserInfo(res)
   }

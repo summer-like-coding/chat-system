@@ -8,8 +8,6 @@ interface ChatStore {
   chatType: RoomType
   setChatId: (chatId: string) => void
   setChatType: (chatType: RoomType) => void
-  setTargetId: (targetId: string) => void
-  targetId: string // targetId,表示当前聊天的对象id
 }
 
 const storageOptions = {
@@ -24,8 +22,6 @@ export const useChatStore = create(
       chatType: 'FRIEND',
       setChatId: (chatId: string) => set({ chatId }),
       setChatType: (chatType: RoomType) => set({ chatType }),
-      setTargetId: (targetId: string) => set({ targetId }),
-      targetId: '',
     }),
     storageOptions,
   ),

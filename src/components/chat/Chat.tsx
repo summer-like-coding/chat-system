@@ -1,12 +1,12 @@
 'use client'
 
-import type { GroupVo, MessageVo, RoomVo, UserVo } from '@/types/views'
+import type { MessageVo, UserVo } from '@/types/views'
 
 import { useChatStore } from '@/app/store/chat'
 import { useUserStore } from '@/app/store/user'
 import { request, requestEventStream } from '@/app/utils/request'
 import { emitter } from '@/utils/eventBus'
-import { MessageType, type UserContact, type UserFriend } from '@prisma/client'
+import { MessageType } from '@prisma/client'
 import { useReactive } from 'ahooks'
 import { Affix, Avatar, Button, Input } from 'antd'
 import React, { useEffect, useRef, useState } from 'react'
@@ -23,15 +23,11 @@ interface ChatProps {
 
 interface IChat {
   chatKey: string
-  searchParams?: { groupId?: string, userId?: string }
-  type: '' | 'bot' | 'group' | 'people'
+  type: 'bot' | 'normal'
 }
 
 export default function Chat({ chatKey, type }: IChat) {
-  const targetId = useChatStore(state => state.targetId)
   const chatId = useChatStore(state => state.chatId) // 当前聊天的房间id
-  const setChatId = useChatStore(state => state.setChatId)
-  const setChatType = useChatStore(state => state.setChatType)
   const userStore = useUserStore(state => state.user)!
   const chatList = useReactive<ChatProps[]>([])
   const [inputValue, setInputValue] = useState('')
@@ -123,23 +119,7 @@ export default function Chat({ chatKey, type }: IChat) {
           prompt: inputValue,
         }, onMessage, onEnd)
       },
-      group: async () => {
-        const res = await request<MessageVo>(`/api/rooms/${chatId}/chat`, {}, {
-          data: {
-            content: inputValue,
-            type: MessageType.TEXT,
-          },
-          method: 'POST',
-        })
-        chatList.push({
-          avatar: userStore.avatar || '',
-          content: res!.content,
-          id: res!.id,
-          isMine: true,
-        } as ChatProps)
-        hasLoadedMessage.current.add(res!.id)
-      },
-      people: async () => {
+      normal: async () => {
         const res = await request<MessageVo>(`/api/rooms/${chatId}/chat`, {}, {
           data: {
             content: inputValue,
@@ -194,56 +174,23 @@ export default function Chat({ chatKey, type }: IChat) {
     chatList.length = 0
     replay.value = ''
     setInputValue('')
-
-    if (!type || type === 'bot')
+    if (!chatKey) {
+      return
+    }
+    if (type === 'bot')
       return
     if (!userStore)
       return
-    async function getChat() {
-      let res: {
-        contact: UserContact
-        friend?: UserFriend
-        group?: GroupVo
-        room: RoomVo
-      } = {} as any
-      if (type === 'people') {
-        res = await request<{
-          contact: UserContact
-          friend: UserFriend
-          room: RoomVo
-        }>('/api/contacts/friends/prepare', {}, {
-          data: {
-            userId: chatKey,
-          },
-          method: 'POST',
-        }) || {} as any
-      }
-      else if (type === 'group') {
-        res = await request<{
-          contact: UserContact
-          group: GroupVo
-          room: RoomVo
-        }>('/api/contacts/groups/prepare', {}, {
-          data: {
-            groupId: chatKey,
-          },
-          method: 'POST',
-        }) || {} as any
-      }
-      res && setChatId(res!.room.id)
-      res && setChatType(res!.room.type)
-      // console.log('需要debug')
-
-      res && pullMessage(res!.room.id)
+    if (chatKey) {
+      pullMessage(chatKey)
     }
-    getChat()
     return () => {
       chatList.length = 0
       replay.value = ''
       setInputValue('')
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chatKey, userStore, targetId])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatKey, userStore])
 
   useEffect(() => {
     async function callback(data: MessageVo) {
@@ -265,7 +212,7 @@ export default function Chat({ chatKey, type }: IChat) {
     return () => {
       emitter.off('imMessage', callback)
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (

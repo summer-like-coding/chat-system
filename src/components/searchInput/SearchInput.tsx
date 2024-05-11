@@ -14,6 +14,8 @@ import React, { useState } from 'react'
 
 import type { IApplyList } from '../applyList/ApplyList'
 
+import { getRoomId } from '../chat/utils'
+
 interface SearchInputProps {
   id?: string
   setList?: React.Dispatch<React.SetStateAction<IApplyList[]>>
@@ -24,7 +26,7 @@ interface SearchInputProps {
 function SearchInput({ setList, type, usedBy }: SearchInputProps) {
   const router = useRouter()
   const userStore = useUserStore(state => state.user)
-  const setTargetId = useChatStore(state => state.setTargetId)
+  const setChatId = useChatStore(state => state.setChatId)
   const [options, setOptions] = useState<{
     label: string
     value: string
@@ -81,7 +83,7 @@ function SearchInput({ setList, type, usedBy }: SearchInputProps) {
         })))
         return res
       }, // 聊天
-      'search-group': () => {}, // 查看群组信息
+      'search-group': () => { }, // 查看群组信息
       'search-user': async () => {
         const res = await request<User[]>(`/api/users/${userStore!.id}/friends/search`, {}, {
           data: {
@@ -124,10 +126,9 @@ function SearchInput({ setList, type, usedBy }: SearchInputProps) {
     }
     queryAppliesMap[type]()
   }
-
   function handleClick(value: string) {
     const handleClickMap = {
-      'apply-group': () => {}, // 申请加入群组
+      'apply-group': () => { }, // 申请加入群组
       'apply-user': async () => {
         const res = await request('/api/applies/friends/apply', {}, {
           data: {
@@ -140,16 +141,22 @@ function SearchInput({ setList, type, usedBy }: SearchInputProps) {
         queryApplies()
         return res
       }, // 申请加好友
-      'chat-group': () => {
-        setTargetId(value)
-        router.push(`/chat?userId=${value}`)
+      'chat-group': async () => {
+        // setTargetId(value)
+        const { roomId } = await getRoomId(value, 'group')
+        setChatId(roomId)
+        // setChatType(roomType)
+        router.push(`/chat?roomId=${roomId}`)
       }, // 聊天
-      'chat-user': () => {
-        setTargetId(value)
-        router.push(`/chat?userId=${value}`)
+      'chat-user': async () => {
+        // setTargetId(value)
+        const { roomId } = await getRoomId(value, 'people')
+        setChatId(roomId)
+        // setChatType(roomType)
+        router.push(`/chat?roomId=${roomId}`)
       }, // 聊天
-      'search-group': () => {}, // 查看群组信息
-      'search-user': () => {}, // 查看好友信息
+      'search-group': () => { }, // 查看群组信息
+      'search-user': () => { }, // 查看好友信息
     }
     handleClickMap[`${usedBy}-${type}`]()
   }

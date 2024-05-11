@@ -4,6 +4,7 @@ import type { ProCoreActionType, ProDescriptionsItemProps } from '@ant-design/pr
 import type { Group, User, UserGroup } from '@prisma/client'
 
 import Authenticated from '@/components/auth/Authenticated'
+import { getRoomId } from '@/components/chat/utils'
 import GroupList from '@/components/groupList/GroupList'
 import UploadImg from '@/components/uploadImg/UploadImg'
 import UserList from '@/components/userList/UserList'
@@ -12,6 +13,7 @@ import { Button, Form, Tabs } from 'antd'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useRef, useState } from 'react'
 
+import { useChatStore } from '../store/chat'
 import { useUserStore } from '../store/user'
 import { request } from '../utils/request'
 import './styles.css'
@@ -21,6 +23,8 @@ type IUser = Pick<User, 'avatar' | 'birthday' | 'description' | 'gender' | 'id' 
 type chooseItem = Group | IUser
 
 export default function FriendList() {
+  const setChatId = useChatStore(state => state.setChatId)
+  // const setChatType = useChatStore(state => state.setChatType)
   const userStore = useUserStore(state => state.user)
   const [userList, setUserList] = useState<IUser[]>([])
   const [groupList, setGroupList] = useState<Group[]>([])
@@ -112,8 +116,13 @@ export default function FriendList() {
       render: () => [
         <Button
           key="chat"
-          onClick={() => {
-            chosedItemInfo && router.push(`/chat?groupId=${chosedItemInfo.id}`)
+          onClick={async () => {
+            if (chosedItemInfo) {
+              const { roomId } = await getRoomId(chosedItemInfo.id, 'group')
+              setChatId(roomId)
+              // setChatType(roomType)
+              router.push(`/chat?roomId=${roomId}`)
+            }
           }}
           type="primary"
         >
@@ -156,8 +165,13 @@ export default function FriendList() {
       render: () => [
         <Button
           key="chat"
-          onClick={() => {
-            chosedItemInfo && router.push(`/chat?userId=${chosedItemInfo.id}`)
+          onClick={async () => {
+            if (chosedItemInfo) {
+              const { roomId } = await getRoomId(chosedItemInfo.id, 'people')
+              setChatId(roomId)
+              // setChatType(roomType)
+              router.push(`/chat?roomId=${roomId}`)
+            }
           }}
           type="primary"
         >

@@ -1,13 +1,10 @@
 'use client'
-import type { User } from '@prisma/client'
+import type { ContactVo, RoomVo } from '@/types/views'
 
-type IUser = Pick<User, 'avatar' | 'birthday' | 'description' | 'gender' | 'id' | 'username'>
-
+import { getContactRecord, getRoomInfo } from '@/components/chat/utils'
 import SearchInput from '@/components/searchInput/SearchInput'
-import UserList from '@/components/userList/UserList'
-import { DashOutlined, TeamOutlined, UserOutlined } from '@ant-design/icons'
-import { useToggle } from 'ahooks'
 import { Layout, Menu } from 'antd'
+import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 
 import { useChatStore } from '../store/chat'
@@ -16,26 +13,33 @@ import { request } from '../utils/request'
 import './style.css'
 
 function ChatLayout({ children }: React.PropsWithChildren) {
+  const router = useRouter()
   const { Content, Header, Sider } = Layout
   const userStore = useUserStore(state => state.user)
-  const chatType = useChatStore(state => state.chatType)
-  const items = [UserOutlined, TeamOutlined].map(
-    (icon, index) => ({
-      icon: React.createElement(icon),
-      key: String(index + 1),
-      label: `nav ${index + 1}`,
-    }),
-  )
-  const [groupUserList, setGroupUserList] = useState<IUser[]>()
-  const [userToggle, { toggle }] = useToggle(false)
+  const setChatId = useChatStore(state => state.setChatId)
+  const [contactList, setContactList] = useState<{
+    icon: React.ReactNode
+    key: string
+    label: string
+  }[]>()
 
   useEffect(() => {
-    if (userStore && chatType === 'GROUP') {
-      request<IUser[]>(`/api/users/${userStore.id}/friends`).then((res) => {
-        res && setGroupUserList(res)
-      })
-    }
-  }, [chatType, userStore])
+    userStore && request<({ room: RoomVo } & ContactVo)[]>(`/api/users/${userStore.id}/contacts`).then(async (res) => {
+      if (!res)
+        return
+      const roomInfos: any = await Promise.all(res.map(async item => getRoomInfo(item)))
+      const contactLists = await Promise.all(roomInfos.map(async (item: any) => {
+        const info = item!.type === 'GROUP' ? await getContactRecord(item!.groupRoom.groupId, 'GROUP') : await getContactRecord(item!.friendRoom.user1Id, 'PEOPLE')
+        return {
+          icon: React.createElement('img', { alt: info!.name, src: info!.avatar, style: { borderRadius: '50%', height: '32px', width: '32px' } }),
+          key: item!.id,
+          label: info!.name,
+          type: item!.type,
+        }
+      }))
+      setContactList(contactLists)
+    })
+  }, [userStore])
 
   return (
     <>
@@ -52,8 +56,12 @@ function ChatLayout({ children }: React.PropsWithChildren) {
           />
         </div>
         <Menu
-          items={items}
+          items={contactList}
           mode="inline"
+          onSelect={({ key }) => {
+            setChatId(key)
+            router.push(`/chat?roomId=${key}`)
+          }}
           style={{
             backgroundColor: '#f5f5f5',
             color: '#848484',
@@ -70,15 +78,7 @@ function ChatLayout({ children }: React.PropsWithChildren) {
             textAlign: 'center',
           }}
         >
-          <div className="w-full">
-            <div className="float-left ml-2">聊天室</div>
-            <div className="float-right mr-2">
-              <DashOutlined
-                onClick={toggle}
-                size={32}
-              />
-            </div>
-          </div>
+          <div className="w-full text-lg">聊天室</div>
         </Header>
         <Content
           className="content-container"
@@ -86,27 +86,6 @@ function ChatLayout({ children }: React.PropsWithChildren) {
           {children}
         </Content>
       </Layout>
-      <Sider
-        style={{
-          backgroundColor: 'transparent',
-          borderLeft: '1px solid #fefefe',
-          display: (chatType === 'GROUP' && userToggle) ? 'block' : 'none',
-        }}
-        width="18%"
-      >
-        <div className="slider-search">
-          <SearchInput
-            type="group"
-            usedBy="chat"
-          />
-        </div>
-        <div className="slider-content">
-          <UserList
-            type="view"
-            userList={groupUserList!}
-          />
-        </div>
-      </Sider>
     </>
   )
 }
