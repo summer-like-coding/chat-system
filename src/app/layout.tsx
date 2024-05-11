@@ -73,12 +73,12 @@ function RootLayout({ children }: React.PropsWithChildren) {
               <Sider
                 hidden={isHidden()}
                 style={{
-                  backgroundColor: '#2e2e2e',
+                  backgroundColor: '#dbe6fb',
                   borderRight: '1px solid #fefefe',
                   color: '#848484',
                   textAlign: 'center',
                 }}
-                width="4%"
+                width="60px"
               >
                 <ToolBar />
               </Sider>

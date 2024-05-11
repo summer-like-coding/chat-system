@@ -43,7 +43,7 @@ function ChatLayout({ children }: React.PropsWithChildren) {
         style={{
           backgroundColor: 'transparent',
         }}
-        width="15%"
+        width="200px"
       >
         <div className="slider-search">
           <SearchInput
