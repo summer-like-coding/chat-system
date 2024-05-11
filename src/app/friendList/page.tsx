@@ -116,6 +116,25 @@ export default function FriendList() {
     {
       render: () => [
         <Button
+          // disabled={chosedItemInfo?.owner !== 'OWNER'}
+          key="delete"
+          // type="primary"
+        >
+          删除群聊
+        </Button>,
+        <Button
+          key="quit"
+          // type="primary"
+        >
+          退出群聊
+        </Button>,
+        <Button
+          key="add"
+          // type="primary"
+        >
+          添加成员
+        </Button>,
+        <Button
           key="chat"
           onClick={async () => {
             if (chosedItemInfo) {
@@ -126,20 +145,7 @@ export default function FriendList() {
           }}
           type="primary"
         >
-          去聊天
-        </Button>,
-        <Button
-          // disabled={chosedItemInfo?.owner !== 'OWNER'}
-          key="delete"
-          type="primary"
-        >
-          删除群聊
-        </Button>,
-        <Button
-          key="quit"
-          type="primary"
-        >
-          退出群聊
+          开始聊天
         </Button>,
       ],
       title: '操作',
