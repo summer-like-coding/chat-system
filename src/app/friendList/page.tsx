@@ -26,7 +26,6 @@ type chooseItem = Group | IUser
 
 export default function FriendList() {
   const setChatId = useChatStore(state => state.setChatId)
-  // const setChatType = useChatStore(state => state.setChatType)
   const userStore = useUserStore(state => state.user)
   const [userList, setUserList] = useState<IUser[]>([])
   const [groupList, setGroupList] = useState<Group[]>([])
@@ -122,13 +121,25 @@ export default function FriendList() {
             if (chosedItemInfo) {
               const { roomId } = await getRoomId(chosedItemInfo.id, 'group')
               setChatId(roomId)
-              // setChatType(roomType)
               router.push(`/chat?roomId=${roomId}`)
             }
           }}
           type="primary"
         >
           去聊天
+        </Button>,
+        <Button
+          // disabled={chosedItemInfo?.owner !== 'OWNER'}
+          key="delete"
+          type="primary"
+        >
+          删除群聊
+        </Button>,
+        <Button
+          key="quit"
+          type="primary"
+        >
+          退出群聊
         </Button>,
       ],
       title: '操作',

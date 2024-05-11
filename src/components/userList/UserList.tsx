@@ -166,7 +166,7 @@ function UserList({ setUserInfo, type, userList }: IUserListProps) {
           <List.Item.Meta
             avatar={<Avatar size={48} src={item.avatar || `https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`} />}
             description={item.username}
-            title={GroupRoleTypeMap[item.owner || 'MEMBER'] || '成员'}
+            title={item.owner ? GroupRoleTypeMap[item.owner] : '好友'}
           />
         </List.Item>
       )}
