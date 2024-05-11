@@ -1,11 +1,13 @@
-import type { User } from '@prisma/client'
+import type { GroupRoleType, User } from '@prisma/client'
 import type { PopconfirmProps } from 'antd'
 
 import { request } from '@/app/utils/request'
 import { Avatar, Button, List, Popconfirm, Popover, message } from 'antd'
 import React, { useState } from 'react'
 
-type IUser = Pick<User, 'avatar' | 'birthday' | 'description' | 'gender' | 'id' | 'username'>
+type IUser = {
+  owner?: GroupRoleType
+} & Pick<User, 'avatar' | 'birthday' | 'description' | 'gender' | 'id' | 'username'>
 
 interface IUserListProps {
   setUserInfo?: React.Dispatch<React.SetStateAction<IUser | undefined>>
@@ -13,15 +15,19 @@ interface IUserListProps {
   userList: IUser[]
 }
 
+const GroupRoleTypeMap = {
+  ADMIN: '管理员',
+  MEMBER: '成员',
+  OWNER: '群主',
+}
+
 function UserList({ setUserInfo, type, userList }: IUserListProps) {
   const [clickUser, setClickUser] = useState<IUser>({} as User)
-  // const setTargetId = useChatStore(state => state.setTargetId)
   function handleMenuClick(item: IUser) {
     setClickUser(item)
   }
 
   async function handleChat(item: IUser) {
-    // setTargetId(item.id)
     const res = await request<User>(`/api/users/${item.id}`, {})
     res && setUserInfo && setUserInfo(res)
   }
@@ -160,7 +166,7 @@ function UserList({ setUserInfo, type, userList }: IUserListProps) {
           <List.Item.Meta
             avatar={<Avatar size={48} src={item.avatar || `https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`} />}
             description={item.username}
-            title="用户"
+            title={GroupRoleTypeMap[item.owner || 'MEMBER'] || '成员'}
           />
         </List.Item>
       )}

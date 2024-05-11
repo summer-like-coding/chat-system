@@ -1,7 +1,7 @@
 'use client'
 import type { UserVo } from '@/types/views'
 import type { ProCoreActionType, ProDescriptionsItemProps } from '@ant-design/pro-components'
-import type { Group, User, UserGroup } from '@prisma/client'
+import type { Group, GroupRoleType, User, UserGroup } from '@prisma/client'
 
 import Authenticated from '@/components/auth/Authenticated'
 import { getRoomId } from '@/components/chat/utils'
@@ -18,7 +18,9 @@ import { useUserStore } from '../store/user'
 import { request } from '../utils/request'
 import './styles.css'
 
-type IUser = Pick<User, 'avatar' | 'birthday' | 'description' | 'gender' | 'id' | 'username'>
+type IUser = {
+  owner?: GroupRoleType
+} & Pick<User, 'avatar' | 'birthday' | 'description' | 'gender' | 'id' | 'username'>
 
 type chooseItem = Group | IUser
 
@@ -169,7 +171,6 @@ export default function FriendList() {
             if (chosedItemInfo) {
               const { roomId } = await getRoomId(chosedItemInfo.id, 'people')
               setChatId(roomId)
-              // setChatType(roomType)
               router.push(`/chat?roomId=${roomId}`)
             }
           }}
@@ -187,7 +188,12 @@ export default function FriendList() {
     if (chosedItemInfo) {
       if (tabKey === 'groupList') {
         request<({ user: UserVo } & UserGroup)[]>(`/api/groups/${chosedItemInfo.id}/members`).then((res) => {
-          res && setGroupUserList(res.map(item => item.user))
+          res && setGroupUserList(res.map((item) => {
+            return {
+              ...item.user,
+              owner: item.groupRole,
+            }
+          }))
         })
       }
       actionRef.current?.reload()
@@ -226,7 +232,6 @@ export default function FriendList() {
             <ProDescriptions
               actionRef={actionRef}
               bordered
-              className="friendList-descriptions"
               column={2}
               columns={tabKey === 'userList' ? userItems : groupItems}
               editable={tabKey === 'userList'
