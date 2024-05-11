@@ -33,7 +33,7 @@ function ToolBar() {
   const removeUserStore = useUserStore(state => state.removeUser)
   const [modalVisible, { setFalse: setModalFalse, setTrue: setModalTrue }] = useBoolean(false)
   const [addModalVisible, { setFalse: setAddModalFalse, setTrue: setAddModalTrue }] = useBoolean(false)
-  const [modalType, setModalType] = useState<string>('help')
+  const [modalType, setModalType] = useState<string>('setting')
   const [addModalType, setAddModalType] = useState<string>('addFriend')
   const [applyList, setApplyList] = useState<IApplyList[]>([])
   const [transferData, setTransferData] = useState<TransferType[]>([])
@@ -74,23 +74,6 @@ function ToolBar() {
   }
 
   const hoverItemContent = {
-    help: {
-      content: <div
-        className="flex items-center"
-        key="2"
-        onClick={() => {
-          setModalType('help')
-          setModalTrue()
-        }}
-               >
-        <CommentOutlined className="mr-2" size={32} />
-        <div>客服与帮助</div>
-      </div>,
-      modalContent: <div className="flex w-full">
-        <div> 请向3244742300@qq.com发送你的疑问 </div>
-      </div>,
-      title: '客服与帮助',
-    },
     logout: {
       content: <div
         className="flex items-center"
@@ -121,12 +104,10 @@ function ToolBar() {
         }}
                >
         <SettingOutlined className="mr-2" size={32} />
-        <div>设置与隐私</div>
+        <div>账号设置</div>
       </div>,
-      modalContent: <div className="w-full">
-        <Setting />
-      </div>,
-      title: '设置与隐私',
+      modalContent: <Setting />,
+      title: '账号设置',
     },
   }
 
@@ -304,8 +285,6 @@ function ToolBar() {
     },
   }
 
-  const contentList = [hoverItemContent.help.content, hoverItemContent.setting.content, hoverItemContent.logout.content]
-
   function userInfo() {
     return (
       <div className="flex w-64 flex-row">
@@ -337,7 +316,7 @@ function ToolBar() {
     return (
       <List
         bordered
-        dataSource={contentList}
+        dataSource={[hoverItemContent.logout.content]}
         footer={null}
         header={userInfo()}
         renderItem={item => <List.Item>{item}</List.Item>}
@@ -355,6 +334,10 @@ function ToolBar() {
     }
     else if (key === 'friendList') {
       router.push('/friendList')
+    }
+    else if (key === 'setting') {
+      setModalType('setting')
+      setModalTrue()
     }
     else {
       router.push('/')
@@ -390,15 +373,15 @@ function ToolBar() {
 
   return (
     <aside className="side-toolbar">
-      <div>
+      <div className="flex h-full flex-col">
         <Popover
           content={settingInfo}
           placement="right"
           trigger="click"
         >
-          <Avatar size={36} src={useStore?.avatar || 'https://api.dicebear.com/7.x/miniavs/svg?seed=2'} />
+          <Avatar size={42} src={useStore?.avatar || 'https://api.dicebear.com/7.x/miniavs/svg?seed=2'} />
         </Popover>
-        <div className="mt-4 flex flex-col items-center">
+        <div className="mt-4 flex h-4/5 flex-col items-center">
           <Badge overflowCount={99}>
             <CommentOutlined
               onClick={() => {
@@ -428,15 +411,20 @@ function ToolBar() {
             style={{ color: '#848484', fontSize: 28, marginTop: 20 }}
           />
         </div>
+        <div className="order-1">
+          <SettingOutlined
+            onClick={() => {
+              menuClick('setting')
+            }}
+            style={{ color: '#848484', fontSize: 28, marginTop: 20 }}
+          />
+        </div>
       </div>
       {/* 账号相关modal */}
       <Modal
         footer={null}
         onCancel={setModalFalse}
         open={beforeOpen()}
-        style={{
-          height: '100%',
-        }}
         title={hoverItemContent[modalType as keyof typeof hoverItemContent].title}
         width={600}
       >

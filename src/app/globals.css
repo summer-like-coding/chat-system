@@ -55,7 +55,6 @@ body {
 
 .content-container {
   padding: 16px;
-  /* background-color: #f5f5f5; */
   background: linear-gradient(to bottom right, #dbe6fb, #f3f4f8);
   text-align: center;
 }

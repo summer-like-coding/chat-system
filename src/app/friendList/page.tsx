@@ -14,6 +14,7 @@ import React, { useEffect, useRef, useState } from 'react'
 
 import { useUserStore } from '../store/user'
 import { request } from '../utils/request'
+import './styles.css'
 
 type IUser = Pick<User, 'avatar' | 'birthday' | 'description' | 'gender' | 'id' | 'username'>
 
@@ -180,24 +181,38 @@ export default function FriendList() {
   }, [chosedItemInfo, tabKey])
 
   return (
-    <>
+    <div
+      className="friendList-wrapper"
+      style={{
+        display: 'flex',
+        flexDirection: 'row',
+      }}
+    >
       <Authenticated />
-      <Tabs
-        defaultActiveKey="userList"
-        items={Object.values(tabItems)}
-        onChange={handleTabClick}
+      <div
         style={{
-          backgroundColor: 'white',
-          paddingLeft: '1%',
-          width: '25%',
+          width: '320px',
         }}
-      />
-      <div style={{ display: 'flex', flexDirection: 'column', marginTop: '20px', width: '70%' }}>
+      >
+        <Tabs
+          defaultActiveKey="userList"
+          items={Object.values(tabItems)}
+          onChange={handleTabClick}
+          type="card"
+        />
+      </div>
+      <div
+        className="friendList-content"
+        style={{
+          padding: 20,
+        }}
+      >
         {
           chosedItemInfo && (
             <ProDescriptions
               actionRef={actionRef}
               bordered
+              className="friendList-descriptions"
               column={2}
               columns={tabKey === 'userList' ? userItems : groupItems}
               editable={tabKey === 'userList'
@@ -231,6 +246,6 @@ export default function FriendList() {
           )
         }
       </div>
-    </>
+    </div>
   )
 }

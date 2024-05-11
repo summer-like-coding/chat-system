@@ -61,7 +61,7 @@ function UserList({ setUserInfo, type, userList }: IUserListProps) {
           onClick={() => handleChat(item)}
           type="link"
         >
-          聊天
+          详情
         </Button>,
         <Popconfirm
           cancelText="否"
