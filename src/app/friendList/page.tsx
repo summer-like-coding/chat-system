@@ -7,6 +7,7 @@ import type { PopconfirmProps } from 'antd'
 import Authenticated from '@/components/auth/Authenticated'
 import { getRoomId } from '@/components/chat/utils'
 import GroupList from '@/components/groupList/GroupList'
+import SearchInput from '@/components/searchInput/SearchInput'
 import UploadImg from '@/components/uploadImg/UploadImg'
 import UserList from '@/components/userList/UserList'
 import { ProDescriptions } from '@ant-design/pro-components'
@@ -121,24 +122,23 @@ export default function FriendList() {
     {
       render: () => [
         <Button
-          // disabled={chosedItemInfo?.owner !== 'OWNER'}
-          key="delete"
-        // type="primary"
-        >
-          删除群聊
-        </Button>,
-        <Button
+          danger
           key="quit"
-        // type="primary"
         >
-          退出群聊
+          退出
         </Button>,
-        <Button
+        <div
           key="add"
-        // type="primary"
+          style={{
+            width: '220px',
+          }}
         >
-          添加成员
-        </Button>,
+          <SearchInput
+            targetId={chosedItemInfo?.id}
+            type="user"
+            usedBy="add"
+          />
+        </div>,
         <Button
           key="chat"
           onClick={async () => {
@@ -150,7 +150,7 @@ export default function FriendList() {
           }}
           type="primary"
         >
-          开始聊天
+          聊天
         </Button>,
       ],
       title: '操作',
@@ -290,6 +290,7 @@ export default function FriendList() {
         {
           chosedItemInfo && tabKey === 'groupList' && (
             <UserList
+              targetId={chosedItemInfo.id}
               type="viewAndDelete"
               userList={groupUserList}
             />

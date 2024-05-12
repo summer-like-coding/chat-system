@@ -19,11 +19,12 @@ import { getRoomId } from '../chat/utils'
 interface SearchInputProps {
   id?: string
   setList?: React.Dispatch<React.SetStateAction<IApplyList[]>>
+  targetId?: string
   type: 'group' | 'user'
-  usedBy: 'apply' | 'chat' | 'search'
+  usedBy: 'add' | 'apply' | 'chat' | 'search'
 }
 
-function SearchInput({ setList, type, usedBy }: SearchInputProps) {
+function SearchInput({ setList, targetId, type, usedBy }: SearchInputProps) {
   const router = useRouter()
   const userStore = useUserStore(state => state.user)
   const setChatId = useChatStore(state => state.setChatId)
@@ -34,6 +35,20 @@ function SearchInput({ setList, type, usedBy }: SearchInputProps) {
 
   async function handleRequest(value: string) {
     const requestMap = {
+      'add-group': () => { },
+      'add-user': async () => {
+        const res = await request<User[]>('/api/users/search', {}, {
+          data: {
+            keyword: value,
+          },
+          method: 'POST',
+        })
+        setOptions(res!.map(item => ({
+          label: item.username,
+          value: item.id,
+        })))
+        return res
+      },
       'apply-group': async () => {
         // 查询所有群组
         const res = await request<Group[]>('/api/groups/search', {}, {
@@ -128,6 +143,18 @@ function SearchInput({ setList, type, usedBy }: SearchInputProps) {
   }
   function handleClick(value: string) {
     const handleClickMap = {
+      'add-group': () => { }, // 添加群组
+      'add-user': async () => {
+        if (!targetId)
+          return message.error('请先选择群组')
+        await request<User[]>(`/api/groups/${targetId}/members/add`, {}, {
+          data: {
+            userIdList: [value],
+          },
+          method: 'POST',
+        })
+        message.success('添加成功')
+      }, // 添加好友进入群组
       'apply-group': () => { }, // 申请加入群组
       'apply-user': async () => {
         const res = await request('/api/applies/friends/apply', {}, {
@@ -173,7 +200,7 @@ function SearchInput({ setList, type, usedBy }: SearchInputProps) {
         <div className="flex flex-row items-center justify-between">
           <div style={{ marginLeft: 8 }}>{label}</div>
           <Button onClick={() => handleClick(value as any)} type="link">
-            {usedBy === 'apply' ? '申请' : '聊天'}
+            {usedBy === 'apply' ? '申请' : (usedBy === 'add' ? '添加' : '聊天')}
           </Button>
         </div>
       )}

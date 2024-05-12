@@ -1,5 +1,4 @@
 import type { GroupRoleType, User } from '@prisma/client'
-import type { PopconfirmProps } from 'antd'
 
 import { request } from '@/app/utils/request'
 import { Avatar, Button, List, Popconfirm, Popover, message } from 'antd'
@@ -11,6 +10,7 @@ type IUser = {
 
 interface IUserListProps {
   setUserInfo?: React.Dispatch<React.SetStateAction<IUser | undefined>>
+  targetId?: string // 如果为群聊，传入群聊id
   type: 'apply' | 'chat' | 'chatAndDelete' | 'view' | 'viewAndDelete'
   userList: IUser[]
 }
@@ -21,7 +21,7 @@ const GroupRoleTypeMap = {
   OWNER: '群主',
 }
 
-function UserList({ setUserInfo, type, userList }: IUserListProps) {
+function UserList({ setUserInfo, targetId, type, userList }: IUserListProps) {
   const [clickUser, setClickUser] = useState<IUser>({} as User)
   function handleMenuClick(item: IUser) {
     setClickUser(item)
@@ -32,8 +32,14 @@ function UserList({ setUserInfo, type, userList }: IUserListProps) {
     res && setUserInfo && setUserInfo(res)
   }
 
-  const groupUserConfirm: PopconfirmProps['onConfirm'] = () => {
-    message.success('Click on Yes')
+  async function groupUserConfirm(item: IUser) {
+    await request(`/api/groups/${targetId}/members/remove`, {}, {
+      data: {
+        userIdList: [item.id],
+      },
+      method: 'POST',
+    })
+    message.success('删除群成员成功')
   }
 
   function handleListAction(item: IUser, index: number) {
@@ -104,7 +110,7 @@ function UserList({ setUserInfo, type, userList }: IUserListProps) {
           cancelText="否"
           key="list-delete"
           okText="是"
-          onConfirm={groupUserConfirm}
+          onConfirm={() => groupUserConfirm(item)}
           title="确定删除这个群成员嘛？"
         >
           <Button danger type="link">删除</Button>
