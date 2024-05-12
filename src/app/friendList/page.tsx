@@ -2,6 +2,7 @@
 import type { UserVo } from '@/types/views'
 import type { ProCoreActionType, ProDescriptionsItemProps } from '@ant-design/pro-components'
 import type { Group, GroupRoleType, User, UserGroup } from '@prisma/client'
+import type { PopconfirmProps } from 'antd'
 
 import Authenticated from '@/components/auth/Authenticated'
 import { getRoomId } from '@/components/chat/utils'
@@ -9,7 +10,7 @@ import GroupList from '@/components/groupList/GroupList'
 import UploadImg from '@/components/uploadImg/UploadImg'
 import UserList from '@/components/userList/UserList'
 import { ProDescriptions } from '@ant-design/pro-components'
-import { Button, Form, Tabs } from 'antd'
+import { Button, Form, Popconfirm, Tabs, message } from 'antd'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useRef, useState } from 'react'
 
@@ -54,6 +55,10 @@ export default function FriendList() {
       const res = await request<IUser[]>(`/api/users/${userStore!.id}/friends`)
       res && setUserList(res)
     }
+  }
+
+  const friendConfirm: PopconfirmProps['onConfirm'] = () => {
+    message.success('Click on Yes')
   }
 
   const tabItems = {
@@ -118,19 +123,19 @@ export default function FriendList() {
         <Button
           // disabled={chosedItemInfo?.owner !== 'OWNER'}
           key="delete"
-          // type="primary"
+        // type="primary"
         >
           删除群聊
         </Button>,
         <Button
           key="quit"
-          // type="primary"
+        // type="primary"
         >
           退出群聊
         </Button>,
         <Button
           key="add"
-          // type="primary"
+        // type="primary"
         >
           添加成员
         </Button>,
@@ -193,8 +198,17 @@ export default function FriendList() {
           }}
           type="primary"
         >
-          去聊天
+          聊天
         </Button>,
+        <Popconfirm
+          cancelText="否"
+          key="list-delete"
+          okText="是"
+          onConfirm={friendConfirm}
+          title="确定删除这个好友嘛？"
+        >
+          <Button danger>删除</Button>
+        </Popconfirm>,
       ],
       title: '操作',
       valueType: 'option',

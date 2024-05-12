@@ -32,10 +32,6 @@ function UserList({ setUserInfo, type, userList }: IUserListProps) {
     res && setUserInfo && setUserInfo(res)
   }
 
-  const friendConfirm: PopconfirmProps['onConfirm'] = () => {
-    message.success('Click on Yes')
-  }
-
   const groupUserConfirm: PopconfirmProps['onConfirm'] = () => {
     message.success('Click on Yes')
   }
@@ -68,15 +64,6 @@ function UserList({ setUserInfo, type, userList }: IUserListProps) {
         >
           详情
         </Button>,
-        <Popconfirm
-          cancelText="否"
-          key="list-delete"
-          okText="是"
-          onConfirm={friendConfirm}
-          title="确定删除这个好友嘛？"
-        >
-          <Button danger type="link">删除</Button>
-        </Popconfirm>,
       ],
       view: [
         <Popover
