@@ -2,7 +2,8 @@
  * 好友搜索框/群搜索框
  */
 
-import type { FriendApply, Group, User } from '@prisma/client'
+import type { UserVo } from '@/types/views'
+import type { FriendApply, Group, GroupRoleType, User, UserGroup } from '@prisma/client'
 
 import { useChatStore } from '@/app/store/chat'
 import { useUserStore } from '@/app/store/user'
@@ -16,15 +17,20 @@ import type { IApplyList } from '../applyList/ApplyList'
 
 import { getRoomId } from '../chat/utils'
 
+type IUser = {
+  owner?: GroupRoleType
+} & Pick<User, 'avatar' | 'birthday' | 'description' | 'gender' | 'id' | 'username'>
+
 interface SearchInputProps {
   id?: string
+  setGroupUserList?: React.Dispatch<React.SetStateAction<IUser[]>>
   setList?: React.Dispatch<React.SetStateAction<IApplyList[]>>
   targetId?: string
   type: 'group' | 'user'
   usedBy: 'add' | 'apply' | 'chat' | 'search'
 }
 
-function SearchInput({ setList, targetId, type, usedBy }: SearchInputProps) {
+function SearchInput({ setGroupUserList, setList, targetId, type, usedBy }: SearchInputProps) {
   const router = useRouter()
   const userStore = useUserStore(state => state.user)
   const setChatId = useChatStore(state => state.setChatId)
@@ -158,6 +164,14 @@ function SearchInput({ setList, targetId, type, usedBy }: SearchInputProps) {
           method: 'POST',
         })
         message.success('添加成功')
+        request<({ user: UserVo } & UserGroup)[]>(`/api/groups/${targetId}/members`).then((res) => {
+          res && setGroupUserList && setGroupUserList(res.map((item) => {
+            return {
+              ...item.user,
+              owner: item.groupRole,
+            }
+          }))
+        })
       }, // 添加好友进入群组
       'apply-group': () => { }, // 申请加入群组
       'apply-user': async () => {

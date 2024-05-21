@@ -134,6 +134,7 @@ export default function FriendList() {
           }}
         >
           <SearchInput
+            setGroupUserList={setGroupUserList}
             targetId={chosedItemInfo?.id}
             type="user"
             usedBy="add"
@@ -255,6 +256,7 @@ export default function FriendList() {
       <div
         className="friendList-content"
         style={{
+          overflowY: 'scroll',
           padding: 20,
         }}
       >
