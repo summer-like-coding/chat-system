@@ -74,7 +74,9 @@ export async function getContactRecord(id: string, type: string) {
     avatar: null | string
     name?: null | string
     nickname?: null | string
-  } = null
+  } = {
+    avatar: null,
+  }
   if (type === 'GROUP') {
     res = await getGroupInfo(id) as GroupVo
   }

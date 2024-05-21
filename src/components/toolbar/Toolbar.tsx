@@ -163,8 +163,6 @@ function ToolBar() {
                 dataSource={applyList}
                 itemLayout="horizontal"
                 renderItem={(item, index) => {
-                  console.log('item:', item, 'addFriendKey:', addFriendKey)
-
                   const content = addFriendKey === 'applyUser'
                     ? (
                       <List.Item>
