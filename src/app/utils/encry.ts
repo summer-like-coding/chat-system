@@ -12,8 +12,8 @@ import util from 'tweetnacl-util'
 **
 */
 
-const keypair = nacl.box.keyPair()
-export const receiverPublicKey = util.encodeBase64(keypair.publicKey) // 公钥
+const keypair = nacl.box.keyPair() // 生成密钥对
+export const receiverPublicKey = util.encodeBase64(keypair.publicKey) // 公钥()
 export const receiverSecretKey = util.encodeBase64(keypair.secretKey) // 私钥
 
 /* encrypted message interface */
@@ -30,9 +30,6 @@ interface IEncryptedMsg {
  * @returns
  */
 export function encrypt(receiverPublicKey: string, msgParams: string) {
-  console.log('receiverPublicKey', receiverPublicKey)
-  console.log('msgParams', msgParams)
-
   const ephemeralKeyPair = nacl.box.keyPair()
   const pubKeyUInt8Array = util.decodeBase64(receiverPublicKey)
   const msgParamsUInt8Array = util.decodeUTF8(msgParams)
@@ -46,10 +43,17 @@ export function encrypt(receiverPublicKey: string, msgParams: string) {
   return {
     ciphertext: util.encodeBase64(encryptedMessage), // 加密后的消息
     ephemPubKey: util.encodeBase64(ephemeralKeyPair.publicKey), // 临时公钥
-    nonce: util.encodeBase64(nonce), // nonce
+    nonce: util.encodeBase64(nonce), // 服务端生成的随机数
     version: 'x25519-xsalsa20-poly1305',
   }
 }
+
+/**
+ *
+ * @param receiverSecretKey 私钥
+ * @param encryptedData
+ * @returns
+ */
 
 export function decrypt(receiverSecretKey: string, encryptedData: IEncryptedMsg) {
   const receiverSecretKeyUint8Array = util.decodeBase64(
@@ -64,5 +68,7 @@ export function decrypt(receiverSecretKey: string, encryptedData: IEncryptedMsg)
     ephemPubKey,
     receiverSecretKeyUint8Array,
   )
+  if (!decryptedMessage)
+    return null
   return util.encodeUTF8(decryptedMessage!)
 }

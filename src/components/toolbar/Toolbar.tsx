@@ -423,6 +423,9 @@ function ToolBar() {
         footer={null}
         onCancel={setModalFalse}
         open={beforeOpen()}
+        style={{
+          top: 20,
+        }}
         title={hoverItemContent[modalType as keyof typeof hoverItemContent].title}
         width={600}
       >
@@ -430,7 +433,6 @@ function ToolBar() {
           modalType === 'logout' ? <div>正在退出中...</div> : hoverItemContent[modalType as keyof typeof hoverItemContent].modalContent
         }
       </Modal>
-      {/* 添加用户相关 */}
       <Modal
         className="userModal-content"
         footer={null}

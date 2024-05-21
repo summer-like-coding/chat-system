@@ -4,6 +4,7 @@ import type { MessageVo, UserVo } from '@/types/views'
 
 import { useChatStore } from '@/app/store/chat'
 import { useUserStore } from '@/app/store/user'
+import { decrypt, encrypt, receiverPublicKey, receiverSecretKey } from '@/app/utils/encry'
 import { request, requestEventStream } from '@/app/utils/request'
 import { emitter } from '@/utils/eventBus'
 import { MessageType } from '@prisma/client'
@@ -42,7 +43,29 @@ export default function Chat({ chatKey, type }: IChat) {
     }, 200)
   }
 
+  function decryptMessage() {
+    const encryptChatList = JSON.parse(JSON.stringify(chatList)) as ChatProps[]
+    if (type === 'normal') {
+      const decryptChatList = encryptChatList.map((item) => {
+        if (item.content.indexOf('{') === 0) {
+          console.log('decrypt', JSON.parse(item.content))
+
+          return {
+            ...item,
+            content: JSON.stringify(decrypt(receiverSecretKey, JSON.parse(item.content))),
+          }
+        }
+        else {
+          return item
+        }
+      })
+      return decryptChatList
+    }
+    return encryptChatList as ChatProps[]
+  }
+
   function getChatList() {
+    const chatLists = decryptMessage()
     return chatList.map((item, index) => {
       return (
         <div
@@ -120,9 +143,13 @@ export default function Chat({ chatKey, type }: IChat) {
         }, onMessage, onEnd)
       },
       normal: async () => {
+        const encryContent = JSON.stringify(encrypt(receiverPublicKey, inputValue))
+        console.log('encryContent', encryContent)
+
         const res = await request<MessageVo>(`/api/rooms/${chatId}/chat`, {}, {
           data: {
-            content: inputValue,
+            // content: inputValue,
+            content: encryContent,
             type: MessageType.TEXT,
           },
           method: 'POST',

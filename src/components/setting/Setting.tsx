@@ -94,7 +94,7 @@ export default function Setting() {
     )
   }
   return (
-    <Layout className="h-max">
+    <Layout className="h-4/5">
       <Content
         style={{
           backgroundColor: '#fff',
