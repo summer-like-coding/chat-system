@@ -5,6 +5,7 @@ import { request } from '@/app/utils/request'
 import { EditOutlined } from '@ant-design/icons'
 import { useToggle } from 'ahooks'
 import { Button, DatePicker, Form, Input, Layout, Select, message } from 'antd'
+import dayjs from 'dayjs'
 import React from 'react'
 
 import UploadImg from '../uploadImg/UploadImg'
@@ -32,7 +33,7 @@ export default function Setting() {
         form={accountFormRef}
         initialValues={{
           ...userStore,
-          birthday: undefined,
+          birthday: userStore?.birthday ? dayjs(userStore.birthday) : undefined,
         }}
         labelCol={{ span: 8 }}
         wrapperCol={{ span: 16 }}
