@@ -39,7 +39,7 @@ function ToolBar() {
   const [transferData, setTransferData] = useState<TransferType[]>([])
   const [selectedKeys, setSelectedKeys] = useState<Key[]>([])
   const [targetKeys, setTargetKeys] = useState<Key[]>([])
-  const [addFriendKey, setAddFriendKey] = useState<Key>('')
+  const [addFriendKey, setAddFriendKey] = useState<Key>('applyUser')
 
   async function handleTabClick(key: string) {
     if (key === 'applyUser' || key === 'appliedUser') {
@@ -119,8 +119,6 @@ function ToolBar() {
     sourceSelectedKeys,
     targetSelectedKeys,
   ) => {
-    console.log('sourceSelectedKeys:', sourceSelectedKeys)
-    console.log('targetSelectedKeys:', targetSelectedKeys)
     setSelectedKeys([...sourceSelectedKeys, ...targetSelectedKeys])
   }
 
@@ -162,12 +160,12 @@ function ToolBar() {
               <List
                 dataSource={applyList}
                 itemLayout="horizontal"
-                renderItem={(item, index) => {
+                renderItem={(item) => {
                   const content = addFriendKey === 'applyUser'
                     ? (
                       <List.Item>
                         <List.Item.Meta
-                          avatar={<Avatar size={48} src={item.targetAvatar || `https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`} />}
+                          avatar={<Avatar size={48} src={item.targetAvatar} />}
                           description={applyStatusMapping[item.status]}
                           title={item.targetName}
                         />
@@ -176,7 +174,7 @@ function ToolBar() {
                     : (
                       <List.Item>
                         <List.Item.Meta
-                          avatar={<Avatar size={48} src={item.launchAvatar || `https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`} />}
+                          avatar={<Avatar size={48} src={item.launchAvatar} />}
                           description={applyStatusMapping[item.status]}
                           title={item.launchName}
                         />
@@ -193,6 +191,7 @@ function ToolBar() {
             children: <div>
               <ApplyList
                 applyList={applyList}
+                setApplyList={setApplyList}
                 type="launch"
               />
             </div>,

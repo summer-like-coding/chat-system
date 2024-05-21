@@ -50,7 +50,6 @@ function SearchInput({ setList, targetId, type, usedBy }: SearchInputProps) {
         return res
       },
       'apply-group': async () => {
-        // 查询所有群组
         const res = await request<Group[]>('/api/groups/search', {}, {
           data: {
             keyword: value,
@@ -127,16 +126,21 @@ function SearchInput({ setList, targetId, type, usedBy }: SearchInputProps) {
         return res
       },
       user: async () => {
-        const res = await request<({ target: User, user: User } & FriendApply)[]>(`/api/users/${userStore!.id}/applies`, {})
+        const res = await request<({ target: User, user: User } & FriendApply)[]>(`/api/users/${userStore!.id}/applies`, {
+          type: 'self',
+        })
         const lists: IApplyList[] = res?.map((item) => {
           return {
+            launchAvatar: item.user.avatar!,
+            launchId: item.user.id,
+            launchName: item.user.nickname || item.user.username,
             status: item.status,
+            targetAvatar: item.target.avatar!,
             targetId: item.id,
-            targetName: item.user.nickname || item.user.username,
+            targetName: item.target.nickname || item.target.username,
           }
         }) || []
         setList && setList(lists)
-        return res
       },
     }
     queryAppliesMap[type]()
@@ -157,7 +161,7 @@ function SearchInput({ setList, targetId, type, usedBy }: SearchInputProps) {
       }, // 添加好友进入群组
       'apply-group': () => { }, // 申请加入群组
       'apply-user': async () => {
-        const res = await request('/api/applies/friends/apply', {}, {
+        await request('/api/applies/friends/apply', {}, {
           data: {
             targetId: value,
             userId: userStore!.id,
@@ -166,20 +170,15 @@ function SearchInput({ setList, targetId, type, usedBy }: SearchInputProps) {
         })
         message.success('申请成功')
         queryApplies()
-        return res
       }, // 申请加好友
       'chat-group': async () => {
-        // setTargetId(value)
         const { roomId } = await getRoomId(value, 'group')
         setChatId(roomId)
-        // setChatType(roomType)
         router.push(`/chat?roomId=${roomId}`)
       }, // 聊天
       'chat-user': async () => {
-        // setTargetId(value)
         const { roomId } = await getRoomId(value, 'people')
         setChatId(roomId)
-        // setChatType(roomType)
         router.push(`/chat?roomId=${roomId}`)
       }, // 聊天
       'search-group': () => { }, // 查看群组信息

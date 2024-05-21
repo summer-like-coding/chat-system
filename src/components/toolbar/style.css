@@ -8,5 +8,10 @@
 .userModal-content{
   .ant-modal-content{
     height: 480px;
+
+  }
+  .ant-list{
+    height: 300px;
+    overflow-y: auto;
   }
 }

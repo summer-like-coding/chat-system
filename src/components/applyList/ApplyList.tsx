@@ -1,5 +1,6 @@
-import type { ApplyStatusType } from '@prisma/client'
+import type { ApplyStatusType, FriendApply, User } from '@prisma/client'
 
+import { useUserStore } from '@/app/store/user'
 import { request } from '@/app/utils/request'
 import { Avatar, Button, List, message } from 'antd'
 import React from 'react'
@@ -17,10 +18,12 @@ export interface IApplyList {
 
 interface IApplyListProps {
   applyList: IApplyList[]
+  setApplyList: React.Dispatch<React.SetStateAction<IApplyList[]>>
   type: 'launch' | 'target'
 }
 
-function ApplyList({ applyList, type }: IApplyListProps) {
+function ApplyList({ applyList, setApplyList, type }: IApplyListProps) {
+  const userStore = useUserStore(state => state.user)
   async function handleAudit(type: 'accept' | 'reject', targetId: string) {
     await request(`/api/applies/friends/${targetId}/audit`, {}, {
       data: {
@@ -29,6 +32,21 @@ function ApplyList({ applyList, type }: IApplyListProps) {
       method: 'POST',
     })
     message.success('操作成功')
+    const res = await request<({ target: User, user: User } & FriendApply)[]>(`/api/users/${userStore!.id}/applies`, {
+      type: 'target',
+    })
+    const lists: IApplyList[] = res?.map((item) => {
+      return {
+        launchAvatar: item.user.avatar!,
+        launchId: item.user.id,
+        launchName: item.user.nickname || item.user.username,
+        status: item.status,
+        targetAvatar: item.target.avatar!,
+        targetId: item.id,
+        targetName: item.target.nickname || item.target.username,
+      }
+    }) || []
+    setApplyList && setApplyList(lists)
   }
 
   function handleListAction(item: IApplyList) {
