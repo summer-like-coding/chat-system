@@ -92,7 +92,7 @@ export async function POST(request: NextRequest, { params }: PathIdParams) {
       }
     }
     const message = await messageService.createMessage({
-      content: JSON.parse(JSON.parse(content).content),
+      content: room.type === 'GROUP' ? content : JSON.parse(JSON.parse(content).content),
       roomId: room.id,
       type,
       userId,

@@ -21,6 +21,7 @@ function ChatLayout({ children }: React.PropsWithChildren) {
     icon: React.ReactNode
     key: string
     label: string
+    type: string
   }[]>()
 
   useEffect(() => {
@@ -41,6 +42,10 @@ function ChatLayout({ children }: React.PropsWithChildren) {
     })
   }, [userStore])
 
+  function getChatType(key: string) {
+    return (contactList?.find(item => item.key === key)?.type)?.toLocaleLowerCase()
+  }
+
   return (
     <>
       <Sider
@@ -59,8 +64,9 @@ function ChatLayout({ children }: React.PropsWithChildren) {
           items={contactList}
           mode="inline"
           onSelect={({ key }) => {
+            const type = getChatType(key)
             setChatId(key)
-            router.push(`/chat?roomId=${key}`)
+            router.push(`/chat?roomId=${key}&type=${type}`)
           }}
           style={{
             backgroundColor: '#f5f5f5',

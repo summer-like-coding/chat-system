@@ -26,7 +26,7 @@ interface ChatProps {
 
 interface IChat {
   chatKey: string
-  type: 'bot' | 'normal'
+  type: 'bot' | 'group' | 'people'
 }
 
 export default function Chat({ chatKey, type }: IChat) {
@@ -52,7 +52,7 @@ export default function Chat({ chatKey, type }: IChat) {
    * @description 解密消息：用私钥解密消息
    */
   function decryptMessage(messageList: ChatProps[]) {
-    if (type === 'normal') {
+    if (type === 'people') {
       const decryptChatList = messageList.map((item) => {
         if (item.content.indexOf('{') === 0 && item.content.indexOf('}') === item.content.length - 1) {
           return {
@@ -105,7 +105,7 @@ export default function Chat({ chatKey, type }: IChat) {
    * @param message
    * @returns {ChatProps[]}
    */
-  function formatMessage(message: ({ user: UserVo } & MessageVo)[]) {
+  function formatMessage(message: ({ user: UserVo } & MessageVo)[]): ChatProps[] {
     if (!userStore) {
       return []
     }
@@ -155,15 +155,26 @@ export default function Chat({ chatKey, type }: IChat) {
           prompt: inputValue,
         }, onMessage, onEnd)
       },
-      normal: async () => {
-        // TODOS: 加密
-        // 公钥是接收者的公钥
-        const encryContent = JSON.stringify(encrypt(receiverPublicKey, inputValue))
-        console.log('encryContent', encryContent)
-
+      group: async () => {
         const res = await request<MessageVo>(`/api/rooms/${chatId}/chat`, {}, {
           data: {
-            // content: inputValue,
+            content: inputValue,
+            type: MessageType.TEXT,
+          },
+          method: 'POST',
+        })
+        chatList.push({
+          avatar: userStore.avatar || '',
+          content: res!.content,
+          id: res!.id,
+          isMine: true,
+        } as ChatProps)
+        hasLoadedMessage.current.add(res!.id)
+      },
+      people: async () => {
+        const encryContent = JSON.stringify(encrypt(receiverPublicKey, inputValue))
+        const res = await request<MessageVo>(`/api/rooms/${chatId}/chat`, {}, {
+          data: {
             content: encryContent,
             type: MessageType.TEXT,
           },
