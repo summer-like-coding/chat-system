@@ -66,11 +66,11 @@ export async function getFriendInfo(id: string, userID: string) {
   // 获取对方信息
   const user1ID = roomInfo?.friendRoom.user1Id
   const user2ID = roomInfo?.friendRoom.user2Id
-  if (user1ID === userID) {
-    return await getUserInfo(user1ID)
+  if (user1ID === userID) { // 说明当前用户是
+    return await getUserInfo(user2ID)
   }
   else {
-    return await getUserInfo(user2ID)
+    return await getUserInfo(user1ID)
   }
 }
 

@@ -15,6 +15,8 @@ import { userVo } from './_mapper'
 export interface RegisterUserType {
   email?: string
   password: string
+  privateKey: string
+  publicKey: string
   username: string
 }
 
@@ -88,7 +90,7 @@ export class UserService extends AbstractService<User> {
    * @returns 注册信息
    */
   async registerUser(data: RegisterUserType): Promise<User> {
-    const { email, password, username } = data
+    const { email, password, privateKey, publicKey, username } = data
     const user = await transaction(async (ctx) => {
       const user = await ctx.user.findFirst({
         where: {
@@ -104,6 +106,8 @@ export class UserService extends AbstractService<User> {
         data: {
           email,
           password: hashedPassword,
+          privateKey,
+          publicKey,
           username,
         },
       })

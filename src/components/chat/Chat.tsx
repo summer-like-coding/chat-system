@@ -22,6 +22,7 @@ interface ChatProps {
   content: string
   id: string
   isMine: boolean
+  privateKey?: string
   publicKey: string
 }
 
@@ -39,9 +40,9 @@ export default function Chat({ chatKey, type }: IChat) {
   const hasLoadedMessage = useRef<Set<string>>(new Set())
   const { TextArea } = Input
   const chatBodyRef = useRef<HTMLDivElement>(null)
-  const privateKey = useKeysStore(state => state.privateKey)
+  const privateKey = useKeysStore(state => state.privateKey) // 当前用户的私钥
   const [receiverPublicKey, setReceiverPublicKey] = useState('')
-
+  const receiverPrivateKey = useReactive({ value: '' })
   function scrollToBottom() {
     setTimeout(() => {
       chatBodyRef.current?.scrollTo(0, chatBodyRef.current.scrollHeight)
@@ -58,7 +59,7 @@ export default function Chat({ chatKey, type }: IChat) {
         if (item.content.indexOf('{') === 0 && item.content.indexOf('}') === item.content.length - 1) {
           return {
             ...item,
-            content: JSON.stringify(decrypt(privateKey, JSON.parse(item.content))),
+            content: decrypt(receiverPrivateKey.value, JSON.parse(item.content), privateKey) || '解密失败',
           }
         }
         else {
@@ -171,7 +172,7 @@ export default function Chat({ chatKey, type }: IChat) {
         })
         chatList.push({
           avatar: userStore.avatar || '',
-          content: res!.content,
+          content: inputValue,
           id: res!.id,
           isMine: true,
         } as ChatProps)
@@ -224,12 +225,17 @@ export default function Chat({ chatKey, type }: IChat) {
    * 初始化设置聊天用户的公钥
    */
   async function initReceiverPublicKey() {
-    type === 'friend' && getFriendInfo(chatKey, userStore.id).then((res) => {
-      if (res?.publicKey) {
+    if (type === 'friend') {
+      const res = await getFriendInfo(chatKey, userStore.id)
+      if (res?.publicKey && res?.privateKey) {
         setReceiverPublicKey(res.publicKey)
+        receiverPrivateKey.value = res.privateKey
       }
-    })
-    pullMessage(chatKey)
+      await pullMessage(chatKey)
+    }
+    else {
+      await pullMessage(chatKey)
+    }
   }
 
   useEffect(() => {

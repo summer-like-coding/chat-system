@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 'use client'
 import type { User } from '@prisma/client'
 
@@ -12,16 +13,15 @@ import { signIn } from 'next-auth/react'
 import React from 'react'
 
 export default function LoginPassword() {
+  const setUser = useUserStore(state => state.setUser)
+  const setPrivateKey = useKeysStore(state => state.setPrivateKey)
+  const setPublicKey = useKeysStore(state => state.setPublicKey)
   const [toggle, setToggle] = useToggle()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl')
   const [loginFormRef] = Form.useForm()
   const [registerFormRef] = Form.useForm()
   const router = useRouter()
-  const setUser = useUserStore(state => state.setUser)
-  const setPrivateKey = useKeysStore(state => state.setPrivateKey)
-  const setPublicKey = useKeysStore(state => state.setPublicKey)
-
   async function login() {
     await loginFormRef.validateFields()
     const password = loginFormRef.getFieldValue('loginPassword') || ''
@@ -35,12 +35,6 @@ export default function LoginPassword() {
       message.error('登录失败！用户名或密码错误')
       return
     }
-    router.push(callbackUrl || '/')
-    message.success('登录成功')
-    // login成功以后，设置个人的公钥和私钥
-    const { ownPublicKey, ownSecretKey } = genderKeyPair()
-    setPrivateKey(ownSecretKey)
-    setPublicKey(ownPublicKey)
     const res = await request<User>('/api/users/getByUsername', {}, {
       data: {
         username,
@@ -48,28 +42,24 @@ export default function LoginPassword() {
       method: 'POST',
     })
     if (res) {
-      // 调用接口，将公钥存储到数据库
-      // TODO: 保存公钥到数据库
-      await request<User>(`/api/users/${res.id}/update`, {}, {
-        data: {
-          publicKey: ownPublicKey,
-        },
-        method: 'POST',
-      }).then(() => {
-        setUser({
-          ...res,
-          publicKey: ownPublicKey,
-        })
-      })
+      setUser(res)
     }
+    router.push(callbackUrl || '/')
+    message.success('登录成功')
   }
 
   async function register() {
     await registerFormRef.validateFields()
+    const { ownPublicKey, ownSecretKey } = genderKeyPair()
+    console.log('用户的', registerFormRef.getFieldValue('registerUserName') || '', '公钥', ownPublicKey, '私钥', ownSecretKey)
+    setPrivateKey(ownSecretKey)
+    setPublicKey(ownPublicKey)
     const res = await request<User>('/api/users/register', {}, {
       data: {
         email: registerFormRef.getFieldValue('registerEmail') || '',
         password: registerFormRef.getFieldValue('registerPassword') || '',
+        privateKey: ownSecretKey,
+        publicKey: ownPublicKey,
         username: registerFormRef.getFieldValue('registerUserName') || '',
       },
       method: 'POST',

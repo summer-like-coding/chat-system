@@ -34,6 +34,7 @@ model User {
   gender      String?
   status      UserStatusType @default(ACTIVE)
   publicKey   String?
+  privateKey  String?
   isDeleted   Boolean        @default(false) @map("is_deleted")
   createdAt   DateTime       @default(now()) @map("created_at")
   updatedAt   DateTime       @default(now()) @updatedAt @map("updated_at")

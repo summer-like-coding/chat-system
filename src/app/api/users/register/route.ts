@@ -2,6 +2,7 @@ import type { NextRequest } from 'next/server'
 
 import { userService } from '@/services/user'
 import { Result } from '@/utils/result'
+import { message } from 'antd'
 
 /**
  * 注册新用户
@@ -29,7 +30,11 @@ import { Result } from '@/utils/result'
  */
 export async function POST(request: NextRequest) {
   try {
-    const { email, password, username } = await request.json()
+    const { email, password, privateKey, publicKey, username } = await request.json()
+    if (!publicKey) {
+      message.error('密钥生成失败，请刷新页面重试')
+      return Result.error('密钥生成失败，请刷新页面重试')
+    }
     if (!username || !password || !email) {
       return Result.error('用户名、密码和邮箱不能为空')
     }
@@ -52,6 +57,8 @@ export async function POST(request: NextRequest) {
     const user = await userService.registerUser({
       email,
       password,
+      privateKey,
+      publicKey,
       username,
     })
     return Result.success(userService.asVo(user))
