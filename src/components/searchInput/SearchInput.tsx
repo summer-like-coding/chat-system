@@ -193,7 +193,7 @@ function SearchInput({ setGroupUserList, setList, targetId, type, usedBy }: Sear
       'chat-user': async () => {
         const { roomId } = await getRoomId(value, 'people')
         setChatId(roomId)
-        router.push(`/chat?roomId=${roomId}&type=people`)
+        router.push(`/chat?roomId=${roomId}&type=friend`)
       }, // 聊天
       'search-group': () => { }, // 查看群组信息
       'search-user': () => { }, // 查看好友信息

@@ -32,7 +32,11 @@ export async function request<T = unknown>(url: string, params?: Record<string, 
     },
     mode: 'cors',
   })
+  console.log('response', response)
+
   const res: ResultType<T> = await response.json()
+  console.log('res', res)
+
   if (response.ok && res.code === 0) {
     return res.data ?? null
   }

@@ -10,11 +10,12 @@ import { request, requestEventStream } from '@/app/utils/request'
 import { emitter } from '@/utils/eventBus'
 import { MessageType } from '@prisma/client'
 import { useReactive } from 'ahooks'
-import { Affix, Avatar, Button, Input } from 'antd'
+import { Affix, Avatar, Button, Input, message } from 'antd'
 import React, { useEffect, useRef, useState } from 'react'
 import Markdown from 'react-markdown'
 
 import './style.css'
+import { getFriendInfo, getUserInfo } from './utils'
 
 interface ChatProps {
   avatar: string
@@ -26,7 +27,7 @@ interface ChatProps {
 
 interface IChat {
   chatKey: string
-  type: 'bot' | 'group' | 'people'
+  type: 'bot' | 'friend' | 'group'
 }
 
 export default function Chat({ chatKey, type }: IChat) {
@@ -52,7 +53,7 @@ export default function Chat({ chatKey, type }: IChat) {
    * @description 解密消息：用私钥解密消息
    */
   function decryptMessage(messageList: ChatProps[]) {
-    if (type === 'people') {
+    if (type === 'friend') {
       const decryptChatList = messageList.map((item) => {
         if (item.content.indexOf('{') === 0 && item.content.indexOf('}') === item.content.length - 1) {
           return {
@@ -155,10 +156,15 @@ export default function Chat({ chatKey, type }: IChat) {
           prompt: inputValue,
         }, onMessage, onEnd)
       },
-      group: async () => {
+      friend: async () => {
+        if (!receiverPublicKey) {
+          message.error('对方未设置公钥，无法加密,无法交流！')
+          return null
+        }
+        const encryContent = encrypt(receiverPublicKey, inputValue)
         const res = await request<MessageVo>(`/api/rooms/${chatId}/chat`, {}, {
           data: {
-            content: inputValue,
+            content: encryContent,
             type: MessageType.TEXT,
           },
           method: 'POST',
@@ -171,11 +177,10 @@ export default function Chat({ chatKey, type }: IChat) {
         } as ChatProps)
         hasLoadedMessage.current.add(res!.id)
       },
-      people: async () => {
-        const encryContent = JSON.stringify(encrypt(receiverPublicKey, inputValue))
+      group: async () => {
         const res = await request<MessageVo>(`/api/rooms/${chatId}/chat`, {}, {
           data: {
-            content: encryContent,
+            content: inputValue,
             type: MessageType.TEXT,
           },
           method: 'POST',
@@ -216,20 +221,16 @@ export default function Chat({ chatKey, type }: IChat) {
   }
 
   /**
-   * 查询用户信息
-   */
-  async function queryUserInfo(id: string) {
-    const res = await request<UserVo>(`/api/users/${id}`)
-    if (res?.publicKey) {
-      setReceiverPublicKey(res.publicKey)
-    }
-    return res
-  }
-
-  /**
    * 初始化设置聊天用户的公钥
    */
-  function initReceiverPublicKey() {}
+  async function initReceiverPublicKey() {
+    type === 'friend' && getFriendInfo(chatKey, userStore.id).then((res) => {
+      if (res?.publicKey) {
+        setReceiverPublicKey(res.publicKey)
+      }
+    })
+    pullMessage(chatKey)
+  }
 
   useEffect(() => {
     chatList.length = 0
@@ -243,7 +244,7 @@ export default function Chat({ chatKey, type }: IChat) {
     if (!userStore)
       return
     if (chatKey) {
-      pullMessage(chatKey)
+      initReceiverPublicKey()
     }
     return () => {
       chatList.length = 0
@@ -256,7 +257,7 @@ export default function Chat({ chatKey, type }: IChat) {
   useEffect(() => {
     async function callback(data: MessageVo) {
       if (data.roomId === chatId) {
-        const targetUser = await queryUserInfo(data.userId)
+        const targetUser = await getUserInfo(data.userId)
         if (!hasLoadedMessage.current.has(data.id)) {
           chatList.push({
             avatar: targetUser?.avatar || '',

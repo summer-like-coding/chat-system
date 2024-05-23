@@ -41,6 +41,8 @@ import { getToken } from 'next-auth/jwt'
  *         description: '`ResultType<MessageVo>` 消息'
  */
 export async function POST(request: NextRequest, { params }: PathIdParams) {
+  console.log("request", request,"params", params);
+
   try {
     const session = await getServerSession(authOptions)
     if (!session) {
@@ -51,13 +53,15 @@ export async function POST(request: NextRequest, { params }: PathIdParams) {
     if (!userId) {
       return Result.error('未登录')
     }
-
     const { id: roomId } = params
     const room = await roomService.getById(roomId, { isDeleted: false })
     if (!room) {
       return Result.error('未找到房间')
     }
+
     const { content, type } = await request.json()
+    console.log('content', content)
+
     if (!type || ![
       MessageType.FILE,
       MessageType.IMAGE,
@@ -65,7 +69,8 @@ export async function POST(request: NextRequest, { params }: PathIdParams) {
     ].includes(type)) {
       return Result.error('消息类型错误')
     }
-    if (!content || !(typeof content === 'string')) {
+
+    if (!content) {
       return Result.error('消息内容不能为空')
     }
 
@@ -91,12 +96,16 @@ export async function POST(request: NextRequest, { params }: PathIdParams) {
         return Result.error('无权限在此房间发送消息')
       }
     }
+    console.log('content', content)
+
     const message = await messageService.createMessage({
       content: room.type === 'GROUP' ? content : JSON.parse(JSON.parse(content).content),
       roomId: room.id,
       type,
       userId,
     })
+    console.log('message', message)
+
     await rabbitPublisher.send('im-events', message)
     return Result.success(messageService.asVo(message))
   }

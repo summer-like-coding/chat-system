@@ -2,7 +2,6 @@
  * 加密和解密
  * @description 使用TweetNaCl.js库进行加密和解密
  */
-import { message } from 'antd'
 import nacl from 'tweetnacl'
 import util from 'tweetnacl-util'
 
@@ -35,10 +34,6 @@ interface IEncryptedMsg {
  * @returns
  */
 export function encrypt(receiverPublicKey: string, msgParams: string) {
-  if (!receiverPublicKey) {
-    message.error('对方未设置公钥，无法加密,无法交流！')
-    return null
-  }
   const ephemeralKeyPair = nacl.box.keyPair()
   const pubKeyUInt8Array = util.decodeBase64(receiverPublicKey)
   const msgParamsUInt8Array = util.decodeUTF8(msgParams)

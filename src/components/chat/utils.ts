@@ -49,7 +49,29 @@ export async function getRoomId(key: string, type: string) {
  * @description 获取聊天室信息
  */
 export async function getRoomInfo({ room }: { room: RoomVo }) {
-  return await request(`/api/rooms/${room.id}`, {})
+  return await request<{
+    contact: UserContact
+    friendRoom: UserFriend
+    groupRoom: GroupVo
+    room: RoomVo
+  }>(`/api/rooms/${room.id}`, {})
+}
+
+/**
+ * @description 获取单聊对方信息
+ */
+export async function getFriendInfo(id: string, userID: string) {
+  // 首先获取聊天室信息
+  const roomInfo = await getRoomInfo({ room: { id } as RoomVo })
+  // 获取对方信息
+  const user1ID = roomInfo?.friendRoom.user1Id
+  const user2ID = roomInfo?.friendRoom.user2Id
+  if (user1ID === userID) {
+    return await getUserInfo(user1ID)
+  }
+  else {
+    return await getUserInfo(user2ID)
+  }
 }
 
 /**
