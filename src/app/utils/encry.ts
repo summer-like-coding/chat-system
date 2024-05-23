@@ -2,19 +2,24 @@
  * 加密和解密
  * @description 使用TweetNaCl.js库进行加密和解密
  */
+import { message } from 'antd'
 import nacl from 'tweetnacl'
 import util from 'tweetnacl-util'
-/*
-** You'll need to generate a key pair for your users e.g.
-** const keypair = nacl.box.keyPair()
-** const receiverPublicKey = util.encodeBase64(keypair.publicKey)
-** const receiverSecretKey = util.encodeBase64(keypair.secretKey)
-**
-*/
 
-const keypair = nacl.box.keyPair() // 生成密钥对
-export const receiverPublicKey = util.encodeBase64(keypair.publicKey) // 公钥()
-export const receiverSecretKey = util.encodeBase64(keypair.secretKey) // 私钥
+// const keypair = nacl.box.keyPair() // 生成密钥对
+// export const receiverPublicKey = util.encodeBase64(keypair.publicKey) // 公钥()
+// export const receiverSecretKey = util.encodeBase64(keypair.secretKey) // 私钥
+
+/**
+ * 生成密钥对
+ */
+export function genderKeyPair() {
+  const keypair = nacl.box.keyPair() // 生成密钥对
+  return {
+    ownPublicKey: util.encodeBase64(keypair.publicKey), // 公钥()
+    ownSecretKey: util.encodeBase64(keypair.secretKey), // 私钥
+  }
+}
 
 /* encrypted message interface */
 interface IEncryptedMsg {
@@ -30,6 +35,10 @@ interface IEncryptedMsg {
  * @returns
  */
 export function encrypt(receiverPublicKey: string, msgParams: string) {
+  if (!receiverPublicKey) {
+    message.error('对方未设置公钥，无法加密,无法交流！')
+    return null
+  }
   const ephemeralKeyPair = nacl.box.keyPair()
   const pubKeyUInt8Array = util.decodeBase64(receiverPublicKey)
   const msgParamsUInt8Array = util.decodeUTF8(msgParams)

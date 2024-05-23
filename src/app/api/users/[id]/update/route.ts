@@ -57,7 +57,7 @@ export async function POST(request: NextRequest, { params }: PathIdParams) {
     if (token?.sub !== params.id) {
       return Result.error('无权限查询用户信息')
     }
-    const { avatar, birthday, description, email, gender, nickname, phone } = await request.json()
+    const { avatar, birthday, description, email, gender, nickname, phone, publicKey } = await request.json()
     const res = await userService.updateById(params.id, {
       avatar,
       birthday: birthday ? new Date(birthday) : undefined,
@@ -66,6 +66,7 @@ export async function POST(request: NextRequest, { params }: PathIdParams) {
       gender,
       nickname,
       phone,
+      publicKey,
     })
     return Result.success(userService.asVo(res))
   }

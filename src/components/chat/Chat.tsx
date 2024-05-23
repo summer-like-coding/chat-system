@@ -3,8 +3,9 @@
 import type { MessageVo, UserVo } from '@/types/views'
 
 import { useChatStore } from '@/app/store/chat'
+import { useKeysStore } from '@/app/store/keys'
 import { useUserStore } from '@/app/store/user'
-import { decrypt, encrypt, receiverPublicKey, receiverSecretKey } from '@/app/utils/encry'
+import { decrypt, encrypt } from '@/app/utils/encry'
 import { request, requestEventStream } from '@/app/utils/request'
 import { emitter } from '@/utils/eventBus'
 import { MessageType } from '@prisma/client'
@@ -20,6 +21,7 @@ interface ChatProps {
   content: string
   id: string
   isMine: boolean
+  publicKey: string
 }
 
 interface IChat {
@@ -36,6 +38,8 @@ export default function Chat({ chatKey, type }: IChat) {
   const hasLoadedMessage = useRef<Set<string>>(new Set())
   const { TextArea } = Input
   const chatBodyRef = useRef<HTMLDivElement>(null)
+  const privateKey = useKeysStore(state => state.privateKey)
+  const [receiverPublicKey, setReceiverPublicKey] = useState('')
 
   function scrollToBottom() {
     setTimeout(() => {
@@ -43,16 +47,17 @@ export default function Chat({ chatKey, type }: IChat) {
     }, 200)
   }
 
-  function decryptMessage() {
-    const encryptChatList = JSON.parse(JSON.stringify(chatList)) as ChatProps[]
+  /**
+   * 解密消息
+   * @description 解密消息：用私钥解密消息
+   */
+  function decryptMessage(messageList: ChatProps[]) {
     if (type === 'normal') {
-      const decryptChatList = encryptChatList.map((item) => {
-        if (item.content.indexOf('{') === 0) {
-          console.log('decrypt', JSON.parse(item.content))
-
+      const decryptChatList = messageList.map((item) => {
+        if (item.content.indexOf('{') === 0 && item.content.indexOf('}') === item.content.length - 1) {
           return {
             ...item,
-            content: JSON.stringify(decrypt(receiverSecretKey, JSON.parse(item.content))),
+            content: JSON.stringify(decrypt(privateKey, JSON.parse(item.content))),
           }
         }
         else {
@@ -61,11 +66,10 @@ export default function Chat({ chatKey, type }: IChat) {
       })
       return decryptChatList
     }
-    return encryptChatList as ChatProps[]
+    return messageList
   }
 
   function getChatList() {
-    const chatLists = decryptMessage()
     return chatList.map((item, index) => {
       return (
         <div
@@ -96,18 +100,25 @@ export default function Chat({ chatKey, type }: IChat) {
     })
   }
 
+  /**
+   * @description 格式化消息
+   * @param message
+   * @returns {ChatProps[]}
+   */
   function formatMessage(message: ({ user: UserVo } & MessageVo)[]) {
     if (!userStore) {
       return []
     }
-    return message.map((item) => {
+    const formatMessageList = message.map((item) => {
       return {
         avatar: item.user.avatar || '',
         content: item.content,
         id: item.id,
         isMine: item.userId === userStore.id,
+        publicKey: item.user.publicKey || '',
       }
     })
+    return decryptMessage(formatMessageList)
   }
 
   function onMessage(data: string) {
@@ -129,11 +140,13 @@ export default function Chat({ chatKey, type }: IChat) {
           content: inputValue,
           id: `${chatList.length + 1}`,
           isMine: true,
+          publicKey: '',
         }, {
           avatar: 'https://api.dicebear.com/7.x/miniavs/svg?seed=2',
           content: replay.value,
           id: `${chatList.length + 2}`,
           isMine: false,
+          publicKey: '',
         })
         hasLoadedMessage.current.add(chatList[chatList.length - 1].id)
         hasLoadedMessage.current.add(chatList[chatList.length - 2].id)
@@ -143,6 +156,8 @@ export default function Chat({ chatKey, type }: IChat) {
         }, onMessage, onEnd)
       },
       normal: async () => {
+        // TODOS: 加密
+        // 公钥是接收者的公钥
         const encryContent = JSON.stringify(encrypt(receiverPublicKey, inputValue))
         console.log('encryContent', encryContent)
 
@@ -167,13 +182,13 @@ export default function Chat({ chatKey, type }: IChat) {
     setInputValue('')
     scrollToBottom()
   }
+
   /**
    * 拉取聊天记录
    * @description 只有在初始化的时候和上划的时候才会拉取聊天记录
    * @param roomId
    */
   async function pullMessage(roomId?: string) {
-    // 拉取聊天记录
     const res = await request<({ user: UserVo } & MessageVo)[]>(`/api/rooms/${roomId || chatId}/pull`, {}, {
       data: {
         time: new Date().getTime(),
@@ -194,8 +209,16 @@ export default function Chat({ chatKey, type }: IChat) {
    */
   async function queryUserInfo(id: string) {
     const res = await request<UserVo>(`/api/users/${id}`)
+    if (res?.publicKey) {
+      setReceiverPublicKey(res.publicKey)
+    }
     return res
   }
+
+  /**
+   * 初始化设置聊天用户的公钥
+   */
+  function initReceiverPublicKey() {}
 
   useEffect(() => {
     chatList.length = 0
@@ -229,6 +252,7 @@ export default function Chat({ chatKey, type }: IChat) {
             content: data.content,
             id: data.id,
             isMine: data.userId === userStore.id,
+            publicKey: targetUser?.publicKey || '',
           })
           hasLoadedMessage.current.add(data.id)
           scrollToBottom()

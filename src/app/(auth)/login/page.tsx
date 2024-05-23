@@ -1,7 +1,9 @@
 'use client'
 import type { User } from '@prisma/client'
 
+import { useKeysStore } from '@/app/store/keys'
 import { useUserStore } from '@/app/store/user'
+import { genderKeyPair } from '@/app/utils/encry'
 import { request } from '@/app/utils/request'
 import { useToggle } from 'ahooks'
 import { Button, Form, Input, message } from 'antd'
@@ -17,6 +19,8 @@ export default function LoginPassword() {
   const [registerFormRef] = Form.useForm()
   const router = useRouter()
   const setUser = useUserStore(state => state.setUser)
+  const setPrivateKey = useKeysStore(state => state.setPrivateKey)
+  const setPublicKey = useKeysStore(state => state.setPublicKey)
 
   async function login() {
     await loginFormRef.validateFields()
@@ -33,14 +37,31 @@ export default function LoginPassword() {
     }
     router.push(callbackUrl || '/')
     message.success('登录成功')
+    // login成功以后，设置个人的公钥和私钥
+    const { ownPublicKey, ownSecretKey } = genderKeyPair()
+    setPrivateKey(ownSecretKey)
+    setPublicKey(ownPublicKey)
     const res = await request<User>('/api/users/getByUsername', {}, {
       data: {
         username,
       },
       method: 'POST',
     })
-    if (res)
-      setUser(res)
+    if (res) {
+      // 调用接口，将公钥存储到数据库
+      // TODO: 保存公钥到数据库
+      await request<User>(`/api/users/${res.id}/update`, {}, {
+        data: {
+          publicKey: ownPublicKey,
+        },
+        method: 'POST',
+      }).then(() => {
+        setUser({
+          ...res,
+          publicKey: ownPublicKey,
+        })
+      })
+    }
   }
 
   async function register() {
