@@ -12,7 +12,7 @@ import React, { useState } from 'react'
 import UploadImg from '../uploadImg/UploadImg'
 
 export default function Setting() {
-  const [tab, setTab] = useState('tab1')
+  const [tab, setTab] = useState('updateInfo')
   const [accountFormRef] = Form.useForm()
   const [pwdFormRef] = Form.useForm()
   const setUser = useUserStore(state => state.setUser)
@@ -68,6 +68,12 @@ export default function Setting() {
         <Form.Item
           label="更改邮箱"
           name="email"
+          rules={[
+            {
+              message: '请输入正确的邮箱格式',
+              type: 'email',
+            },
+          ]}
         >
           <Input
             className="w-full"
@@ -176,15 +182,6 @@ export default function Setting() {
     )
   }
   return (
-    // <Layout className="h-4/5">
-    //   <Content
-    //     style={{
-    //       backgroundColor: '#fff',
-    //     }}
-    //   >
-    //     {accountItem()}
-    //   </Content>
-    // </Layout>
     <ProCard
       tabs={{
         activeKey: tab,
