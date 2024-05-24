@@ -211,6 +211,10 @@ export default function Chat({ chatKey, type }: IChat) {
       },
       method: 'POST',
     })
+    const secretChangeList = res!.filter(item => item.type === MessageType.SECRETKEY)
+    secretChangeList.forEach((item) => {
+      hasSecretKeyExchange(item)
+    })
     chatList.push(...formatMessage(res!.filter(
       item => !hasLoadedMessage.current.has(item.id) && item.type === MessageType.TEXT,
     )))
@@ -265,7 +269,7 @@ export default function Chat({ chatKey, type }: IChat) {
       const encryContent = encrypt(userPublicKey, tempRoomPublicKey)
       await request<MessageVo>(`/api/rooms/${chatId}/chat`, {}, {
         data: {
-          content: encryContent,
+          content: JSON.stringify(encryContent),
           type: MessageType.SECRETKEY,
         },
         method: 'POST',
