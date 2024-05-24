@@ -21,7 +21,7 @@ export function getParams(request: Request): Record<string, string | undefined> 
  * @param defaultSize 默认每页大小
  * @returns 分页参数
  */
-export function getPageParams(request: Request, defaultPage = 1, defaultSize = 10): PageParamsType {
+export function getPageParams(request: Request, defaultPage = 1, defaultSize = 20): PageParamsType {
   const { page, size } = getParams(request)
   const res = {
     page: page ? Number.parseInt(page) : defaultPage,
