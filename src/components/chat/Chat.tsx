@@ -3,9 +3,8 @@
 import type { MessageVo, UserVo } from '@/types/views'
 
 import { useChatStore } from '@/app/store/chat'
-import { useKeysStore } from '@/app/store/keys'
 import { useUserStore } from '@/app/store/user'
-import { decrypt, encrypt } from '@/app/utils/encry'
+import { decrypt, decryptAES, encrypt, encryptAES, randomAESKey } from '@/app/utils/encry'
 import { request, requestEventStream } from '@/app/utils/request'
 import { emitter } from '@/utils/eventBus'
 import { MessageType } from '@prisma/client'
@@ -15,7 +14,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import Markdown from 'react-markdown'
 
 import './style.css'
-import { getFriendInfo, getUserInfo } from './utils'
+import { getFriendInfo, getSymmetricKey, getUserInfo } from './utils'
 
 interface ChatProps {
   avatar: string
@@ -40,9 +39,7 @@ export default function Chat({ chatKey, type }: IChat) {
   const hasLoadedMessage = useRef<Set<string>>(new Set())
   const { TextArea } = Input
   const chatBodyRef = useRef<HTMLDivElement>(null)
-  const privateKey = useKeysStore(state => state.privateKey) // 当前用户的私钥
-  const [receiverPublicKey, setReceiverPublicKey] = useState('')
-  const receiverPrivateKey = useReactive({ value: '' })
+  const roomsPublicKey = useReactive({ value: '' })
   function scrollToBottom() {
     setTimeout(() => {
       chatBodyRef.current?.scrollTo(0, chatBodyRef.current.scrollHeight)
@@ -56,10 +53,10 @@ export default function Chat({ chatKey, type }: IChat) {
   function decryptMessage(messageList: ChatProps[]) {
     if (type === 'friend') {
       const decryptChatList = messageList.map((item) => {
-        if (item.content.indexOf('{') === 0 && item.content.indexOf('}') === item.content.length - 1) {
+        if (item.content) {
           return {
             ...item,
-            content: decrypt(receiverPrivateKey.value, JSON.parse(item.content), privateKey) || '解密失败',
+            content: decryptAES(item.content, roomsPublicKey.value) || '解密失败',
           }
         }
         else {
@@ -158,14 +155,16 @@ export default function Chat({ chatKey, type }: IChat) {
         }, onMessage, onEnd)
       },
       friend: async () => {
-        if (!receiverPublicKey) {
-          message.error('对方未设置公钥，无法加密,无法交流！')
+        const localStorageSecret = JSON.parse(localStorage.getItem('roomKeysMap') || '{}')[chatKey]
+        if (!localStorageSecret) {
+          message.error('房间未设置公钥，无法加密,无法交流！')
           return null
         }
-        const encryContent = encrypt(receiverPublicKey, inputValue)
+        const encryContent = encryptAES(inputValue, localStorageSecret)
         const res = await request<MessageVo>(`/api/rooms/${chatId}/chat`, {}, {
           data: {
             content: encryContent,
+            // content: inputValue,
             type: MessageType.TEXT,
           },
           method: 'POST',
@@ -214,7 +213,7 @@ export default function Chat({ chatKey, type }: IChat) {
       method: 'POST',
     })
     chatList.push(...formatMessage(res!.filter(
-      item => !hasLoadedMessage.current.has(item.id),
+      item => !hasLoadedMessage.current.has(item.id) && item.type === MessageType.TEXT,
     )))
     res!.forEach((item) => {
       hasLoadedMessage.current.add(item.id)
@@ -222,19 +221,87 @@ export default function Chat({ chatKey, type }: IChat) {
   }
 
   /**
-   * 初始化设置聊天用户的公钥
+   * 获取对方公钥/获取群组公钥
    */
-  async function initReceiverPublicKey() {
+  async function getReceiverPublicKey() {
+    if (type === 'bot') {
+      return ''
+    }
     if (type === 'friend') {
       const res = await getFriendInfo(chatKey, userStore.id)
-      if (res?.publicKey && res?.privateKey) {
-        setReceiverPublicKey(res.publicKey)
-        receiverPrivateKey.value = res.privateKey
+      if (res?.publicKey) {
+        return res.publicKey
       }
-      await pullMessage(chatKey)
+      return ''
+    }
+    else if (type === 'group') {
+      return ''
     }
     else {
-      await pullMessage(chatKey)
+      return ''
+    }
+  }
+
+  /**
+   * 初始化设置聊天房间公钥
+   */
+  async function initRoomPublicKey() {
+    let userPublicKey = ''
+    if (type === 'bot') {
+      return ''
+    }
+    const roomPublicKey = getSymmetricKey(chatKey) // 获取房间的公钥
+    if (roomPublicKey) {
+      roomsPublicKey.value = roomPublicKey
+    }
+    else {
+      userPublicKey = await getReceiverPublicKey() // 获取对方的公钥
+      if (!userPublicKey) {
+        message.error('对方未设置公钥，无法加密,无法交流！')
+        return null
+      }
+      const tempRoomPublicKey = randomAESKey()
+      localStorage.setItem('roomKeysMap', JSON.stringify({ [chatKey]: tempRoomPublicKey }))
+      roomsPublicKey.value = tempRoomPublicKey
+      const encryContent = encrypt(userPublicKey, tempRoomPublicKey)
+      await request<MessageVo>(`/api/rooms/${chatId}/chat`, {}, {
+        data: {
+          content: encryContent,
+          type: MessageType.SECRETKEY,
+        },
+        method: 'POST',
+      })
+    }
+  }
+
+  /**
+   * @description 判断当前对话是否为密钥交换
+   */
+  function hasSecretKeyExchange(data: MessageVo) {
+    if (data.userId === userStore?.id) {
+      return
+    }
+    const { content, type } = data
+    const keys = JSON.parse(localStorage.getItem('keys') || '{}')
+    if (type === MessageType.SECRETKEY) {
+      const tempSecret = decrypt(keys.state.privateKey, JSON.parse(content))
+      if (!tempSecret) {
+        message.error('解密失败')
+        return
+      }
+      const localStorageSecret = JSON.parse(localStorage.getItem('roomKeysMap') || '{}')[chatKey]
+      if (!localStorageSecret) {
+        localStorage.setItem('roomKeysMap', JSON.stringify({ [chatKey]: tempSecret }))
+        roomsPublicKey.value = tempSecret!
+        return
+      }
+      if (tempSecret! < localStorageSecret) {
+        localStorage.setItem('roomKeysMap', JSON.stringify({ [chatKey]: tempSecret }))
+        roomsPublicKey.value = tempSecret!
+      }
+      else {
+        roomsPublicKey.value = localStorageSecret
+      }
     }
   }
 
@@ -250,7 +317,10 @@ export default function Chat({ chatKey, type }: IChat) {
     if (!userStore)
       return
     if (chatKey) {
-      initReceiverPublicKey()
+      // initReceiverPublicKey()
+      initRoomPublicKey().then(async () => {
+        await pullMessage(chatKey)
+      })
     }
     return () => {
       chatList.length = 0
@@ -262,15 +332,13 @@ export default function Chat({ chatKey, type }: IChat) {
 
   useEffect(() => {
     async function callback(data: MessageVo) {
-      console.log("回调");
-
-      const privateKey = JSON.parse(localStorage.getItem('keys') || '{}').state.privateKey
-      if (data.roomId === chatKey) {
+      hasSecretKeyExchange(data)
+      if (data.roomId === chatKey && data.type === MessageType.TEXT) {
         const targetUser = await getUserInfo(data.userId)
         if (!hasLoadedMessage.current.has(data.id)) {
           chatList.push({
             avatar: targetUser?.avatar || '',
-            content: decrypt(receiverPrivateKey.value, JSON.parse(data.content), privateKey) || '解密失败',
+            content: decryptAES(data.content, roomsPublicKey.value) || '解密失败',
             id: data.id,
             isMine: data.userId === userStore?.id,
             publicKey: targetUser?.publicKey || '',

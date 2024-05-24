@@ -66,7 +66,7 @@ function ChatLayout({ children }: React.PropsWithChildren) {
           onSelect={({ key }) => {
             const type = getChatType(key)
             setChatId(key)
-            router.push(`/chat?roomId=${key}&type=${type}`)
+            router.push(`/chat/${key}?type=${type}`)
           }}
           style={{
             backgroundColor: '#f5f5f5',

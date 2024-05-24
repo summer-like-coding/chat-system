@@ -3,6 +3,7 @@
  * @description 使用TweetNaCl.js库进行加密和解密
  */
 
+import { AES, enc } from 'crypto-js'
 import nacl from 'tweetnacl'
 import util from 'tweetnacl-util'
 
@@ -91,4 +92,32 @@ export function decrypt(
     return null
 
   return util.encodeUTF8(decryptedMessage)
+}
+
+/**
+ * @description 用aes加密消息
+ */
+
+export function encryptAES(data: string, key: string) {
+  return AES.encrypt(data, key).toString()
+}
+
+/**
+ * @description 用aes解密消息
+ */
+export function decryptAES(data: string, key: string) {
+  const bytes = AES.decrypt(data, key)
+  return bytes.toString(enc.Utf8)
+}
+
+/**
+ * @description 生成随机字符串
+ */
+export function randomAESKey() {
+  const typeArray = new Uint8Array(32)
+  window.crypto.getRandomValues(typeArray)
+  // to hex
+  return Array.from(typeArray)
+    .map(byte => (byte & 0xFF).toString(16).padStart(2, '0'))
+    .join('')
 }

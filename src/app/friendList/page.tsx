@@ -146,7 +146,7 @@ export default function FriendList() {
             if (chosedItemInfo) {
               const { roomId } = await getRoomId(chosedItemInfo.id, 'group')
               setChatId(roomId)
-              router.push(`/chat?roomId=${roomId}&type=group`)
+              router.push(`/chat/${roomId}?type=group`)
             }
           }}
           type="primary"
@@ -194,7 +194,7 @@ export default function FriendList() {
             if (chosedItemInfo) {
               const { roomId } = await getRoomId(chosedItemInfo.id, 'people')
               setChatId(roomId)
-              router.push(`/chat?roomId=${roomId}&type=friend`)
+              router.push(`/chat/${roomId}?type=friend`)
             }
           }}
           type="primary"

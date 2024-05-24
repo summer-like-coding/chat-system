@@ -60,6 +60,7 @@ export async function POST(request: NextRequest, { params }: PathIdParams) {
     if (!type || ![
       MessageType.FILE,
       MessageType.IMAGE,
+      MessageType.SECRETKEY,
       MessageType.TEXT,
     ].includes(type)) {
       return Result.error('消息类型错误')
@@ -92,7 +93,7 @@ export async function POST(request: NextRequest, { params }: PathIdParams) {
       }
     }
     const message = await messageService.createMessage({
-      content: room.type === 'GROUP' ? content : JSON.stringify(content),
+      content,
       roomId: room.id,
       type,
       userId,

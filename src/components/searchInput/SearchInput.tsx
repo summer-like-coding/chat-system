@@ -188,12 +188,12 @@ function SearchInput({ setGroupUserList, setList, targetId, type, usedBy }: Sear
       'chat-group': async () => {
         const { roomId } = await getRoomId(value, 'group')
         setChatId(roomId)
-        router.push(`/chat?roomId=${roomId}&type=group`)
+        router.push(`/chat/${roomId}?type=group`)
       }, // 聊天
       'chat-user': async () => {
         const { roomId } = await getRoomId(value, 'people')
         setChatId(roomId)
-        router.push(`/chat?roomId=${roomId}&type=friend`)
+        router.push(`/chat/${roomId}?type=friend`)
       }, // 聊天
       'search-group': () => { }, // 查看群组信息
       'search-user': () => { }, // 查看好友信息

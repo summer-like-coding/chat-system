@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 'use client'
 import type { User } from '@prisma/client'
 
@@ -43,6 +42,9 @@ export default function LoginPassword() {
     })
     if (res) {
       setUser(res)
+      // 将公钥和私钥存储
+      setPrivateKey(res.privateKey!)
+      setPublicKey(res.publicKey!)
     }
     router.push(callbackUrl || '/')
     message.success('登录成功')
@@ -51,7 +53,6 @@ export default function LoginPassword() {
   async function register() {
     await registerFormRef.validateFields()
     const { ownPublicKey, ownSecretKey } = genderKeyPair()
-    console.log('用户的', registerFormRef.getFieldValue('registerUserName') || '', '公钥', ownPublicKey, '私钥', ownSecretKey)
     setPrivateKey(ownSecretKey)
     setPublicKey(ownPublicKey)
     const res = await request<User>('/api/users/register', {}, {

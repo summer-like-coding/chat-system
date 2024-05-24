@@ -61,6 +61,12 @@ export async function getRoomInfo({ room }: { room: RoomVo }) {
  * @description 获取单聊对方信息
  */
 export async function getFriendInfo(id: string, userID: string) {
+  if (!id) {
+    throw new Error('id is required')
+  }
+  if (!userID) {
+    throw new Error('userID is required')
+  }
   const roomInfo = await getRoomInfo({ room: { id } as RoomVo })
   const user1ID = roomInfo?.friendRoom.user1Id
   const user2ID = roomInfo?.friendRoom.user2Id
@@ -107,4 +113,15 @@ export async function getContactRecord(id: string, type: string) {
     avatar: res!.avatar,
     name: res!.name || res!.nickname,
   }
+}
+
+/**
+ * @description 获取当前房间的对称性密钥
+ */
+export function getSymmetricKey(roomId: string) {
+  const roomKeysMap = JSON.parse(localStorage.getItem('roomKeysMap') || '{}')
+  if (roomKeysMap[roomId]) {
+    return roomKeysMap[roomId] as string
+  }
+  return null
 }
