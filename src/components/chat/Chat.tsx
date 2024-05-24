@@ -259,7 +259,7 @@ export default function Chat({ chatKey, type }: IChat) {
     }
     else {
       userPublicKey = await getReceiverPublicKey() // 获取对方的公钥
-      if (!userPublicKey) {
+      if (!userPublicKey && type === 'friend') {
         message.error('对方未设置公钥，无法加密,无法交流！')
         return null
       }
