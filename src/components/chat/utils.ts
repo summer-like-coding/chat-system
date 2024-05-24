@@ -1,5 +1,5 @@
 import type { GroupVo, RoomVo, UserVo } from '@/types/views'
-import type { UserContact, UserFriend } from '@prisma/client'
+import type { FriendRoom, UserContact, UserFriend } from '@prisma/client'
 
 import { request } from '@/app/utils/request'
 /**
@@ -51,7 +51,7 @@ export async function getRoomId(key: string, type: string) {
 export async function getRoomInfo({ room }: { room: RoomVo }) {
   return await request<{
     contact: UserContact
-    friendRoom: UserFriend
+    friendRoom: FriendRoom
     groupRoom: GroupVo
     room: RoomVo
   }>(`/api/rooms/${room.id}`, {})
@@ -61,16 +61,14 @@ export async function getRoomInfo({ room }: { room: RoomVo }) {
  * @description 获取单聊对方信息
  */
 export async function getFriendInfo(id: string, userID: string) {
-  // 首先获取聊天室信息
   const roomInfo = await getRoomInfo({ room: { id } as RoomVo })
-  // 获取对方信息
   const user1ID = roomInfo?.friendRoom.user1Id
   const user2ID = roomInfo?.friendRoom.user2Id
-  if (user1ID === userID) { // 说明当前用户是
-    return await getUserInfo(user2ID)
+  if (user1ID === userID) {
+    return await getUserInfo(user2ID!)
   }
   else {
-    return await getUserInfo(user1ID)
+    return await getUserInfo(user1ID!)
   }
 }
 
