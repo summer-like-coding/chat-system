@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * 加密和解密
  * @description 使用TweetNaCl.js库进行加密和解密
@@ -12,9 +11,6 @@ import util from 'tweetnacl-util'
  */
 export function genderKeyPair() {
   const keypair = nacl.box.keyPair() // 生成密钥对
-  // 判断生成的密钥对是否正确，是否为Uint8Array类型
-  console.log('公钥长度:', keypair.publicKey.length) // 打印公钥长度
-  console.log('私钥长度:', keypair.secretKey.length) // 打印私钥长度
   return {
     ownPublicKey: util.encodeBase64(keypair.publicKey), // 公钥()
     ownSecretKey: util.encodeBase64(keypair.secretKey), // 私钥
@@ -37,8 +33,6 @@ interface IEncryptedMsg {
 export function encrypt(receiverPublicKey: string, msgParams: string) {
   const ephemeralKeyPair = nacl.box.keyPair()
   const pubKeyUInt8Array = util.decodeBase64(receiverPublicKey)
-  console.log('公钥长度:', pubKeyUInt8Array.length)
-
   const msgParamsUInt8Array = util.decodeUTF8(msgParams)
   const nonce = nacl.randomBytes(nacl.box.nonceLength)
   const encryptedMessage = nacl.box(
@@ -65,16 +59,11 @@ export function encrypt(receiverPublicKey: string, msgParams: string) {
 export function decrypt(
   receiverSecretKey: string,
   encryptedData: IEncryptedMsg,
-  ownSecretKey: string,
+  ownSecretKey?: string,
 ) {
-  console.log('receiverSecretKey', receiverSecretKey)
-  console.log('ownSecretKey', ownSecretKey)
-
   const receiverSecretKeyUint8Array = util.decodeBase64(
     receiverSecretKey,
   )
-  const ownSecretKeyUint8Array = util.decodeBase64(ownSecretKey)
-  console.log('私钥长度', receiverSecretKeyUint8Array.length)
 
   const nonce = util.decodeBase64(encryptedData.nonce)
   const ciphertext = util.decodeBase64(encryptedData.ciphertext)
@@ -85,16 +74,21 @@ export function decrypt(
     ephemPubKey,
     receiverSecretKeyUint8Array,
   )
-  const decryptedMessageOwn = nacl.box.open(
-    ciphertext,
-    nonce,
-    ephemPubKey,
-    ownSecretKeyUint8Array,
-  )
-  console.log('decryptedMessage', decryptedMessage)
+  if (ownSecretKey) {
+    const ownSecretKeyUint8Array = util.decodeBase64(ownSecretKey)
+    const decryptedMessageOwn = nacl.box.open(
+      ciphertext,
+      nonce,
+      ephemPubKey,
+      ownSecretKeyUint8Array,
+    )
+    if (!decryptedMessage && !decryptedMessageOwn)
+      return null
+    return decryptedMessage ? util.encodeUTF8(decryptedMessage) : util.encodeUTF8(decryptedMessageOwn!)
+  }
 
-  if (!decryptedMessage && !decryptedMessageOwn)
+  if (!decryptedMessage)
     return null
 
-  return decryptedMessage ? util.encodeUTF8(decryptedMessage) : util.encodeUTF8(decryptedMessageOwn!)
+  return util.encodeUTF8(decryptedMessage)
 }

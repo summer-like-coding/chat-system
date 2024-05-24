@@ -262,14 +262,17 @@ export default function Chat({ chatKey, type }: IChat) {
 
   useEffect(() => {
     async function callback(data: MessageVo) {
-      if (data.roomId === chatId) {
+      console.log("回调");
+
+      const privateKey = JSON.parse(localStorage.getItem('keys') || '{}').state.privateKey
+      if (data.roomId === chatKey) {
         const targetUser = await getUserInfo(data.userId)
         if (!hasLoadedMessage.current.has(data.id)) {
           chatList.push({
             avatar: targetUser?.avatar || '',
-            content: data.content,
+            content: decrypt(receiverPrivateKey.value, JSON.parse(data.content), privateKey) || '解密失败',
             id: data.id,
-            isMine: data.userId === userStore.id,
+            isMine: data.userId === userStore?.id,
             publicKey: targetUser?.publicKey || '',
           })
           hasLoadedMessage.current.add(data.id)
