@@ -3,16 +3,18 @@ import type { User } from '@prisma/client'
 import { useUserStore } from '@/app/store/user'
 import { request } from '@/app/utils/request'
 import { EditOutlined } from '@ant-design/icons'
+import { ProCard } from '@ant-design/pro-components'
 import { useToggle } from 'ahooks'
-import { Button, DatePicker, Form, Input, Layout, Select, message } from 'antd'
+import { Button, DatePicker, Form, Input, Select, message } from 'antd'
 import dayjs from 'dayjs'
-import React from 'react'
+import React, { useState } from 'react'
 
 import UploadImg from '../uploadImg/UploadImg'
 
 export default function Setting() {
+  const [tab, setTab] = useState('tab1')
   const [accountFormRef] = Form.useForm()
-  const { Content } = Layout
+  const [pwdFormRef] = Form.useForm()
   const setUser = useUserStore(state => state.setUser)
   const userStore = useUserStore(state => state.user)
   const [emailDisabled, { toggle: toggleEmailDisabled }] = useToggle(false)
@@ -27,6 +29,20 @@ export default function Setting() {
       setUser(res)
     }
   }
+
+  function handleUpdatepwd() {
+    pwdFormRef.validateFields().then(async (values) => {
+      const res = await request<User>(`/api/users/${userStore?.id}/resetPassword`, {}, {
+        data: values,
+        method: 'POST',
+      })
+      if (res) {
+        message.success('更新成功')
+        setUser(res)
+      }
+    })
+  }
+
   function accountItem() {
     return (
       <Form
@@ -94,15 +110,101 @@ export default function Setting() {
       </Form>
     )
   }
-  return (
-    <Layout className="h-4/5">
-      <Content
-        style={{
-          backgroundColor: '#fff',
-        }}
+
+  // 修改密码
+  function updatePwd() {
+    return (
+      <Form
+        form={pwdFormRef}
+        labelCol={{ span: 8 }}
+        wrapperCol={{ span: 16 }}
       >
-        {accountItem()}
-      </Content>
-    </Layout>
+        <Form.Item
+          label="旧密码"
+          name="oldPassword"
+          required
+          rules={[
+            {
+              message: '请输入旧密码',
+              required: true,
+            },
+          ]}
+        >
+          <Input className="w-full" />
+        </Form.Item>
+        <Form.Item
+          label="新密码"
+          name="newPassword"
+          required
+          rules={[
+            {
+              message: '请输入新密码',
+              required: true,
+            },
+          ]}
+        >
+          <Input className="w-full" />
+        </Form.Item>
+        <Form.Item
+          label="确认密码"
+          name="newPassword1"
+          required
+          // 密码需要和newPassword一致
+          rules={[
+            ({ getFieldValue }) => ({
+              validator(_, value) {
+                if (!value || getFieldValue('newPassword') === value) {
+                  return Promise.resolve()
+                }
+                return Promise.reject(new Error('两次密码不一致'))
+              },
+            }),
+          ]}
+        >
+          <Input className="w-full" />
+        </Form.Item>
+        <Form.Item wrapperCol={{
+          offset: 8,
+          span: 16,
+        }}
+        >
+          <Button htmlType="submit" onClick={handleUpdatepwd}>
+            保存配置
+          </Button>
+        </Form.Item>
+      </Form>
+    )
+  }
+  return (
+    // <Layout className="h-4/5">
+    //   <Content
+    //     style={{
+    //       backgroundColor: '#fff',
+    //     }}
+    //   >
+    //     {accountItem()}
+    //   </Content>
+    // </Layout>
+    <ProCard
+      tabs={{
+        activeKey: tab,
+        items: [
+          {
+            children: accountItem(),
+            key: 'updateInfo',
+            label: '修改用户信息',
+          },
+          {
+            children: updatePwd(),
+            key: 'updatePwd',
+            label: '更新密码',
+          },
+        ],
+        onChange: (key) => {
+          setTab(key)
+        },
+        tabPosition: 'left',
+      }}
+    />
   )
 }
