@@ -5,7 +5,7 @@ import { emitter } from '@/utils/eventBus'
 import { message } from 'antd'
 import React, { useEffect } from 'react'
 
-export default function Page({ searchParams }: { parmas: { id: string }, searchParams?: { type?: 'bot' | 'friend' | 'group' } }) {
+export default function Page({ searchParams }: { searchParams?: { type?: 'bot' | 'friend' | 'group' } }) {
   useEffect(() => {
     function callback(_e: string) {
       message.success('Socket 服务连接成功！')

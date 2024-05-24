@@ -164,7 +164,6 @@ export default function Chat({ chatKey, type }: IChat) {
         const res = await request<MessageVo>(`/api/rooms/${chatId}/chat`, {}, {
           data: {
             content: encryContent,
-            // content: inputValue,
             type: MessageType.TEXT,
           },
           method: 'POST',
@@ -333,7 +332,7 @@ export default function Chat({ chatKey, type }: IChat) {
   useEffect(() => {
     async function callback(data: MessageVo) {
       hasSecretKeyExchange(data)
-      if (data.roomId === chatKey && data.type === MessageType.TEXT) {
+      if (data.roomId === chatKey && data.type === MessageType.TEXT && type === 'friend') {
         const targetUser = await getUserInfo(data.userId)
         if (!hasLoadedMessage.current.has(data.id)) {
           chatList.push({
