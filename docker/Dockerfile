@@ -1,4 +1,4 @@
-ARG NODE_VERSION=20.11.0
+ARG NODE_VERSION=22.2.0
 ARG NPM_REGISTRY=https://registry.npmmirror.com/
 
 # Builder image

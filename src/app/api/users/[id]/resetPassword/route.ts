@@ -68,7 +68,7 @@ export async function POST(request: NextRequest, { params }: PathIdParams) {
     }
     const { newPassword, oldPassword } = await request.json()
     if (!(typeof newPassword === 'string') || (
-      !/^(?=.*\d)(?=.*[a-zA-Z])(?=.*[^\da-zA-Z\s]).{8,20}$/
+      !/^(?=.*\d)(?=.*[a-zA-Z])(?=.*[^\da-zA-Z\s]).{8,20}$/.test(newPassword)
     )) {
       return Result.error('密码不符合规范，请使用 8-20 位字符，包含数字、字母和特殊字符')
     }

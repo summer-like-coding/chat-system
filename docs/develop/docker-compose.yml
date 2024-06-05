@@ -96,7 +96,7 @@ services:
       options:
         max-size: 1m
   redis:
-    image: redis:7.2.4-alpine3.19
+    image: nginx:1.25.5-alpine3.19-slim
     restart: unless-stopped
     container_name: im-redis-dev
     ports:

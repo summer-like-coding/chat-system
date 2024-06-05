@@ -66,6 +66,7 @@ const config = [
       'curly': 'off',
       'quotes': ['error', 'single'],
       'semi': ['error', 'never'],
+      'style/indent': 'warn',
       'style/jsx-closing-tag-location': 'off',
     },
   },

@@ -10,7 +10,7 @@
 ```bash
 docker pull mongo:7.0.5
 docker pull rabbitmq:3.13.0-management-alpine
-docker pull redis:7.2.4-alpine3.19
+docker pull nginx:1.25.5-alpine3.19-slim
 ```
 
 进入目录：
