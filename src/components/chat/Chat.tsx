@@ -320,7 +320,6 @@ export default function Chat({ chatKey, type }: IChat) {
     if (!userStore)
       return
     if (chatKey) {
-      // initReceiverPublicKey()
       initRoomPublicKey().then(async () => {
         await pullMessage(chatKey)
       })

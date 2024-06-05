@@ -60,12 +60,10 @@ export function encrypt(receiverPublicKey: string, msgParams: string) {
 export function decrypt(
   receiverSecretKey: string,
   encryptedData: IEncryptedMsg,
-  ownSecretKey?: string,
 ) {
   const receiverSecretKeyUint8Array = util.decodeBase64(
     receiverSecretKey,
   )
-
   const nonce = util.decodeBase64(encryptedData.nonce)
   const ciphertext = util.decodeBase64(encryptedData.ciphertext)
   const ephemPubKey = util.decodeBase64(encryptedData.ephemPubKey)
@@ -75,22 +73,8 @@ export function decrypt(
     ephemPubKey,
     receiverSecretKeyUint8Array,
   )
-  if (ownSecretKey) {
-    const ownSecretKeyUint8Array = util.decodeBase64(ownSecretKey)
-    const decryptedMessageOwn = nacl.box.open(
-      ciphertext,
-      nonce,
-      ephemPubKey,
-      ownSecretKeyUint8Array,
-    )
-    if (!decryptedMessage && !decryptedMessageOwn)
-      return null
-    return decryptedMessage ? util.encodeUTF8(decryptedMessage) : util.encodeUTF8(decryptedMessageOwn!)
-  }
-
   if (!decryptedMessage)
     return null
-
   return util.encodeUTF8(decryptedMessage)
 }
 
