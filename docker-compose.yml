@@ -103,7 +103,7 @@ services:
       options:
         max-size: 1m
   redis:
-    image: nginx:1.25.5-alpine3.19-slim
+    image: redis:7.2.4-alpine3.19
     restart: unless-stopped
     volumes:
       - /etc/localtime:/etc/localtime:ro
