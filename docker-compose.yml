@@ -1,17 +1,39 @@
 services:
   web:
-    build:
-      context: .
-      dockerfile: ./docker/Dockerfile
+    image: chat-system-web
     restart: unless-stopped
     volumes:
       - /etc/localtime:/etc/localtime:ro
-    ports:
-      - 3000:3000
     logging:
       driver: json-file
       options:
         max-size: 1m
+    networks:
+      - chat-system
+    depends_on:
+      - socketio
+      - rabbitmq
+      - redis
+      - mongo1
+      - mongo2
+      - mongo3
+  socketio:
+    image: chat-system-socketio
+    restart: unless-stopped
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
+    networks:
+      - chat-system
+    depends_on:
+      - rabbitmq
+      - redis
+      - mongo1
+      - mongo2
+      - mongo3
   mongo1:
     image: mongo:7.0.5
     restart: unless-stopped
@@ -38,6 +60,8 @@ services:
       driver: json-file
       options:
         max-size: 1m
+    networks:
+      - chat-system
   mongo2:
     image: mongo:7.0.5
     restart: unless-stopped
@@ -64,6 +88,8 @@ services:
       driver: json-file
       options:
         max-size: 1m
+    networks:
+      - chat-system
   mongo3:
     image: mongo:7.0.5
     restart: unless-stopped
@@ -90,6 +116,8 @@ services:
       driver: json-file
       options:
         max-size: 1m
+    networks:
+      - chat-system
   rabbitmq:
     image: rabbitmq:3.13.0-management-alpine
     restart: unless-stopped
@@ -102,6 +130,8 @@ services:
       driver: json-file
       options:
         max-size: 1m
+    networks:
+      - chat-system
   redis:
     image: redis:7.2.4-alpine3.19
     restart: unless-stopped
@@ -111,3 +141,25 @@ services:
       driver: json-file
       options:
         max-size: 1m
+    networks:
+      - chat-system
+  nginx:
+    image: nginx:1.27.0-alpine3.19-slim
+    restart: unless-stopped
+    ports:
+      - 5201:80
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
+    networks:
+      - chat-system
+    depends_on:
+      - web
+      - socketio
+networks:
+  chat-system:
+    external: true

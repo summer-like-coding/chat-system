@@ -80,19 +80,22 @@ pnpm start
 
 ### 3.2 Docker 构建
 
-Docker 构建并运行：
+拉取镜像：
 
 ```bash
-docker build -t chat-system .
-
-docker run -d \
-  -p 3000:3000 \
-  --restart=always \
-  --name chat-system \
-  chat-system
+docker pull node:22.2.0-bookworm
+docker pull node:22.2.0-bookworm-slim
+docker pull nginx:1.27.0-alpine3.19-slim
+docker pull mongo:7.0.5
+docker pull rabbitmq:3.13.0-management-alpine
+docker pull redis:7.2.4-alpine3.19
 ```
 
-### 3.3 Docker Compose
+Docker 构建：
+
+```bash
+docker build -t chat-system-web . -f docker/Dockerfile
+```
 
 创建密钥：
 
@@ -102,16 +105,17 @@ openssl rand -base64 756 > secrets/rs0.key
 chmod 400 secrets/rs0.key
 ```
 
-Docker Compose 部署：
+创建网络并使用 Docker Compose 部署：
 
 ```bash
+docker network create --driver=bridge chat-system
 docker compose --env-file .env.production up -d
 ```
 
 需要手动初始化集群，进入任意容器：
 
 ```bash
-docker exec -it $MONGO1 mongosh
+docker exec -it chat-system-mongo1-1 mongosh
 ```
 
 初始化集群：
@@ -122,12 +126,13 @@ db.auth('root', 'password')
 config = {
   _id: "rs0",
   members: [
-    {_id: 0, host: "host.docker.internal:27017"},
-    {_id: 1, host: "host.docker.internal:27018"},
-    {_id: 2, host: "host.docker.internal:27019"},
+    {_id: 0, host: "mongo1:27017"},
+    {_id: 1, host: "mongo2:27017"},
+    {_id: 2, host: "mongo3:27017"},
   ]
 }
 rs.initiate(config)
+exit
 ```
 
 关闭 Docker Compose：
@@ -135,6 +140,3 @@ rs.initiate(config)
 ```bash
 docker compose down
 ```
-
-> [!TIP]
-> 如果无法连接，请求确保你的主机解析 `host.docker.internal` 为 `127.0.0.1` 或不解析。

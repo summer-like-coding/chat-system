@@ -1,5 +1,6 @@
 'use client'
 import type { ContactVo, RoomVo } from '@/types/views'
+import type { ItemType, MenuItemType } from 'antd/es/menu/interface'
 
 import { getContactRecord, getRoomInfo } from '@/components/chat/utils'
 import SearchInput from '@/components/searchInput/SearchInput'
@@ -17,12 +18,7 @@ function ChatLayout({ children }: React.PropsWithChildren) {
   const { Content, Header, Sider } = Layout
   const userStore = useUserStore(state => state.user)
   const setChatId = useChatStore(state => state.setChatId)
-  const [contactList, setContactList] = useState<{
-    icon: React.ReactNode
-    key: string
-    label: string
-    type: string
-  }[]>()
+  const [contactList, setContactList] = useState<ItemType<MenuItemType>[]>()
 
   useEffect(() => {
     userStore && request<({ room: RoomVo } & ContactVo)[]>(`/api/users/${userStore.id}/contacts`).then(async (res) => {
@@ -43,7 +39,7 @@ function ChatLayout({ children }: React.PropsWithChildren) {
   }, [userStore])
 
   function getChatType(key: string) {
-    return (contactList?.find(item => item.key === key)?.type)?.toLocaleLowerCase()
+    return (contactList?.find(item => item?.key === key)?.type)?.toLocaleLowerCase()
   }
 
   return (

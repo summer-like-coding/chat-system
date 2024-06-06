@@ -64,20 +64,24 @@ export default function FriendList() {
 
   const tabItems = {
     groupList: {
-      children: <GroupList
-        groupList={groupList}
-        setGroupInfo={setChosedItemInfo as React.Dispatch<React.SetStateAction<Group | undefined>>}
-        type="chat"
-                />,
+      children: (
+        <GroupList
+          groupList={groupList}
+          setGroupInfo={setChosedItemInfo as React.Dispatch<React.SetStateAction<Group | undefined>>}
+          type="chat"
+        />
+      ),
       key: 'groupList',
       label: '群聊列表',
     },
     userList: {
-      children: <UserList
-        setUserInfo={setChosedItemInfo as React.Dispatch<React.SetStateAction<IUser | undefined>>}
-        type="chatAndDelete"
-        userList={userList}
-                />,
+      children: (
+        <UserList
+          setUserInfo={setChosedItemInfo as React.Dispatch<React.SetStateAction<IUser | undefined>>}
+          type="chatAndDelete"
+          userList={userList}
+        />
+      ),
       key: 'userList',
       label: '好友列表',
     },

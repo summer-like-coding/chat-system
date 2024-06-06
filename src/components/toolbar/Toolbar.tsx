@@ -75,37 +75,41 @@ function ToolBar() {
 
   const hoverItemContent = {
     logout: {
-      content: <div
-        className="flex items-center"
-        key="3"
-        onClick={() => {
-          setModalType('logout')
-          signOut({
-            callbackUrl: '/login',
-          })
-            .then(() => {
-              removeUserStore()
+      content: (
+        <div
+          className="flex items-center"
+          key="3"
+          onClick={() => {
+            setModalType('logout')
+            signOut({
+              callbackUrl: '/login',
             })
-        }}
-               >
-        <LogoutOutlined className="mr-2" size={32} />
-        <div>退出账号</div>
-      </div>,
+              .then(() => {
+                removeUserStore()
+              })
+          }}
+        >
+          <LogoutOutlined className="mr-2" size={32} />
+          <div>退出账号</div>
+        </div>
+      ),
       modalContent: <></>,
       title: '退出账号',
     },
     setting: {
-      content: <div
-        className="flex items-center"
-        key="4"
-        onClick={() => {
-          setModalType('setting')
-          setModalTrue()
-        }}
-               >
-        <SettingOutlined className="mr-2" size={32} />
-        <div>账号设置</div>
-      </div>,
+      content: (
+        <div
+          className="flex items-center"
+          key="4"
+          onClick={() => {
+            setModalType('setting')
+            setModalTrue()
+          }}
+        >
+          <SettingOutlined className="mr-2" size={32} />
+          <div>账号设置</div>
+        </div>
+      ),
       modalContent: <Setting />,
       title: '账号设置',
     },
@@ -136,148 +140,162 @@ function ToolBar() {
 
   const addUserModalContent = {
     addFriend: {
-      content: <div className="ml-2 flex flex-col flex-nowrap items-center">
-        <Button
-          icon={<UserAddOutlined />}
-          onClick={() => {
-            setAddModalType('addFriend')
-            setAddModalTrue()
+      content: (
+        <div className="ml-2 flex flex-col flex-nowrap items-center">
+          <Button
+            icon={<UserAddOutlined />}
+            onClick={() => {
+              setAddModalType('addFriend')
+              setAddModalTrue()
+            }}
+            size="large"
+          />
+          添加好友
+        </div>
+      ),
+      modalContent: (
+        <Tabs
+          defaultActiveKey="applyUser"
+          items={[
+            {
+              children: (
+                <div>
+                  <SearchInput
+                    setList={setApplyList}
+                    type="user"
+                    usedBy="apply"
+                  />
+                  <List
+                    dataSource={applyList}
+                    itemLayout="horizontal"
+                    renderItem={(item) => {
+                      const content = addFriendKey === 'applyUser'
+                        ? (
+                          <List.Item>
+                            <List.Item.Meta
+                              avatar={<Avatar size={48} src={item.targetAvatar} />}
+                              description={applyStatusMapping[item.status]}
+                              title={item.targetName}
+                            />
+                          </List.Item>
+                          )
+                        : (
+                          <List.Item>
+                            <List.Item.Meta
+                              avatar={<Avatar size={48} src={item.launchAvatar} />}
+                              description={applyStatusMapping[item.status]}
+                              title={item.launchName}
+                            />
+                          </List.Item>
+                          )
+                      return content
+                    }}
+                  />
+                </div>
+              ),
+              key: 'applyUser',
+              label: '申请好友',
+            },
+            {
+              children: (
+                <div>
+                  <ApplyList
+                    applyList={applyList}
+                    setApplyList={setApplyList}
+                    type="launch"
+                  />
+                </div>
+              ),
+              key: 'appliedUser',
+              label: '新朋友',
+            },
+          ]}
+          onTabClick={(key) => {
+            handleTabClick(key)
+            setAddFriendKey(key)
           }}
-          size="large"
         />
-        添加好友
-      </div>,
-      modalContent: <Tabs
-        defaultActiveKey="applyUser"
-        items={[
-          {
-            children: <div>
-              <SearchInput
-                setList={setApplyList}
-                type="user"
-                usedBy="apply"
-              />
-              <List
-                dataSource={applyList}
-                itemLayout="horizontal"
-                renderItem={(item) => {
-                  const content = addFriendKey === 'applyUser'
-                    ? (
-                      <List.Item>
-                        <List.Item.Meta
-                          avatar={<Avatar size={48} src={item.targetAvatar} />}
-                          description={applyStatusMapping[item.status]}
-                          title={item.targetName}
-                        />
-                      </List.Item>
-                      )
-                    : (
-                      <List.Item>
-                        <List.Item.Meta
-                          avatar={<Avatar size={48} src={item.launchAvatar} />}
-                          description={applyStatusMapping[item.status]}
-                          title={item.launchName}
-                        />
-                      </List.Item>
-                      )
-                  return content
-                }}
-              />
-            </div>,
-            key: 'applyUser',
-            label: '申请好友',
-          },
-          {
-            children: <div>
-              <ApplyList
-                applyList={applyList}
-                setApplyList={setApplyList}
-                type="launch"
-              />
-            </div>,
-            key: 'appliedUser',
-            label: '新朋友',
-          },
-        ]}
-        onTabClick={(key) => {
-          handleTabClick(key)
-          setAddFriendKey(key)
-        }}
-                    />,
+      ),
       title: '好友',
     },
     addGroup: {
-      content: <div className="flex flex-col flex-nowrap items-center">
-        <Button
-          icon={<MessageOutlined />}
-          onClick={() => {
-            setAddModalType('addGroup')
-            setAddModalTrue()
-          }}
-          size="large"
-        />
-        发起群聊
-      </div>,
-      modalContent: <Tabs
-        defaultActiveKey="launchGroup"
-        items={[
-          {
-            children: <>
-              <Transfer
-                dataSource={transferData}
-                footer={(_, direction) => {
-                  if (direction?.direction === 'right') {
-                    return (
-                      <Form
-                        layout="inline"
-                        onFinish={handleLaunchGroup}
-                      >
-                        <Form.Item
-                          label="群聊名称"
-                          name="groupName"
+      content: (
+        <div className="flex flex-col flex-nowrap items-center">
+          <Button
+            icon={<MessageOutlined />}
+            onClick={() => {
+              setAddModalType('addGroup')
+              setAddModalTrue()
+            }}
+            size="large"
+          />
+          发起群聊
+        </div>
+      ),
+      modalContent: (
+        <Tabs
+          defaultActiveKey="launchGroup"
+          items={[
+            {
+              children: <>
+                <Transfer
+                  dataSource={transferData}
+                  footer={(_, direction) => {
+                    if (direction?.direction === 'right') {
+                      return (
+                        <Form
+                          layout="inline"
+                          onFinish={handleLaunchGroup}
                         >
-                          <Input />
-                        </Form.Item>
-                        <Form.Item>
-                          <Button htmlType="submit" type="link">
-                            创建
-                          </Button>
-                        </Form.Item>
-                      </Form>
-                    )
-                  }
-                  return null
-                }}
-                listStyle={{
-                  height: 300,
-                  width: 250,
-                }}
-                onChange={onTransferChange}
-                onSelectChange={onTransferSelectChange}
-                oneWay
-                render={item => item.title}
-                selectedKeys={selectedKeys} // 选中的数据
-                showSearch
-                targetKeys={targetKeys}
-              />
-            </>,
-            key: 'launchGroup',
-            label: '发起群聊',
-          },
-          {
-            children: <div>
-              <SearchInput
-                setList={setApplyList}
-                type="group"
-                usedBy="apply"
-              />
-            </div>,
-            key: 'applyGroup',
-            label: '加入群聊',
-          },
-        ]}
-        onChange={key => handleTabClick(key)}
-                    />,
+                          <Form.Item
+                            label="群聊名称"
+                            name="groupName"
+                          >
+                            <Input />
+                          </Form.Item>
+                          <Form.Item>
+                            <Button htmlType="submit" type="link">
+                              创建
+                            </Button>
+                          </Form.Item>
+                        </Form>
+                      )
+                    }
+                    return null
+                  }}
+                  listStyle={{
+                    height: 300,
+                    width: 250,
+                  }}
+                  onChange={onTransferChange}
+                  onSelectChange={onTransferSelectChange}
+                  oneWay
+                  render={item => item.title}
+                  selectedKeys={selectedKeys} // 选中的数据
+                  showSearch
+                  targetKeys={targetKeys}
+                />
+              </>,
+              key: 'launchGroup',
+              label: '发起群聊',
+            },
+            {
+              children: (
+                <div>
+                  <SearchInput
+                    setList={setApplyList}
+                    type="group"
+                    usedBy="apply"
+                  />
+                </div>
+              ),
+              key: 'applyGroup',
+              label: '加入群聊',
+            },
+          ]}
+          onChange={key => handleTabClick(key)}
+        />
+      ),
       title: '群聊',
     },
   }
