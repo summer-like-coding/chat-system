@@ -58,6 +58,7 @@ config = {
   ]
 }
 rs.initiate(config)
+exit
 ```
 
 返回 `{ "ok" : 1 }` 就说明初始化成功，现在可以通过副本集地址访问 MongoDB 集群了。

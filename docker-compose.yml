@@ -8,8 +8,6 @@ services:
       driver: json-file
       options:
         max-size: 1m
-    networks:
-      - chat-system
     depends_on:
       - socketio
       - rabbitmq
@@ -20,14 +18,14 @@ services:
   socketio:
     image: chat-system-socketio
     restart: unless-stopped
+    ports:
+      - 5202:3001
     volumes:
       - /etc/localtime:/etc/localtime:ro
     logging:
       driver: json-file
       options:
         max-size: 1m
-    networks:
-      - chat-system
     depends_on:
       - rabbitmq
       - redis
@@ -60,8 +58,6 @@ services:
       driver: json-file
       options:
         max-size: 1m
-    networks:
-      - chat-system
   mongo2:
     image: mongo:7.0.5
     restart: unless-stopped
@@ -88,8 +84,6 @@ services:
       driver: json-file
       options:
         max-size: 1m
-    networks:
-      - chat-system
   mongo3:
     image: mongo:7.0.5
     restart: unless-stopped
@@ -116,8 +110,6 @@ services:
       driver: json-file
       options:
         max-size: 1m
-    networks:
-      - chat-system
   rabbitmq:
     image: rabbitmq:3.13.0-management-alpine
     restart: unless-stopped
@@ -130,8 +122,6 @@ services:
       driver: json-file
       options:
         max-size: 1m
-    networks:
-      - chat-system
   redis:
     image: redis:7.2.4-alpine3.19
     restart: unless-stopped
@@ -141,8 +131,6 @@ services:
       driver: json-file
       options:
         max-size: 1m
-    networks:
-      - chat-system
   nginx:
     image: nginx:1.27.0-alpine3.19-slim
     restart: unless-stopped
@@ -155,11 +143,6 @@ services:
       driver: json-file
       options:
         max-size: 1m
-    networks:
-      - chat-system
     depends_on:
       - web
       - socketio
-networks:
-  chat-system:
-    external: true
