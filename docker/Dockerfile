@@ -1,9 +1,9 @@
 ARG NODE_VERSION=22.2.0
 ARG NPM_REGISTRY=https://registry.npmjs.org
-ARG DEBIAN_MIRROR=mirrors.ustc.edu.cn
+ARG DEBIAN_MIRROR=deb.debian.org
 
 # Builder image
-FROM node:${NODE_VERSION}-bookworm as builder
+FROM node:${NODE_VERSION}-bookworm AS builder
 ARG NPM_REGISTRY
 WORKDIR /app
 
@@ -46,6 +46,6 @@ RUN sed -i "s/deb.debian.org/${DEBIAN_MIRROR}/g" /etc/apt/sources.list.d/debian.
 
 COPY --from=builder /app/dist /app
 
-ENV PATH /app/node_modules/.bin:$PATH
+ENV PATH=/app/node_modules/.bin:$PATH
 EXPOSE 3000
 CMD ["next", "start"]
