@@ -282,7 +282,7 @@ export default function FriendList() {
                       const res = await request<Group[]>(`/api/users/${userStore!.id}/groups`)
                       res && setGroupList(res)
                     },
-              }}
+                  }}
               formProps={{ form: formRef }}
               request={async () => {
                 return {

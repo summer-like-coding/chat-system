@@ -27,9 +27,8 @@ interface IEncryptedMsg {
 }
 /**
  * 加密
- * @param receiverPublicKey ；接收者的公钥
- * @param msgParams：要加密的消息
- * @returns
+ * @param receiverPublicKey 接收者的公钥
+ * @param msgParams 要加密的消息
  */
 export function encrypt(receiverPublicKey: string, msgParams: string) {
   const ephemeralKeyPair = nacl.box.keyPair()

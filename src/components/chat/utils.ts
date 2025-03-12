@@ -6,7 +6,6 @@ import { request } from '@/app/utils/request'
  * @description 获取聊天室id
  * @param key
  * @param type
- * @returns {Promise<{roomId: string, roomType: string}>}
  */
 export async function getRoomId(key: string, type: string) {
   let res: {

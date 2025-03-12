@@ -15,7 +15,7 @@ import {
   yaml,
 } from '@antfu/eslint-config'
 import { FlatCompat } from '@eslint/eslintrc'
-import perfectionistNatural from 'eslint-plugin-perfectionist/configs/recommended-natural'
+import tailwind from 'eslint-plugin-tailwindcss'
 
 const compat = new FlatCompat()
 const config = [
@@ -40,11 +40,7 @@ const config = [
     unicorn(),
     yaml(),
   )),
-  ...compat.config({
-    extends: ['plugin:tailwindcss/recommended'],
-    rules: {
-    },
-  }),
+  ...tailwind.configs['flat/recommended'],
   ...compat.config({
     overrides: [{
       extends: ['plugin:markdownlint/recommended'],
@@ -59,7 +55,6 @@ const config = [
       },
     }],
   }),
-  perfectionistNatural,
   {
     rules: {
       'curly': 'off',
@@ -67,6 +62,7 @@ const config = [
       'semi': ['error', 'never'],
       'style/indent': 'warn',
       'style/jsx-closing-tag-location': 'off',
+      'antfu/no-top-level-await': 'off',
     },
   },
 ]

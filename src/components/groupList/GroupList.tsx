@@ -18,22 +18,26 @@ function GroupList({ groupList, setGroupInfo, type }: IGroupListProps) {
 
   function handleListAction(item: Group) {
     const listActionMap = {
-      apply: [<Button
-        key="list-apply"
-        onClick={() => handleMenuClick(item)}
-        type="link"
-              >
-        申请
-      </Button>],
-      chat: [<Button
-        key="list-chat"
-        onClick={() => {
-          handleMenuClick(item)
-        }}
-        type="link"
-             >
-        聊天
-      </Button>],
+      apply: [
+        <Button
+          key="list-apply"
+          onClick={() => handleMenuClick(item)}
+          type="link"
+        >
+          申请
+        </Button>,
+      ],
+      chat: [
+        <Button
+          key="list-chat"
+          onClick={() => {
+            handleMenuClick(item)
+          }}
+          type="link"
+        >
+          聊天
+        </Button>,
+      ],
     }
     return listActionMap[type]
   }

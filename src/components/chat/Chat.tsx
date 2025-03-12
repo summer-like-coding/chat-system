@@ -78,20 +78,20 @@ export default function Chat({ chatKey, type }: IChat) {
           {
             item.isMine
               ? (
-                <>
-                  <div className="chatContent"><Markdown>{item.content}</Markdown></div>
-                  <div className="chatAvatar">
-                    <Avatar size={32} src={item.avatar} />
-                  </div>
-                </>
+                  <>
+                    <div className="chatContent"><Markdown>{item.content}</Markdown></div>
+                    <div className="chatAvatar">
+                      <Avatar size={32} src={item.avatar} />
+                    </div>
+                  </>
                 )
               : (
-                <>
-                  <div className="chatAvatar">
-                    <Avatar size={32} src={item.avatar} />
-                  </div>
-                  <div className="chatContent"><Markdown>{item.content}</Markdown></div>
-                </>
+                  <>
+                    <div className="chatAvatar">
+                      <Avatar size={32} src={item.avatar} />
+                    </div>
+                    <div className="chatContent"><Markdown>{item.content}</Markdown></div>
+                  </>
                 )
           }
         </div>
@@ -102,7 +102,6 @@ export default function Chat({ chatKey, type }: IChat) {
   /**
    * @description 格式化消息
    * @param message
-   * @returns {ChatProps[]}
    */
   function formatMessage(message: ({ user: UserVo } & MessageVo)[]): ChatProps[] {
     if (!userStore) {

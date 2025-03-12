@@ -171,22 +171,22 @@ function ToolBar() {
                     renderItem={(item) => {
                       const content = addFriendKey === 'applyUser'
                         ? (
-                          <List.Item>
-                            <List.Item.Meta
-                              avatar={<Avatar size={48} src={item.targetAvatar} />}
-                              description={applyStatusMapping[item.status]}
-                              title={item.targetName}
-                            />
-                          </List.Item>
+                            <List.Item>
+                              <List.Item.Meta
+                                avatar={<Avatar size={48} src={item.targetAvatar} />}
+                                description={applyStatusMapping[item.status]}
+                                title={item.targetName}
+                              />
+                            </List.Item>
                           )
                         : (
-                          <List.Item>
-                            <List.Item.Meta
-                              avatar={<Avatar size={48} src={item.launchAvatar} />}
-                              description={applyStatusMapping[item.status]}
-                              title={item.launchName}
-                            />
-                          </List.Item>
+                            <List.Item>
+                              <List.Item.Meta
+                                avatar={<Avatar size={48} src={item.launchAvatar} />}
+                                description={applyStatusMapping[item.status]}
+                                title={item.launchName}
+                              />
+                            </List.Item>
                           )
                       return content
                     }}
