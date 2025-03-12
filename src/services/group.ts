@@ -13,7 +13,7 @@ import { groupVo, userGroupVo, userVo } from './_mapper'
 /**
  * 群组服务
  */
-export class Groupervice extends AbstractService<Group> {
+export class GroupService extends AbstractService<Group> {
   delegate = prisma.group
 
   asVo(data?: Group | null) {
@@ -133,12 +133,12 @@ export class Groupervice extends AbstractService<Group> {
   }
 }
 
-export const groupService = new Groupervice()
+export const groupService = new GroupService()
 
 /**
  * 用户群组服务
  */
-export class UserGroupervice extends AbstractService<UserGroup> {
+export class UserGroupService extends AbstractService<UserGroup> {
   delegate = prisma.userGroup
 
   /**
@@ -372,4 +372,4 @@ export class UserGroupervice extends AbstractService<UserGroup> {
   }
 }
 
-export const userGroupService = new UserGroupervice()
+export const userGroupService = new UserGroupService()

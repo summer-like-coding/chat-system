@@ -25,6 +25,10 @@ const ROBOT_LIST = [
     name: 'GPT-4',
   },
   {
+    key: 'gpt-4.5-preview',
+    name: 'GPT-4.5 预览版',
+  },
+  {
     key: 'claude-3-opus-20240229',
     name: 'Claude 3 Opus',
   },
@@ -41,18 +45,6 @@ const ROBOT_LIST = [
     name: 'Gemini Pro',
   },
   {
-    key: 'google-palm',
-    name: 'Google PaLM',
-  },
-  {
-    key: 'ERNIE-Bot-turbo',
-    name: '文心一言',
-  },
-  {
-    key: 'glm-3-turbo',
-    name: 'ChatGLM 3',
-  },
-  {
     key: 'chatglm_turbo',
     name: 'ChatGLM',
   },
@@ -63,6 +55,26 @@ const ROBOT_LIST = [
   {
     key: 'qwen-plus',
     name: '通义千问 Plus',
+  },
+  {
+    key: 'gpt-4o',
+    name: 'GPT-4o',
+  },
+  {
+    key: 'deepseek-chat',
+    name: 'DeepSeek Chat',
+  },
+  {
+    key: 'Doubao-pro-32k',
+    name: '豆包 Pro',
+  },
+  {
+    key: 'gemini-2.0-flash',
+    name: 'Gemini 2.0 Flash',
+  },
+  {
+    key: 'claude-3-7-sonnet-20250219',
+    name: 'Claude 3.7 Sonnet',
   },
 ]
 export async function GET(_request: NextRequest) {

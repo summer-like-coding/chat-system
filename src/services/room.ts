@@ -8,7 +8,7 @@ import { friendRoomVo, groupRoomVo, groupVo, roomVo, userVo } from './_mapper'
 /**
  * 房间服务
  */
-export class Roomervice extends AbstractService<Room> {
+export class RoomService extends AbstractService<Room> {
   delegate = prisma.room
 
   asVo(data?: Room | null) {
@@ -16,7 +16,7 @@ export class Roomervice extends AbstractService<Room> {
   }
 }
 
-export const roomService = new Roomervice()
+export const roomService = new RoomService()
 
 /**
  * 单聊房间
@@ -76,7 +76,7 @@ export const friendRoomService = new FriendRoomService()
 /**
  * 群聊房间
  */
-export class GroupRoomervice extends AbstractService<GroupRoom> {
+export class GroupRoomService extends AbstractService<GroupRoom> {
   delegate = prisma.groupRoom
 
   asVo(data?: {
@@ -122,4 +122,4 @@ export class GroupRoomervice extends AbstractService<GroupRoom> {
   }
 }
 
-export const groupRoomService = new GroupRoomervice()
+export const groupRoomService = new GroupRoomService()

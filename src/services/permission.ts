@@ -7,8 +7,8 @@ import { AbstractService } from './_base'
 /**
  * 权限服务
  */
-export class Permissionervice extends AbstractService<Permission> {
+export class PermissionService extends AbstractService<Permission> {
   delegate = prisma.permission
 }
 
-export const permissionService = new Permissionervice()
+export const permissionService = new PermissionService()
